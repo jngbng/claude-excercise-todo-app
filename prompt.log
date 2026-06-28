@@ -105,3 +105,7 @@ DATA_MODEL.md에서 Drizzle ORM 스키마를 개선해줘:
 - 불필요한 TicketRow, NewTicketRow 타입은 지워줘.
 - 로우 업데이트 시 updateAt 필드가 자동으로 업데이트 되도록 해줘.
 - 인덱스 정의를 추가해줘.
+
+---
+
+API_SPECS.md 파일을 작성해줘. REQUIREMENTS.md에 있는 FR 문서를 살펴보고, DATA_MODEL.md를 참고해서 URL과 HTTP API 스펙을 그대로 작성해줘.
