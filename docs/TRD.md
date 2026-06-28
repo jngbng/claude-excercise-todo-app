@@ -45,49 +45,49 @@ Vercel 단일 프로젝트로 프론트엔드·백엔드·DB를 통합 배포한
 src/shared/ ←── 양쪽에서 import (타입, Zod 스키마, 상수)
 ```
 
-### 디렉토리 구조
+---
+
+## 2. 디렉토리 구조
 
 ```
 app/
-  api/
-    tickets/
-      route.ts             # GET /api/tickets, POST /api/tickets
-      [id]/
-        route.ts           # GET, PATCH, DELETE /api/tickets/:id
-        complete/
-          route.ts         # PATCH /api/tickets/:id/complete
-    tickets/reorder/
-      route.ts             # PATCH /api/tickets/reorder
-  page.tsx                 # 칸반 보드 페이지 (RSC)
-  layout.tsx
-
+├── api/
+│   └── tickets/
+│       ├── route.ts              # GET /api/tickets, POST /api/tickets
+│       ├── [id]/
+│       │   ├── route.ts          # GET, PATCH, DELETE /api/tickets/:id
+│       │   └── complete/
+│       │       └── route.ts      # PATCH /api/tickets/:id/complete
+│       └── reorder/
+│           └── route.ts          # PATCH /api/tickets/reorder
+├── page.tsx                      # 칸반 보드 페이지 (RSC)
+└── layout.tsx
 src/
-  client/
-    components/            # React 컴포넌트 (PascalCase)
-    hooks/                 # 커스텀 훅
-    api/
-      ticketApi.ts         # API 호출 함수 (유일한 API 진입점)
-  server/
-    services/
-      ticketService.ts     # 비즈니스 로직
-    db/
-      schema.ts            # Drizzle 테이블 스키마
-      index.ts             # DB 연결
-    middleware/            # 공통 미들웨어 (에러 핸들링 등)
-  shared/
-    types/
-      index.ts             # 공유 타입 (Ticket, BoardData 등)
-    validations/
-      ticketSchema.ts      # Zod 검증 스키마
-    constants/
-      index.ts             # TICKET_STATUS, TICKET_PRIORITY 상수
-
+├── client/                       # [프론트엔드] — src/server/ import 금지
+│   ├── components/               # React 컴포넌트 (PascalCase)
+│   ├── hooks/                    # 커스텀 훅
+│   └── api/
+│       └── ticketApi.ts          # API 호출 함수 (유일한 진입점)
+├── server/                       # [백엔드] — src/client/ import 금지
+│   ├── services/
+│   │   └── ticketService.ts      # 비즈니스 로직
+│   ├── db/
+│   │   ├── schema.ts             # Drizzle 테이블 스키마
+│   │   └── index.ts              # DB 연결
+│   └── middleware/               # 공통 미들웨어 (에러 핸들링 등)
+└── shared/                       # [공유] — 양쪽에서 import 가능
+    ├── types/
+    │   └── index.ts              # 공유 타입 (Ticket, BoardData 등)
+    ├── validations/
+    │   └── ticketSchema.ts       # Zod 검증 스키마
+    └── constants/
+        └── index.ts              # TICKET_STATUS, TICKET_PRIORITY 상수
 docs/
 ```
 
 ---
 
-## 2. 기술 스택 상세
+## 3. 기술 스택 상세
 
 ### 프론트엔드 (`src/client/`)
 
@@ -128,7 +128,7 @@ docs/
 
 ---
 
-## 3. 데이터 흐름
+## 4. 데이터 흐름
 
 ### 읽기 흐름 (보드 조회)
 
@@ -185,7 +185,81 @@ onDragEnd 이벤트
 
 ---
 
-## 4. 계층 간 경계 규칙
+## 5. 프론트엔드 아키텍처
+
+### 컴포넌트 계층 구조
+
+```
+app/page.tsx (BoardPage — RSC, 초기 데이터 패치)
+└── src/client/components/
+    ├── KanbanBoard             # 보드 전체 레이아웃, DndContext 루트
+    │   ├── BoardColumn         # 칼럼 단위 (Backlog / TODO / In Progress / Done)
+    │   │   ├── ColumnHeader    # 칼럼명 + 카드 수 뱃지
+    │   │   └── TicketCard      # 개별 티켓 카드 (드래그 가능)
+    │   └── FilterBar           # 이번 주 업무 / 만기일 지난 업무 필터 버튼
+    ├── TicketModal             # 티켓 상세 보기 / 수정 오버레이
+    │   └── TicketForm          # 생성·수정 공용 폼
+    └── ConfirmDialog           # 삭제 확인 다이얼로그
+```
+
+### 상태 관리
+
+외부 상태 관리 라이브러리(Redux, Zustand 등)를 사용하지 않는다. React 내장 훅(`useState`, `useReducer`, `useOptimistic`)으로 로컬 상태를 관리한다.
+
+| 상태 | 위치 | 관리 방법 |
+|------|------|-----------|
+| 보드 전체 티켓 목록 | `KanbanBoard` | `useState<BoardData>` |
+| 드래그 중 임시 상태 | `KanbanBoard` | `useOptimistic` (낙관적 업데이트) |
+| 모달 열림/닫힘 | `KanbanBoard` | `useState<TicketId \| null>` |
+| 필터 선택 상태 | `FilterBar` | `useState<FilterType \| null>` |
+| 폼 입력값 | `TicketForm` | `useState<FormData>` |
+
+### 커스텀 훅
+
+| 훅 | 위치 | 역할 |
+|----|------|------|
+| `useBoard` | `hooks/useBoard.ts` | 보드 데이터 패치, 티켓 CRUD 액션, 낙관적 업데이트 조율 |
+| `useDragAndDrop` | `hooks/useDragAndDrop.ts` | @dnd-kit 이벤트 핸들러, reorder 호출, 롤백 처리 |
+| `useTicketFilter` | `hooks/useTicketFilter.ts` | 이번 주 / 오버듀 필터 로직, 파생 티켓 목록 계산 |
+
+### API 호출 단일 진입점 (`ticketApi.ts`)
+
+프론트엔드의 모든 API 호출은 `src/client/api/ticketApi.ts`를 통해서만 한다. 컴포넌트나 훅에서 `fetch`를 직접 호출하지 않는다.
+
+```typescript
+// src/client/api/ticketApi.ts 제공 함수 목록
+getBoard()                         // GET  /api/tickets
+getTicket(id)                      // GET  /api/tickets/:id
+createTicket(data)                 // POST /api/tickets
+updateTicket(id, data)             // PATCH /api/tickets/:id
+completeTicket(id)                 // PATCH /api/tickets/:id/complete
+deleteTicket(id)                   // DELETE /api/tickets/:id
+reorderTicket(ticketId, status, position) // PATCH /api/tickets/reorder
+```
+
+### 낙관적 업데이트 패턴
+
+드래그앤드롭·생성·삭제는 API 응답을 기다리지 않고 UI를 즉시 반영한다.
+
+```
+사용자 액션
+  └─ 이전 상태 스냅샷 저장
+        └─ UI 즉시 반영 (낙관적)
+              └─ API 호출
+                    ├─ 성공: 스냅샷 폐기 (UI 유지)
+                    └─ 실패: 스냅샷으로 UI 롤백 + 에러 메시지 표시
+```
+
+### 드래그 앤 드롭 (@dnd-kit)
+
+- `DndContext`: `KanbanBoard` 루트에 배치, `onDragEnd`에서 `useDragAndDrop` 훅 호출
+- `SortableContext`: 각 `BoardColumn`에 적용, `position` 기준 정렬 유지
+- `useSortable`: 각 `TicketCard`에 적용, 드래그 핸들 및 transform 스타일 제공
+- 칼럼 간 이동: `active.data.current.sortable.containerId`로 출발 칼럼 판별
+
+---
+
+## 6. 계층 간 경계 규칙
 
 ### import 허용 규칙
 
@@ -259,20 +333,73 @@ export async function POST(req: Request) {
 }
 ```
 
-### API 호출 단일 진입점
-
-프론트엔드에서 API 호출은 반드시 `src/client/api/ticketApi.ts`를 통해서만 한다. 컴포넌트에서 `fetch`를 직접 호출하지 않는다.
-
 ---
 
-## 5. 에러 처리
+## 7. API 설계 원칙
 
-### API 에러 응답 형식
+### URL 설계 규칙
+
+- 리소스 이름은 복수 명사 소문자 사용: `/api/tickets`
+- 계층 관계는 경로로 표현: `/api/tickets/:id/complete`
+- 동사 사용 금지 (예외: 특정 동작을 명시해야 할 때 — `reorder`, `complete`)
+- 쿼리 파라미터는 필터링·정렬에만 사용
+
+```
+GET    /api/tickets              # 전체 티켓 목록 (보드 데이터)
+POST   /api/tickets              # 티켓 생성
+GET    /api/tickets/:id          # 티켓 단건 조회
+PATCH  /api/tickets/:id          # 티켓 부분 수정
+DELETE /api/tickets/:id          # 티켓 삭제
+PATCH  /api/tickets/:id/complete # 티켓 완료 처리
+PATCH  /api/tickets/reorder      # 순서/상태 변경 (드래그앤드롭)
+```
+
+### HTTP 메서드 규칙
+
+| 메서드 | 용도 | 멱등성 |
+|--------|------|--------|
+| `GET` | 조회 (부작용 없음) | ✅ |
+| `POST` | 생성 | ❌ |
+| `PATCH` | 부분 수정 | ✅ |
+| `DELETE` | 삭제 | ✅ |
+
+> `PUT`(전체 교체)은 사용하지 않는다. 티켓 수정은 항상 전송된 필드만 업데이트하는 `PATCH`를 사용한다.
+
+### 요청 형식
+
+- Content-Type: `application/json`
+- 날짜 형식: ISO 8601 (`2026-06-28`)
+- 빈 값 삭제: `null` 전송으로 해당 필드를 명시적으로 삭제
+
+### 성공 응답 형식
+
+```typescript
+// 단건 응답 (생성·수정·조회)
+{ id, title, status, priority, position, ... }
+
+// 목록 응답 (보드 조회)
+{
+  backlog: Ticket[],
+  todo: Ticket[],
+  inProgress: Ticket[],
+  done: Ticket[]
+}
+
+// 삭제 성공 (204 No Content)
+// — 응답 본문 없음
+```
+
+### 에러 응답 형식
 
 모든 에러 응답은 아래 형식을 따른다.
 
 ```typescript
 { error: { code: string; message: string } }
+
+// 예시
+{ error: { code: "VALIDATION_ERROR", message: "제목을 입력해주세요" } }
+{ error: { code: "NOT_FOUND", message: "티켓을 찾을 수 없습니다" } }
+{ error: { code: "INTERNAL_ERROR", message: "서버 오류가 발생했습니다" } }
 ```
 
 ### HTTP 상태 코드
@@ -290,10 +417,13 @@ export async function POST(req: Request) {
 
 - API 실패 시 토스트 또는 인라인 에러 메시지 표시
 - 드래그앤드롭 실패 시 이전 보드 상태로 롤백 (낙관적 업데이트 취소)
+- 400 에러: 검증 실패 메시지를 폼 필드 옆에 표시
+- 404 에러: "티켓을 찾을 수 없습니다" 토스트 표시 후 보드 재조회
+- 500 에러: "일시적인 오류가 발생했습니다. 다시 시도해주세요" 토스트 표시
 
 ---
 
-## 6. 개발 환경 설정
+## 8. 개발 환경 설정
 
 ### 초기 설정
 
@@ -322,21 +452,21 @@ npm run dev                  # 개발 서버 실행 (localhost:3000)
 ### 테스트
 
 ```bash
-npm test              # 전체 테스트 실행
-npm test -- --watch   # 워치 모드
+npm test               # 전체 테스트 실행
+npm test -- --watch    # 워치 모드
 npm test -- --coverage # 커버리지 리포트
 ```
 
 ### Lint / 포맷
 
 ```bash
-npm run lint          # ESLint 검사
-npm run format        # Prettier 포맷
+npm run lint    # ESLint 검사
+npm run format  # Prettier 포맷
 ```
 
 ---
 
-## 7. 배포 전략
+## 9. 배포 전략
 
 ### 환경 구분
 
@@ -350,7 +480,7 @@ npm run format        # Prettier 포맷
 ```
 git push origin main
   └─ Vercel CI: next build
-        └─ 빌드 성공 → 프로덕션 배포
+        ├─ 빌드 성공 → 프로덕션 배포
         └─ 빌드 실패 → 배포 중단 (이전 버전 유지)
 ```
 
@@ -367,7 +497,7 @@ git push origin main
 
 ---
 
-## 8. 코딩 컨벤션 요약
+## 10. 코딩 컨벤션 요약
 
 > 상세 내용은 `CLAUDE.md` 참조
 
