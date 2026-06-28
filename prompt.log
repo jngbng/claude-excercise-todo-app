@@ -109,3 +109,7 @@ DATA_MODEL.md에서 Drizzle ORM 스키마를 개선해줘:
 ---
 
 API_SPECS.md 파일을 작성해줘. REQUIREMENTS.md에 있는 FR 문서를 살펴보고, DATA_MODEL.md를 참고해서 URL과 HTTP API 스펙을 그대로 작성해줘.
+
+---
+
+API_SPECS.md의 `엔드포인트 상세` 섹션에서 request body를 예제로만 표현하지 말고, 필드별 타입과 필수 여부, 제약 조건, 기본값, 설명을 표 형식으로 표시해줘.

@@ -145,13 +145,13 @@ type Ticket = {
 }
 ```
 
-| 필드 | 타입 | 필수 | 제약 | 기본값 |
-|------|------|------|------|--------|
-| `title` | `string` | ✅ | 1~200자, 공백만 불가 | — |
-| `description` | `string` | ❌ | 최대 1000자 | `null` |
-| `priority` | `'LOW' \| 'MEDIUM' \| 'HIGH'` | ❌ | — | `'MEDIUM'` |
-| `plannedStartDate` | `string` | ❌ | `YYYY-MM-DD` | `null` |
-| `dueDate` | `string` | ❌ | `YYYY-MM-DD`, 오늘 이후 | `null` |
+| 필드 | 타입 | 필수 | 제약 | 기본값 | 설명 |
+|------|------|------|------|--------|------|
+| `title` | `string` | ✅ | 1~200자, 공백만 불가 | — | 티켓 제목 |
+| `description` | `string` | ❌ | 최대 1000자 | `null` | 티켓 설명 |
+| `priority` | `'LOW' \| 'MEDIUM' \| 'HIGH'` | ❌ | — | `'MEDIUM'` | 우선순위 |
+| `plannedStartDate` | `string` | ❌ | `YYYY-MM-DD` | `null` | 계획시작일 |
+| `dueDate` | `string` | ❌ | `YYYY-MM-DD`, 오늘 이후 | `null` | 계획종료일 |
 
 #### 처리 규칙
 
@@ -241,13 +241,13 @@ type Ticket = {
 }
 ```
 
-| 필드 | 타입 | 제약 | 비고 |
-|------|------|------|------|
-| `title` | `string` | 1~200자 | 선택 |
-| `description` | `string \| null` | 최대 1000자 | `null` 전송 시 삭제 |
-| `priority` | `'LOW' \| 'MEDIUM' \| 'HIGH'` | — | 선택 |
-| `plannedStartDate` | `string \| null` | `YYYY-MM-DD` | `null` 전송 시 삭제 |
-| `dueDate` | `string \| null` | `YYYY-MM-DD`, 오늘 이후 | `null` 전송 시 삭제 |
+| 필드 | 타입 | 필수 | 제약 | 기본값 | 설명 |
+|------|------|------|------|--------|------|
+| `title` | `string` | ❌ | 1~200자, 공백만 불가 | — | 티켓 제목 (전송 시 업데이트) |
+| `description` | `string \| null` | ❌ | 최대 1000자 | — | 티켓 설명 (`null` 전송 시 삭제) |
+| `priority` | `'LOW' \| 'MEDIUM' \| 'HIGH'` | ❌ | — | — | 우선순위 (전송 시 업데이트) |
+| `plannedStartDate` | `string \| null` | ❌ | `YYYY-MM-DD` | — | 계획시작일 (`null` 전송 시 삭제) |
+| `dueDate` | `string \| null` | ❌ | `YYYY-MM-DD`, 오늘 이후 | — | 계획종료일 (`null` 전송 시 삭제) |
 
 #### 처리 규칙
 
@@ -356,11 +356,11 @@ Body 없음.
 }
 ```
 
-| 필드 | 타입 | 필수 | 제약 |
-|------|------|------|------|
-| `ticketId` | `number` | ✅ | 존재하는 티켓 ID |
-| `status` | `'BACKLOG' \| 'TODO' \| 'IN_PROGRESS'` | ✅ | `DONE` 불가 |
-| `position` | `number` | ✅ | 정수 |
+| 필드 | 타입 | 필수 | 제약 | 기본값 | 설명 |
+|------|------|------|------|--------|------|
+| `ticketId` | `number` | ✅ | 존재하는 티켓 ID | — | 이동할 티켓 ID |
+| `status` | `'BACKLOG' \| 'TODO' \| 'IN_PROGRESS'` | ✅ | `DONE` 불가 | — | 이동 대상 칼럼 |
+| `position` | `number` | ✅ | 정수 | — | 칼럼 내 새 위치 (클라이언트가 계산하여 전송) |
 
 #### 처리 규칙
 
