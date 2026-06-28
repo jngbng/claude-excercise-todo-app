@@ -630,7 +630,7 @@ onDragEnd
 
 ### F-1. 티켓 생성
 
-> **상태 소유**: `KanbanBoard` (`isCreateModalOpen`, `board`)  
+> **상태 소유**: `KanbanBoard` (`isCreateModalOpen`, `board`)
 > **이벤트 발생**: 사용자 → 헤더 버튼 → `TicketForm` submit
 
 ```
@@ -661,7 +661,7 @@ BoardColumn(BACKLOG) ── TicketCard 신규 렌더
 
 ### F-2. 티켓 상세 모달 열기
 
-> **상태 소유**: `KanbanBoard` (`modalTicketId`)  
+> **상태 소유**: `KanbanBoard` (`modalTicketId`)
 > **이벤트 발생**: `TicketCard` 클릭 → `BoardColumn` → `KanbanBoard`
 
 ```
@@ -688,7 +688,7 @@ KanbanBoard [소유: modalTicketId]
 
 ### F-3. 티켓 수정 저장
 
-> **상태 소유**: `KanbanBoard` (`board`), `TicketForm` (`formValues`, `errors`)  
+> **상태 소유**: `KanbanBoard` (`board`), `TicketForm` (`formValues`, `errors`)
 > **이벤트 발생**: `TicketForm` submit → `TicketModal` → `KanbanBoard`
 
 ```
@@ -717,7 +717,7 @@ TicketModal ── 갱신된 데이터로 재렌더
 
 ### F-4. 티켓 삭제
 
-> **상태 소유**: `KanbanBoard` (`deleteTargetId`, `modalTicketId`, `board`)  
+> **상태 소유**: `KanbanBoard` (`deleteTargetId`, `modalTicketId`, `board`)
 > **이벤트 발생**: `TicketModal` 삭제 버튼 → `ConfirmDialog` 확인
 
 ```
@@ -753,7 +753,7 @@ BoardColumn ── TicketCard 제거 후 재렌더
 
 ### F-5. 드래그앤드롭 — 칼럼 간/내 이동
 
-> **상태 소유**: `KanbanBoard` (`board`, `activeTicketId`), `useDragAndDrop` (스냅샷)  
+> **상태 소유**: `KanbanBoard` (`board`, `activeTicketId`), `useDragAndDrop` (스냅샷)
 > **이벤트 발생**: `TicketCard` 드래그 → `DndContext` 이벤트
 
 ```
@@ -790,7 +790,7 @@ useDragAndDrop [소유: snapshot]
 
 ### F-6. 티켓 완료 처리 (DONE 이동)
 
-> **상태 소유**: `KanbanBoard` (`board`), `useDragAndDrop` (스냅샷)  
+> **상태 소유**: `KanbanBoard` (`board`), `useDragAndDrop` (스냅샷)
 > **이벤트 발생**: `TicketCard` → DONE 칼럼 드롭 → `useDragAndDrop`
 
 ```
@@ -822,7 +822,7 @@ useDragAndDrop
 
 ### F-7. 필터 토글
 
-> **상태 소유**: `KanbanBoard` (`filter`), `useTicketFilter` (filteredBoard 계산)  
+> **상태 소유**: `KanbanBoard` (`filter`), `useTicketFilter` (filteredBoard 계산)
 > **이벤트 발생**: `FilterBar` 버튼 클릭 → `KanbanBoard`
 
 ```
@@ -848,3 +848,18 @@ KanbanBoard
   │
   │  FilterBar ── 활성 필터 버튼 강조 표시 업데이트
 ```
+
+---
+
+## 7. 사용자 스토리 × 컴포넌트·Hook 매핑
+
+| US | 사용자 스토리 | FR | 컴포넌트 | Hook |
+|----|--------------|----|----------|------|
+| US-003 | 칸반 보드 현황 파악 | FR-002 | `BoardPage` · `KanbanBoard` · `BoardColumn` · `TicketCard` | `useBoard` |
+| US-004 | 마감 초과 인지 | FR-008 | `TicketCard` | `useBoard` |
+| US-001 | 새 할 일 등록 | FR-001 | `KanbanBoard` · `TicketModal` · `TicketForm` | `useBoard` |
+| US-002 | 상세 정보 설정 | FR-001 | `TicketModal` · `TicketForm` | `useBoard` |
+| US-007 | 할 일 수정 | FR-003, FR-004 | `TicketCard` · `TicketModal` · `TicketForm` | `useBoard` |
+| US-008 | 할 일 삭제 | FR-006 | `TicketModal` · `ConfirmDialog` | `useBoard` |
+| US-005 | 드래그앤드롭 상태 변경 | FR-007 | `KanbanBoard` · `BoardColumn` · `TicketCard` · `DragOverlay` | `useDragAndDrop` |
+| US-006 | 할 일 완료 처리 | FR-005 | `KanbanBoard` · `BoardColumn` · `DragOverlay` | `useDragAndDrop` |
