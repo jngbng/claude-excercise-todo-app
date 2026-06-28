@@ -610,3 +610,241 @@ onDragEnd
 - 원본 위치: 반투명 placeholder 카드 표시
 - 드래그 중 카드: `DragOverlay`로 포탈 렌더링 (z-index 최상위, 그림자 강조)
 - 드롭 가능한 칼럼 위에 올라올 때: 칼럼 배경색 강조 (`isOver` 상태 활용)
+
+---
+
+## 6. 이벤트 흐름
+
+핵심 기능별로 컴포넌트 간 데이터와 이벤트 흐름을 정리한다. 누가 상태를 소유하고 누가 이벤트를 발생시키는지 명확히 확인할 수 있다.
+
+**표기 규칙**
+
+| 기호 | 의미 |
+|------|------|
+| `[소유]` | 해당 컴포넌트·훅이 상태를 직접 관리 |
+| `──props──▶` | 부모 → 자식으로 데이터 전달 |
+| `◀──callback──` | 자식 → 부모로 이벤트 전달 |
+| `──API──▶` | `ticketApi.ts`를 통한 서버 호출 |
+
+---
+
+### F-1. 티켓 생성
+
+> **상태 소유**: `KanbanBoard` (`isCreateModalOpen`, `board`)  
+> **이벤트 발생**: 사용자 → 헤더 버튼 → `TicketForm` submit
+
+```
+사용자
+  │  [+ 새 티켓] 클릭
+  ▼
+KanbanBoard [소유: isCreateModalOpen, board]
+  │  isCreateModalOpen = true
+  │──mode="create"──▶ TicketModal
+  │                        │
+  │                        │──▶ TicketForm [소유: formValues, errors]
+  │                                 │  사용자 입력 + Zod 검증
+  │                                 │  onSubmit(data)
+  │                        ◀────────┘
+  │◀──onSubmit(data)────────┘
+  │
+  │  useBoard.createTicket(data)
+  │──POST /api/tickets──▶ 서버
+  │◀──201: Ticket──────────┘
+  │
+  │  board.backlog 맨 앞에 추가
+  │  isCreateModalOpen = false
+  ▼
+BoardColumn(BACKLOG) ── TicketCard 신규 렌더
+```
+
+---
+
+### F-2. 티켓 상세 모달 열기
+
+> **상태 소유**: `KanbanBoard` (`modalTicketId`)  
+> **이벤트 발생**: `TicketCard` 클릭 → `BoardColumn` → `KanbanBoard`
+
+```
+사용자
+  │  TicketCard 클릭 (드래그 없이, 5px 미만 이동)
+  ▼
+TicketCard
+  │  onClick() 호출
+  ▼
+BoardColumn
+  │  onCardClick(id) 호출
+  ▼
+KanbanBoard [소유: modalTicketId]
+  │  modalTicketId = id
+  │──ticketId, onClose, onDelete──▶ TicketModal
+  │                                     │
+  │                                     │──GET /api/tickets/:id──▶ 서버
+  │                                     │◀──200: Ticket───────────┘
+  │                                     ▼
+  │                                  TicketForm ── 기존 값으로 렌더 (읽기 모드)
+```
+
+---
+
+### F-3. 티켓 수정 저장
+
+> **상태 소유**: `KanbanBoard` (`board`), `TicketForm` (`formValues`, `errors`)  
+> **이벤트 발생**: `TicketForm` submit → `TicketModal` → `KanbanBoard`
+
+```
+사용자
+  │  필드 수정 후 [저장] 클릭
+  ▼
+TicketForm [소유: formValues, errors]
+  │  Zod 검증 통과
+  │  onSubmit(data) 호출
+  ▼
+TicketModal
+  │  onUpdate(ticketId, data) 호출
+  ▼
+KanbanBoard [소유: board]
+  │  useBoard.updateTicket(id, data)
+  │──PATCH /api/tickets/:id──▶ 서버
+  │◀──200: Ticket─────────────┘
+  │
+  │  board 내 해당 Ticket 교체
+  │  isEditing = false (모달 유지, 읽기 모드 복귀)
+  ▼
+TicketModal ── 갱신된 데이터로 재렌더
+```
+
+---
+
+### F-4. 티켓 삭제
+
+> **상태 소유**: `KanbanBoard` (`deleteTargetId`, `modalTicketId`, `board`)  
+> **이벤트 발생**: `TicketModal` 삭제 버튼 → `ConfirmDialog` 확인
+
+```
+사용자
+  │  TicketModal 내 [삭제] 클릭
+  ▼
+TicketModal
+  │  onDelete(id) 호출
+  ▼
+KanbanBoard [소유: deleteTargetId]
+  │  deleteTargetId = id
+  │──onConfirm, onCancel──▶ ConfirmDialog 렌더
+  │
+  │                  사용자 [삭제 확인] 클릭
+  │                        │  onConfirm() 호출
+  │◀─────────────────────────┘
+  │
+  │  useBoard.deleteTicket(id)
+  │──DELETE /api/tickets/:id──▶ 서버
+  │◀──204: No Content──────────┘
+  │
+  │  board에서 해당 Ticket 제거
+  │  deleteTargetId = null
+  │  modalTicketId = null  (모달 닫기)
+  ▼
+BoardColumn ── TicketCard 제거 후 재렌더
+
+  │  사용자 [취소] 클릭 시
+  │  onCancel() 호출 → deleteTargetId = null (모달 유지)
+```
+
+---
+
+### F-5. 드래그앤드롭 — 칼럼 간/내 이동
+
+> **상태 소유**: `KanbanBoard` (`board`, `activeTicketId`), `useDragAndDrop` (스냅샷)  
+> **이벤트 발생**: `TicketCard` 드래그 → `DndContext` 이벤트
+
+```
+사용자
+  │  TicketCard 드래그 시작 (5px 이상 이동)
+  ▼
+DndContext.onDragStart
+  │  activeTicketId = id
+  ▼
+KanbanBoard
+  │──isDragging=true──▶ DragOverlay ── 드래그 중 카드 미리보기 렌더
+  │  원본 TicketCard 자리 ── 반투명 placeholder 표시
+
+사용자
+  │  대상 칼럼(BACKLOG / TODO / IN_PROGRESS)에 드롭
+  ▼
+DndContext.onDragEnd
+  ▼
+useDragAndDrop [소유: snapshot]
+  │  1. 현재 board 스냅샷 저장
+  │  2. board 상태 즉시 업데이트 (낙관적)
+  │     ── 칼럼 이동 + position 재계산 (fractional indexing)
+  │  3. activeTicketId = null → DragOverlay 제거
+  │
+  │──PATCH /api/tickets/reorder──▶ 서버
+  │
+  ├── 성공: 스냅샷 폐기, 서버 응답 값으로 board 갱신
+  └── 실패: 스냅샷으로 board 복원 + 에러 토스트
+            ▼
+         BoardColumn ── 원래 위치로 롤백 재렌더
+```
+
+---
+
+### F-6. 티켓 완료 처리 (DONE 이동)
+
+> **상태 소유**: `KanbanBoard` (`board`), `useDragAndDrop` (스냅샷)  
+> **이벤트 발생**: `TicketCard` → DONE 칼럼 드롭 → `useDragAndDrop`
+
+```
+사용자
+  │  TicketCard를 DONE 칼럼에 드롭
+  ▼
+DndContext.onDragEnd
+  ▼
+useDragAndDrop
+  │  targetStatus === 'DONE' 감지
+  │  → reorder 대신 complete API 분기
+  │
+  │  1. board 스냅샷 저장
+  │  2. 낙관적 업데이트: 해당 카드를 board.done으로 이동
+  │
+  │──PATCH /api/tickets/:id/complete──▶ 서버
+  │◀──200: completedAt=NOW(), status='DONE'──┘
+  │
+  ├── 성공: 서버 응답 Ticket으로 board.done 갱신
+  └── 실패: 스냅샷 복원 + 에러 토스트
+
+[DONE → 다른 칼럼으로 역이동 시]
+  │  useDragAndDrop: targetStatus !== 'DONE' 이고 sourceStatus === 'DONE'
+  │──PATCH /api/tickets/:id/complete──▶ 서버
+  │◀──200: completedAt=null, status='IN_PROGRESS'──┘
+```
+
+---
+
+### F-7. 필터 토글
+
+> **상태 소유**: `KanbanBoard` (`filter`), `useTicketFilter` (filteredBoard 계산)  
+> **이벤트 발생**: `FilterBar` 버튼 클릭 → `KanbanBoard`
+
+```
+사용자
+  │  [이번 주 업무] 또는 [만기일이 지난 업무] 버튼 클릭
+  ▼
+FilterBar
+  │  onFilterChange(newFilter) 호출
+  │  (현재 활성 필터와 같으면 null 전달 → 필터 해제)
+  ▼
+KanbanBoard [소유: filter]
+  │  filter 상태 업데이트
+  ▼
+useTicketFilter(board, filter) [소유: filteredBoard 계산값]
+  │  filter 조건에 맞는 티켓만 추출
+  │  ── 'THIS_WEEK': plannedStartDate 또는 dueDate가 이번 주(월~일) 해당
+  │  ── 'OVERDUE':   isOverdue === true 인 티켓만
+  │  ── null:        전체 board 반환
+  ▼
+KanbanBoard
+  │──tickets(filteredBoard)──▶ BoardColumn × 4
+  │                                │──ticket──▶ TicketCard (필터 결과만 렌더)
+  │
+  │  FilterBar ── 활성 필터 버튼 강조 표시 업데이트
+```
