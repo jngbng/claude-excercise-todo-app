@@ -202,3 +202,19 @@ TC-API-001의 테스트 시나리오를 기반으로 __tests__/api/tickets.test.
 방금 추가한 __tests__/api/tickets.test.ts 파일에서 참조를 '../../app/' 처럼 상대 경로가 아니라 '@/app/` 형식의 프로젝트 루트 기준 경로 참조로 바꿔줘.
 
 ---
+
+방금 작성한 티켓 생성 API 테스트를 모두 통과하도록 구현해줘.
+
+구현위치:
+- Route handler: app/api/tickets/route.ts 의 POST 함수
+- 서비스: src/server/services/ticketService.ts의 create 함수
+- 검증: src/shared/validations/ticket.ts의 createTicketSchema (Zod)
+- DB 스키마: src/server/db/schema.ts의 tickets 테이블
+
+조건:
+- 테스트가 통과하는 최소한의 코드만 작성해줘.
+- 에러 핸들링이나 로깅 같은 추가 기능을 넣지 마.
+- 테스트 코드는 수정하지 마.
+- 작업 범위: app/api/, src/server/, src/shared/ 디렉터리만
+
+---
