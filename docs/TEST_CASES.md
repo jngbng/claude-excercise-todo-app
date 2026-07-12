@@ -20,8 +20,8 @@
 | TC-API-001-2 | 전체 필드로 생성 성공 | `{ title, description, priority: "HIGH", plannedStartDate, dueDate }` | 201, 입력 필드 모두 응답에 포함 |
 | TC-API-001-3 | title 누락 | `{}` | 400, VALIDATION_ERROR, "제목을 입력해주세요" |
 | TC-API-001-4 | title 공백만 입력 | `{ title: "   " }` | 400, VALIDATION_ERROR, "제목을 입력해주세요" |
-| TC-API-001-5 | title 201자 초과 | `{ title: "a".repeat(201) }` | 400, VALIDATION_ERROR, "제목은 200자 이내로 입력해주세요" |
-| TC-API-001-6 | description 1001자 초과 | `{ title: "t", description: "a".repeat(1001) }` | 400, VALIDATION_ERROR, "설명은 1000자 이내로 입력해주세요" |
+| TC-API-001-5 | title 200자 초과 | `{ title: "a".repeat(201) }` | 400, VALIDATION_ERROR, "제목은 200자 이내로 입력해주세요" |
+| TC-API-001-6 | description 1000자 초과 | `{ title: "t", description: "a".repeat(1001) }` | 400, VALIDATION_ERROR, "설명은 1000자 이내로 입력해주세요" |
 | TC-API-001-7 | 잘못된 priority 값 | `{ title: "t", priority: "URGENT" }` | 400, VALIDATION_ERROR, "우선순위는 LOW, MEDIUM, HIGH 중 선택해주세요" |
 | TC-API-001-8 | dueDate가 과거 날짜 | `{ title: "t", dueDate: "2020-01-01" }` | 400, VALIDATION_ERROR, "종료예정일은 오늘 이후 날짜를 선택해주세요" |
 
