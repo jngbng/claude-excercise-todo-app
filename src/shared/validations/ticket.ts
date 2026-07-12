@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { today } from '@/shared/utils/today';
 
 const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
@@ -26,9 +27,7 @@ export const createTicketSchema = z.object({
     .refine(
       (value) => {
         if (!value) return true;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return new Date(value) >= today;
+        return new Date(value) >= today();
       },
       { message: '종료예정일은 오늘 이후 날짜를 선택해주세요' },
     ),
