@@ -1,0 +1,16 @@
+services:
+  db:
+    image: dhi.io/postgres:18-alpine3.23
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: tikauser
+      POSTGRES_PASSWORD: tikaSecr3tPassw0rd
+      POSTGRES_DB: tika
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

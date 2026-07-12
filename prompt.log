@@ -156,3 +156,21 @@ TEST_CASES.md 파일을 작성해줘. REQUIREMENTS.md, API_SPEC.md, DATA_MODEL.m
   - 테스트 ID 별로 시나리오, 동작, 기대 결과를 표로 간결히 정리해줘.
 - 추적 메트릭스 (Requirement Traceability Matrix) 섹션도 추가해줘.
   - TC ID (테스트 케이스 ID)별로 관련 FR (기능 요구사항), US (사용자 스토리), 테스트 대상을 간략하게 표로 정리해줘
+
+---
+
+현재 정의한 스펙 문서들을 참고하되 **코드는 생성하지 말고** 다음의 사항으로 진행해줘.
+
+요구사항:
+TDD로 개발할 예정이야. 프로젝트 스케폴딩만 해줘.
+
+필요한 것:
+- 디렉터리 구조
+- package.json (의존성)
+- 설정 파일들 (tsconfig, jest, drizzle)
+
+하지 말 것:
+- 컴포넌트, 서비스, API 등 구현 코드
+- 테스트 코드 (내가 직접 Red 단계부터 시작할 거야)
+
+---
