@@ -241,3 +241,11 @@ TRD.md를 참조해서 Next.js 15 프로젝트를 생성해줘.
 이미 생성된 코드들은 검토해서 필요하면 변경해.
 
 ---
+
+Jest 테스트 환경을 구성해줘.
+- Next.js 15 App Router와 호환되어야 해.
+- TypeScript strict 모드 사용
+- @testing-library/react와 @testing-library/jest-dom 포함
+- 경로 별칭 @/는 src/를 가리켜야 해.
+
+---
