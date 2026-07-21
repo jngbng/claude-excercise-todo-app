@@ -231,3 +231,13 @@ TC-API-001의 테스트 시나리오를 기반으로 __tests__/api/tickets.test.
 단, 테스트는 수정하지 마. 리팩터링 후에도 테스트가 통과해야 해.
 
 ---
+
+TRD.md를 참조해서 Next.js 15 프로젝트를 생성해줘.
+- App Router 기반
+- TypeScript strict 모드
+- Tailwind CSS 포함
+- src 디렉토리 사용
+
+이미 생성된 코드들은 검토해서 필요하면 변경해.
+
+---
