@@ -4,13 +4,15 @@
 Tika는 티켓 기반 칸반 보드 TODO 앱이다.
 Next.js App Router 기반으로, 프론트엔드와 백엔드를 디렉토리 수준에서 분리한다.
 src/shared/에서 타입과 검증 스키마를 공유한다.
+새 기능 개발은 spec-kit 기반 SDD(Spec-Driven Development) 워크플로를 따른다 — 상세 규칙은 CLAUDE-SDD.md 참조.
 
 ## 프로젝트 구조
 - app/api/ : 백엔드 진입점 (Route Handlers, 요청 파싱 + 응답만)
 - src/server/ : 백엔드 로직 (services, db, middleware)
 - src/client/ : 프론트엔드 로직 (components, hooks, api 호출)
 - src/shared/ : 공유 타입, Zod 스키마, 상수
-- docs/ : 프로젝트 명세 문서
+- docs/ : 프로젝트 전역 명세 문서
+- specs/, .specify/ : SDD 관련 산출물·설정 (CLAUDE-SDD.md 참조)
 
 ## 기술 스택
 - Framework: Next.js 15 (App Router)
@@ -83,3 +85,7 @@ src/shared/에서 타입과 검증 스키마를 공유한다.
 - Refactor 단계: 코드 개선만, 새 기능 추가 금지, 테스트는 반드시 통과 유지
 - 테스트와 구현을 한 번에 작성하지 말 것 - 반드시 단계별로 진행
 - 테스트 실패 시 구현을 수정할 것, 테스트를 수정하지 말 것 (명세 오류인 경우 명세 먼저 수정)
+
+### SDD 워크플로
+- 새 기능은 spec-kit 기반 SDD 워크플로(constitution → specify → clarify → plan → tasks → analyze/checklist → implement)를 따른다
+- 상세 진행 순서, 준수 규칙, 문서 체계는 CLAUDE-SDD.md 참조
