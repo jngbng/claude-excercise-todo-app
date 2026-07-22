@@ -79,6 +79,46 @@ Sync Impact Report
 - 상세 규칙은 `CLAUDE.md`(코딩 컨벤션·TDD·경계 규칙)와 `CLAUDE-SDD.md`(SDD 워크플로 상세)를
   따른다.
 
+## Guardrails (절대 준수 사항)
+
+AI 코딩 에이전트가 위험한 작업을 수행하지 않도록 명시적으로 금지하는 규칙들이다.
+**이 규칙들은 어떤 상황에서도 위반할 수 없다.**
+
+### 데이터베이스 금지 명령어
+- `DROP TABLE`, `DROP DATABASE` -- 절대 금지
+- `TRUNCATE` -- 절대 금지
+- `DELETE FROM` (WHERE 절 없이) -- 절대 금지
+- `ALTER TABLE DROP COLUMN` -- 사용자 명시적 허가 필요
+
+### 데이터베이스 안전 규칙
+- 삭제/리셋 작업 시 반드시 사용자 승인 요청
+- 삭제 전 백업 또는 복구 방법 안내
+- 테스트 데이터 존재 시 DB 리셋 대신 SQL로 해결
+- 운영 DB 자동 변경 절대 금지
+
+### Git 금지 명령어
+- `git push --force` -- 절대 금지
+- `git reset --hard` -- 절대 금지
+- `git clean -fd` -- 사용자 확인 필요
+- `git branch -D` (main/master) -- 절대 금지
+
+### 패키지 관리 금지 명령어
+- `npm audit fix --force` -- 절대 금지
+- `rm -rf node_modules && npm install` (또는 `yarn install`) -- 사용자 확인 필요
+- 메이저 버전 자동 업그레이드 -- 절대 금지
+
+### 파일 시스템 금지 명령어
+- `rm -rf /` 또는 루트 경로 삭제 -- 절대 금지
+- 프로젝트 외부 파일 수정 -- 절대 금지
+- `.env` 파일 삭제 -- 사용자 확인 필요
+- `src/` 디렉터리 전체 삭제 -- 절대 금지
+
+### 안전 작업 원칙
+- 파괴적 작업(삭제, 초기화) 전 반드시 사용자 확인
+- 복구 불가능한 작업은 백업 방법 먼저 안내
+- 자동화된 스크립트의 파괴적 명령 실행 금지
+- 의심스러운 작업은 실행 전 사용자에게 설명 및 확인
+
 ## Governance
 
 - 이 헌장은 `CLAUDE.md`, `CLAUDE-SDD.md`, `docs/`를 포함한 프로젝트의 다른 모든 관례보다
