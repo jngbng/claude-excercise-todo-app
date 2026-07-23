@@ -91,3 +91,9 @@ export const create = async (input: CreateTicketInput): Promise<Ticket> => {
 
   return toTicket(ticket);
 };
+
+export const getById = async (id: number): Promise<Ticket | null> => {
+  const [row] = await db.select().from(tickets).where(eq(tickets.id, id));
+
+  return row ? toTicket(row) : null;
+};

@@ -46,7 +46,7 @@ quickstart.md
 
 ### Implementation for User Story 1 (Green)
 
-- [ ] T002 [US1] `getById()` 서비스 함수 + `app/api/tickets/[id]/route.ts`에 `GET` Route
+- [x] T002 [US1] `getById()` 서비스 함수 + `app/api/tickets/[id]/route.ts`에 `GET` Route
   Handler(path parameter 파싱, 404 처리 헬퍼 포함) 구현 —
   `src/server/services/ticketService.ts`, `app/api/tickets/[id]/route.ts` (의존: T001)
 
