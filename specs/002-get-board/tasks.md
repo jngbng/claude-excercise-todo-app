@@ -56,7 +56,7 @@ description: "Task list template for feature implementation"
 > **테스트를 먼저 작성해 실패를 확인한 뒤 구현한다 (`app/api/tickets/route.ts`에 아직 `GET`이
 > 없으므로 전부 실패해야 한다).**
 
-- [ ] T002 [US1] TC-API-002-1,2,3 테스트 작성: 빈 보드 조회, 정렬된 다중 티켓 조회, Done 24시간
+- [x] T002 [US1] TC-API-002-1,2,3 테스트 작성: 빈 보드 조회, 정렬된 다중 티켓 조회, Done 24시간
   필터 검증 — `__tests__/api/tickets.test.ts` (기존 POST 테스트보다 앞에 위치, 의존: T001)
 
 ### Implementation for User Story 1 (Green)

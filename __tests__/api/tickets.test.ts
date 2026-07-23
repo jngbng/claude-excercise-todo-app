@@ -3,21 +3,81 @@
  */
 
 // TC-API-001: POST /api/tickets — 티켓 생성 (docs/TEST_CASES.md, docs/API_SPECS.md 참조)
-// 구현 전 Red 단계 테스트 — app/api/tickets/route.ts가 아직 없으므로 전부 실패해야 한다.
+// TC-API-002: GET /api/tickets — 보드 전체 조회 (docs/TEST_CASES.md, docs/API_SPECS.md 참조)
+import { eq } from 'drizzle-orm';
 import { NextRequest } from 'next/server';
-import { POST } from '@/app/api/tickets/route';
-import { closeDb } from '@/server/db';
+import { GET, POST } from '@/app/api/tickets/route';
+import { closeDb, db } from '@/server/db';
+import { tickets } from '@/server/db/schema';
+import { cleanupTrackedTickets, trackTicketId } from '../helpers/ticketFixtures';
 
-afterAll(() => closeDb());
+afterAll(async () => {
+  await cleanupTrackedTickets();
+  await closeDb();
+});
 
-const postTickets = (body: unknown) =>
-  POST(
+// 생성에 성공한 티켓의 id는 자동으로 추적되어, 이 파일의 테스트가 끝나면(afterAll) 정리된다.
+const postTickets = async (body: unknown) => {
+  const response = await POST(
     new NextRequest('http://localhost/api/tickets', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     }),
   );
+
+  if (response.status === 201) {
+    const created = await response.clone().json();
+    trackTicketId(created.id);
+  }
+
+  return response;
+};
+
+// GET 테스트는 "빈 보드 조회"(TC-API-002-1)를 검증해야 하므로, 아직 아무것도 쓰지 않은 이
+// 파일의 맨 앞(POST 테스트보다 먼저)에서 실행되어야 한다 — Jest는 한 파일 내에서
+// describe/it을 선언 순서대로 순차 실행하므로 순서를 보장할 수 있다.
+describe('GET /api/tickets', () => {
+  it('TC-API-002-1: 빈 보드를 조회하면 200과 함께 모든 칼럼이 빈 배열인 객체를 반환한다', async () => {
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body).toEqual({ backlog: [], todo: [], inProgress: [], done: [] });
+  });
+
+  it('TC-API-002-2: 티켓이 있는 보드를 조회하면 각 칼럼에 position 오름차순으로 정렬된 티켓 배열을 반환한다', async () => {
+    await postTickets({ title: '첫 번째' });
+    await postTickets({ title: '두 번째' });
+
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.backlog.map((ticket: { title: string }) => ticket.title)).toEqual([
+      '두 번째',
+      '첫 번째',
+    ]);
+    expect(body.backlog[0].position).toBeLessThan(body.backlog[1].position);
+  });
+
+  it('TC-API-002-3: completedAt이 25시간 지난 DONE 티켓은 done 배열에 포함되지 않는다', async () => {
+    const createResponse = await postTickets({ title: '오래된 완료 티켓' });
+    const created = await createResponse.json();
+    const twentyFiveHoursAgo = new Date(Date.now() - 25 * 60 * 60 * 1000);
+
+    await db
+      .update(tickets)
+      .set({ status: 'DONE', completedAt: twentyFiveHoursAgo })
+      .where(eq(tickets.id, created.id));
+
+    const response = await GET();
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.done.find((ticket: { id: number }) => ticket.id === created.id)).toBeUndefined();
+  });
+});
 
 describe('POST /api/tickets', () => {
   // 1. 모든 필드를 포함한 정상 생성 -> 201
