@@ -31,7 +31,7 @@ description: "Task list template for feature implementation"
 
 **Purpose**: 통합 테스트가 실제 DB에 남긴 자기 자신의 데이터만 정리할 수 있는 인프라 준비
 
-- [ ] T001 [P] 티켓 생성 id 추적 + 정리 헬퍼 생성 — `__tests__/helpers/ticketFixtures.ts`
+- [x] T001 [P] 티켓 생성 id 추적 + 정리 헬퍼 생성 — `__tests__/helpers/ticketFixtures.ts`
   (`trackTicketId`, `cleanupTrackedTickets`)
 
 ---
