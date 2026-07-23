@@ -70,7 +70,17 @@ describe('POST /api/tickets', () => {
     expect(body.error.message).toBe('제목을 입력해주세요');
   });
 
-  // 4. 제목 200자 초과 -> 400
+  // 4. 제목 공백만 입력 -> 400
+  it('TC-API-001-4: title이 공백 문자로만 구성되면 400과 "제목을 입력해주세요" 메시지를 반환한다', async () => {
+    const response = await postTickets({ title: '   ' });
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error.code).toBe('VALIDATION_ERROR');
+    expect(body.error.message).toBe('제목을 입력해주세요');
+  });
+
+  // 5. 제목 200자 초과 -> 400
   it('TC-API-001-5: title이 200자를 초과하면 400과 "제목은 200자 이내로 입력해주세요" 메시지를 반환한다', async () => {
     const response = await postTickets({ title: 'a'.repeat(201) });
     const body = await response.json();
@@ -80,7 +90,17 @@ describe('POST /api/tickets', () => {
     expect(body.error.message).toBe('제목은 200자 이내로 입력해주세요');
   });
 
-  // 5. 과거 마감일 -> 400
+  // 6. 설명 1000자 초과 -> 400
+  it('TC-API-001-6: description이 1000자를 초과하면 400과 "설명은 1000자 이내로 입력해주세요" 메시지를 반환한다', async () => {
+    const response = await postTickets({ title: 't', description: 'a'.repeat(1001) });
+    const body = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(body.error.code).toBe('VALIDATION_ERROR');
+    expect(body.error.message).toBe('설명은 1000자 이내로 입력해주세요');
+  });
+
+  // 7. 과거 마감일 -> 400
   it('TC-API-001-8: dueDate가 과거 날짜면 400과 "종료예정일은 오늘 이후 날짜를 선택해주세요" 메시지를 반환한다', async () => {
     const response = await postTickets({ title: 't', dueDate: '2020-01-01' });
     const body = await response.json();
@@ -90,7 +110,7 @@ describe('POST /api/tickets', () => {
     expect(body.error.message).toBe('종료예정일은 오늘 이후 날짜를 선택해주세요');
   });
 
-  // 6. 잘못된 우선순위 값 -> 400
+  // 8. 잘못된 우선순위 값 -> 400
   it('TC-API-001-7: priority가 유효하지 않으면 400과 "우선순위는 LOW, MEDIUM, HIGH 중 선택해주세요" 메시지를 반환한다', async () => {
     const response = await postTickets({ title: 't', priority: 'URGENT' });
     const body = await response.json();

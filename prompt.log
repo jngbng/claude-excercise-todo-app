@@ -286,3 +286,8 @@ Zod 검증, Route handler, Service 레이어 분리를 고려해.
 /speckit.tasks
 
 ---
+
+/speckit-implement Phase 1 부터 순서대로 구현해줘.
+각 Phase 완료 후에 다음으로 넘어가. 이미 구현 완료되어 있으면 할 일은 없어.
+
+---
