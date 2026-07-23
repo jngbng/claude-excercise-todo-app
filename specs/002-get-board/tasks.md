@@ -66,7 +66,7 @@ description: "Task list template for feature implementation"
 
 ### Refactor
 
-- [ ] T004 [US1] `create()`와 `getBoard()`가 공유하는 DB row → API 응답 변환 로직을 `toTicket()`
+- [x] T004 [US1] `create()`와 `getBoard()`가 공유하는 DB row → API 응답 변환 로직을 `toTicket()`
   헬퍼로 추출 — `src/server/services/ticketService.ts` (의존: T003, 테스트는 계속 통과 유지)
 
 **Checkpoint**: User Story 1 독립적으로 동작 확인됨

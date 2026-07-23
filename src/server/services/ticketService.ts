@@ -18,6 +18,26 @@ const isOverdue = (dueDate: string | null, status: TicketStatus): boolean => {
   return new Date(dueDate) < today();
 };
 
+const toTicket = (row: typeof tickets.$inferSelect): Ticket => {
+  const status = row.status as TicketStatus;
+
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    status,
+    priority: row.priority as TicketPriority,
+    position: row.position,
+    plannedStartDate: row.plannedStartDate,
+    dueDate: row.dueDate,
+    startedAt: row.startedAt ? row.startedAt.toISOString() : null,
+    completedAt: row.completedAt ? row.completedAt.toISOString() : null,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+    isOverdue: isOverdue(row.dueDate, status),
+  };
+};
+
 const isDoneVisible = (completedAt: Date | null): boolean =>
   completedAt != null && Date.now() - completedAt.getTime() <= DONE_VISIBLE_WINDOW_MS;
 
@@ -27,36 +47,19 @@ export const getBoard = async (): Promise<BoardData> => {
   const board: BoardData = { backlog: [], todo: [], inProgress: [], done: [] };
 
   for (const row of rows) {
-    const status = row.status as TicketStatus;
-    const ticket: Ticket = {
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      status,
-      priority: row.priority as TicketPriority,
-      position: row.position,
-      plannedStartDate: row.plannedStartDate,
-      dueDate: row.dueDate,
-      startedAt: row.startedAt ? row.startedAt.toISOString() : null,
-      completedAt: row.completedAt ? row.completedAt.toISOString() : null,
-      createdAt: row.createdAt.toISOString(),
-      updatedAt: row.updatedAt.toISOString(),
-      isOverdue: isOverdue(row.dueDate, status),
-    };
-
-    switch (status) {
+    switch (row.status as TicketStatus) {
       case TICKET_STATUS.BACKLOG:
-        board.backlog.push(ticket);
+        board.backlog.push(toTicket(row));
         break;
       case TICKET_STATUS.TODO:
-        board.todo.push(ticket);
+        board.todo.push(toTicket(row));
         break;
       case TICKET_STATUS.IN_PROGRESS:
-        board.inProgress.push(ticket);
+        board.inProgress.push(toTicket(row));
         break;
       case TICKET_STATUS.DONE:
         if (isDoneVisible(row.completedAt)) {
-          board.done.push(ticket);
+          board.done.push(toTicket(row));
         }
         break;
     }
@@ -86,21 +89,5 @@ export const create = async (input: CreateTicketInput): Promise<Ticket> => {
     })
     .returning();
 
-  const status = ticket.status as TicketStatus;
-
-  return {
-    id: ticket.id,
-    title: ticket.title,
-    description: ticket.description,
-    status,
-    priority: ticket.priority as TicketPriority,
-    position: ticket.position,
-    plannedStartDate: ticket.plannedStartDate,
-    dueDate: ticket.dueDate,
-    startedAt: ticket.startedAt ? ticket.startedAt.toISOString() : null,
-    completedAt: ticket.completedAt ? ticket.completedAt.toISOString() : null,
-    createdAt: ticket.createdAt.toISOString(),
-    updatedAt: ticket.updatedAt.toISOString(),
-    isOverdue: isOverdue(ticket.dueDate, status),
-  };
+  return toTicket(ticket);
 };
