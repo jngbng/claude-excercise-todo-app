@@ -61,7 +61,7 @@ description: "Task list template for feature implementation"
 
 ### Implementation for User Story 1 (Green)
 
-- [ ] T003 [US1] `getBoard()` 서비스 함수(그룹화·정렬·24시간 필터, 최소 구현) + `GET` Route
+- [x] T003 [US1] `getBoard()` 서비스 함수(그룹화·정렬·24시간 필터, 최소 구현) + `GET` Route
   Handler 추가 — `src/server/services/ticketService.ts`, `app/api/tickets/route.ts` (의존: T002)
 
 ### Refactor

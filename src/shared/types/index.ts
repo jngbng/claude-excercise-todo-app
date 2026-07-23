@@ -30,3 +30,10 @@ export type Ticket = {
   updatedAt: string;
   isOverdue: boolean;
 };
+
+export type BoardData = {
+  backlog: Ticket[];
+  todo: Ticket[];
+  inProgress: Ticket[];
+  done: Ticket[];
+};

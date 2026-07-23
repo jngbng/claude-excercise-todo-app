@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createTicketSchema } from '@/shared/validations/ticket';
-import { create } from '@/server/services/ticketService';
+import { create, getBoard } from '@/server/services/ticketService';
+
+export const GET = async () => {
+  const board = await getBoard();
+
+  return NextResponse.json(board, { status: 200 });
+};
 
 export const POST = async (request: NextRequest) => {
   const body: unknown = await request.json();
