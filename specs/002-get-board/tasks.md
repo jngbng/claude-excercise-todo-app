@@ -77,8 +77,8 @@ description: "Task list template for feature implementation"
 
 **Purpose**: 전체 기능에 대한 최종 검증
 
-- [ ] T005 [P] `quickstart.md`의 curl 시나리오를 로컬 서버에서 수동 검증
-- [ ] T006 [P] `npx tsc --noEmit`, `npm run lint`, `npm test`가 모두 통과하는지 확인
+- [x] T005 [P] `quickstart.md`의 curl 시나리오를 로컬 서버에서 수동 검증
+- [x] T006 [P] `npx tsc --noEmit`, `npm run lint`, `npm test`가 모두 통과하는지 확인
 
 ---
 
