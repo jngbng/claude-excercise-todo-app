@@ -6,6 +6,9 @@
 // 구현 전 Red 단계 테스트 — app/api/tickets/route.ts가 아직 없으므로 전부 실패해야 한다.
 import { NextRequest } from 'next/server';
 import { POST } from '@/app/api/tickets/route';
+import { closeDb } from '@/server/db';
+
+afterAll(() => closeDb());
 
 const postTickets = (body: unknown) =>
   POST(
