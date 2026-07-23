@@ -41,7 +41,7 @@ quickstart.md
 
 ### Tests for User Story 1 (Red)
 
-- [ ] T001 [US1] TC-API-003-1,2 테스트 작성: 존재하는 티켓 조회(200), 존재하지 않는 ID
+- [x] T001 [US1] TC-API-003-1,2 테스트 작성: 존재하는 티켓 조회(200), 존재하지 않는 ID
   조회(404) 검증 — `__tests__/api/tickets-id.test.ts` (신규 파일)
 
 ### Implementation for User Story 1 (Green)
