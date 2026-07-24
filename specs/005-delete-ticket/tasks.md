@@ -40,7 +40,7 @@ quickstart.md
 
 ### Implementation for User Story 1 (Green)
 
-- [ ] T002 [US1] `remove()` 서비스 함수 + `app/api/tickets/[id]/route.ts`에 `DELETE` Route
+- [x] T002 [US1] `remove()` 서비스 함수 + `app/api/tickets/[id]/route.ts`에 `DELETE` Route
   Handler 추가 — `src/server/services/ticketService.ts`, `app/api/tickets/[id]/route.ts`
   (의존: T001)
 

@@ -111,3 +111,9 @@ export const update = async (id: number, input: UpdateTicketInput): Promise<Tick
 
   return row ? toTicket(row) : null;
 };
+
+export const remove = async (id: number): Promise<boolean> => {
+  const [row] = await db.delete(tickets).where(eq(tickets.id, id)).returning({ id: tickets.id });
+
+  return row !== undefined;
+};

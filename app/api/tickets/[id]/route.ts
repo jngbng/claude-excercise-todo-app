@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateTicketSchema } from '@/shared/validations/ticket';
-import { getById, update } from '@/server/services/ticketService';
+import { getById, remove, update } from '@/server/services/ticketService';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -52,4 +52,15 @@ export const PATCH = async (request: NextRequest, { params }: RouteContext) => {
   }
 
   return NextResponse.json(ticket, { status: 200 });
+};
+
+export const DELETE = async (_request: NextRequest, { params }: RouteContext) => {
+  const id = await parseId(params);
+  const deleted = id === null ? false : await remove(id);
+
+  if (!deleted) {
+    return notFoundResponse();
+  }
+
+  return new NextResponse(null, { status: 204 });
 };
