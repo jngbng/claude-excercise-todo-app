@@ -40,7 +40,7 @@ research.md, quickstart.md
 
 ### Implementation for User Story 1 (Green)
 
-- [ ] T002 [US1] `complete()` 서비스 함수(조회 후 토글 갱신) + `app/api/tickets/[id]/complete/route.ts`
+- [x] T002 [US1] `complete()` 서비스 함수(조회 후 토글 갱신) + `app/api/tickets/[id]/complete/route.ts`
   생성 — `src/server/services/ticketService.ts`,
   `app/api/tickets/[id]/complete/route.ts` (의존: T001)
 

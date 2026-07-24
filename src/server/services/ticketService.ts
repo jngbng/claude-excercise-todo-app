@@ -117,3 +117,17 @@ export const remove = async (id: number): Promise<boolean> => {
 
   return row !== undefined;
 };
+
+export const complete = async (id: number): Promise<Ticket | null> => {
+  const [existing] = await db.select().from(tickets).where(eq(tickets.id, id));
+  if (!existing) return null;
+
+  const values =
+    existing.status === TICKET_STATUS.DONE
+      ? { status: TICKET_STATUS.IN_PROGRESS, completedAt: null }
+      : { status: TICKET_STATUS.DONE, completedAt: new Date() };
+
+  const [row] = await db.update(tickets).set(values).where(eq(tickets.id, id)).returning();
+
+  return toTicket(row);
+};
