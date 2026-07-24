@@ -61,8 +61,8 @@ position 재계산·재정렬·startedAt 자동 처리를 트랜잭션으로 원
 
 ## Phase 4: Polish & Cross-Cutting Concerns
 
-- [ ] T004 [P] `quickstart.md`의 curl 시나리오를 로컬 서버에서 수동 검증
-- [ ] T005 [P] `npx tsc --noEmit`, `npm run lint`, `npm test`가 모두 통과하는지 확인
+- [x] T004 [P] `quickstart.md`의 curl 시나리오를 로컬 서버에서 수동 검증
+- [x] T005 [P] `npx tsc --noEmit`, `npm run lint`, `npm test`가 모두 통과하는지 확인
 
 ---
 
