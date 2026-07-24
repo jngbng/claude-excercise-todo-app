@@ -36,7 +36,7 @@ position 재계산·재정렬·startedAt 자동 처리를 트랜잭션으로 원
 
 ### Tests for User Story 1 (Red)
 
-- [ ] T001 [US1] TC-API-007-1~7 테스트 작성: BACKLOG→TODO(startedAt 기록), TODO→BACKLOG
+- [x] T001 [US1] TC-API-007-1~7 테스트 작성: BACKLOG→TODO(startedAt 기록), TODO→BACKLOG
   (startedAt 초기화), 같은 칼럼 내 순서 변경, DONE 이동 시도(400), 잘못된 status 값(400),
   존재하지 않는 ticketId(404), 간격<1 시 재정렬(200) 검증 —
   `__tests__/api/tickets-reorder.test.ts` (신규 파일)
