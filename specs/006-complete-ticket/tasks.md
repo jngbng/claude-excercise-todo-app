@@ -54,8 +54,8 @@ research.md, quickstart.md
 
 ## Phase 4: Polish & Cross-Cutting Concerns
 
-- [ ] T003 [P] `quickstart.md`의 curl 시나리오를 로컬 서버에서 수동 검증
-- [ ] T004 [P] `npx tsc --noEmit`, `npm run lint`, `npm test`가 모두 통과하는지 확인
+- [x] T003 [P] `quickstart.md`의 curl 시나리오를 로컬 서버에서 수동 검증
+- [x] T004 [P] `npx tsc --noEmit`, `npm run lint`, `npm test`가 모두 통과하는지 확인
 
 ---
 
