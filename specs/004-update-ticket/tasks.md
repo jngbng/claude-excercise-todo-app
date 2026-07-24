@@ -36,7 +36,7 @@ quickstart.md
 
 ### Tests for User Story 1 (Red)
 
-- [ ] T001 [US1] TC-API-004-1~6 테스트 작성: title만 수정, description null 삭제, 복수 필드
+- [x] T001 [US1] TC-API-004-1~6 테스트 작성: title만 수정, description null 삭제, 복수 필드
   동시 수정, 존재하지 않는 ID(404), title 초과(400), 과거 dueDate(400) 검증 —
   `__tests__/api/tickets-id.test.ts` (기존 GET 테스트 옆에 추가)
 
