@@ -303,3 +303,24 @@ Jest did not exit one second after the test run has completed.
 확인하고 수정해줘.
 
 ---
+
+API_SPEC.md에 정의된 7개 API 엔드포인트가 코드에 구현되어 있는지 검토하고 미구현되어 있으면 추가로 구현해줘.
+
+확인할 API 목록:
+| 메서드 | URL | 설명 | FR |
+|--------|-----|------|----|
+| `POST` | `/api/tickets` | 티켓 생성 | FR-001 |
+| `GET` | `/api/tickets` | 보드 전체 티켓 조회 (칼럼별 그룹화) | FR-002 |
+| `GET` | `/api/tickets/:id` | 티켓 단건 조회 | FR-003 |
+| `PATCH` | `/api/tickets/:id` | 티켓 수정 | FR-004 |
+| `DELETE` | `/api/tickets/:id` | 티켓 삭제 | FR-006 |
+| `PATCH` | `/api/tickets/:id/complete` | 티켓 완료 처리 | FR-005 |
+| `PATCH` | `/api/tickets/reorder` | 티켓 순서/상태 변경 (드래그앤드롭) | FR-007 |
+
+각 API 별로 작업을 완료하고 그 다음 API로 진행해줘.
+
+각 API 작업을 직행할 때는 speckit을 이용한 SDD 스타일로 진행하고, 매 스탭이 끝날 때 마다 커밋을 해줘. (speckit의 단계마다, TDD의 Red-Green-Blue 단계마다.)
+
+진행 계획을 먼저 요약해줘.
+
+---
