@@ -9,7 +9,7 @@ import {
   type TicketPriority,
   type TicketStatus,
 } from '@/shared/types';
-import type { CreateTicketInput } from '@/shared/validations/ticket';
+import type { CreateTicketInput, UpdateTicketInput } from '@/shared/validations/ticket';
 
 const DONE_VISIBLE_WINDOW_MS = 24 * 60 * 60 * 1000;
 
@@ -94,6 +94,20 @@ export const create = async (input: CreateTicketInput): Promise<Ticket> => {
 
 export const getById = async (id: number): Promise<Ticket | null> => {
   const [row] = await db.select().from(tickets).where(eq(tickets.id, id));
+
+  return row ? toTicket(row) : null;
+};
+
+export const update = async (id: number, input: UpdateTicketInput): Promise<Ticket | null> => {
+  const values: Partial<typeof tickets.$inferInsert> = {};
+
+  if ('title' in input) values.title = input.title;
+  if ('description' in input) values.description = input.description ?? null;
+  if ('priority' in input) values.priority = input.priority;
+  if ('plannedStartDate' in input) values.plannedStartDate = input.plannedStartDate ?? null;
+  if ('dueDate' in input) values.dueDate = input.dueDate ?? null;
+
+  const [row] = await db.update(tickets).set(values).where(eq(tickets.id, id)).returning();
 
   return row ? toTicket(row) : null;
 };

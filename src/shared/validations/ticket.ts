@@ -34,3 +34,35 @@ export const createTicketSchema = z.object({
 });
 
 export type CreateTicketInput = z.infer<typeof createTicketSchema>;
+
+export const updateTicketSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(1, '제목을 입력해주세요')
+    .max(200, '제목은 200자 이내로 입력해주세요')
+    .optional(),
+  description: z
+    .string()
+    .max(1000, '설명은 1000자 이내로 입력해주세요')
+    .nullable()
+    .optional(),
+  priority: z
+    .enum(['LOW', 'MEDIUM', 'HIGH'], {
+      errorMap: () => ({ message: '우선순위는 LOW, MEDIUM, HIGH 중 선택해주세요' }),
+    })
+    .optional(),
+  plannedStartDate: dateString.nullable().optional(),
+  dueDate: dateString
+    .nullable()
+    .optional()
+    .refine(
+      (value) => {
+        if (!value) return true;
+        return new Date(value) >= today();
+      },
+      { message: '종료예정일은 오늘 이후 날짜를 선택해주세요' },
+    ),
+});
+
+export type UpdateTicketInput = z.infer<typeof updateTicketSchema>;

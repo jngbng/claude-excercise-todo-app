@@ -42,9 +42,9 @@ quickstart.md
 
 ### Implementation for User Story 1 (Green)
 
-- [ ] T002 [US1] `updateTicketSchema` 정의(모든 필드 optional, 기본값 없음) —
+- [x] T002 [US1] `updateTicketSchema` 정의(모든 필드 optional, 기본값 없음) —
   `src/shared/validations/ticket.ts` (의존: T001)
-- [ ] T003 [US1] `update()` 서비스 함수(키 존재 여부로 부분 갱신) + `app/api/tickets/[id]/route.ts`에
+- [x] T003 [US1] `update()` 서비스 함수(키 존재 여부로 부분 갱신) + `app/api/tickets/[id]/route.ts`에
   `PATCH` Route Handler 추가 — `src/server/services/ticketService.ts`,
   `app/api/tickets/[id]/route.ts` (의존: T002)
 

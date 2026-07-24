@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getById } from '@/server/services/ticketService';
+import { updateTicketSchema } from '@/shared/validations/ticket';
+import { getById, update } from '@/server/services/ticketService';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -19,6 +20,32 @@ const notFoundResponse = () =>
 export const GET = async (_request: NextRequest, { params }: RouteContext) => {
   const id = await parseId(params);
   const ticket = id === null ? null : await getById(id);
+
+  if (!ticket) {
+    return notFoundResponse();
+  }
+
+  return NextResponse.json(ticket, { status: 200 });
+};
+
+export const PATCH = async (request: NextRequest, { params }: RouteContext) => {
+  const id = await parseId(params);
+  const body: unknown = await request.json();
+  const parsed = updateTicketSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      {
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: parsed.error.issues[0].message,
+        },
+      },
+      { status: 400 },
+    );
+  }
+
+  const ticket = id === null ? null : await update(id, parsed.data);
 
   if (!ticket) {
     return notFoundResponse();
