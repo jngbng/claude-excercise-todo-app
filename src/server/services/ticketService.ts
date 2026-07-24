@@ -143,19 +143,23 @@ export const complete = async (id: number): Promise<Ticket | null> => {
 const computeInsertPosition = (
   neighbors: { position: number }[],
   index: number,
-): { position: number; needsRenumber: boolean } => {
+): { position: number; clampedIndex: number; needsRenumber: boolean } => {
   const clampedIndex = Math.max(0, Math.min(index, neighbors.length));
   const prev = clampedIndex > 0 ? neighbors[clampedIndex - 1] : null;
   const next = clampedIndex < neighbors.length ? neighbors[clampedIndex] : null;
 
-  if (!prev && !next) return { position: 0, needsRenumber: false };
-  if (!prev) return { position: next!.position - POSITION_GAP, needsRenumber: false };
-  if (!next) return { position: prev.position + POSITION_GAP, needsRenumber: false };
+  if (!prev && !next) return { position: 0, clampedIndex, needsRenumber: false };
+  if (!prev) return { position: next!.position - POSITION_GAP, clampedIndex, needsRenumber: false };
+  if (!next) return { position: prev.position + POSITION_GAP, clampedIndex, needsRenumber: false };
 
   const gap = next.position - prev.position;
-  if (gap < 1) return { position: 0, needsRenumber: true };
+  if (gap < 1) return { position: 0, clampedIndex, needsRenumber: true };
 
-  return { position: Math.round((prev.position + next.position) / 2), needsRenumber: false };
+  return {
+    position: Math.round((prev.position + next.position) / 2),
+    clampedIndex,
+    needsRenumber: false,
+  };
 };
 
 export const reorder = async (input: ReorderTicketInput): Promise<Ticket | null> => {
@@ -173,15 +177,15 @@ export const reorder = async (input: ReorderTicketInput): Promise<Ticket | null>
       .where(and(eq(tickets.status, targetStatus), ne(tickets.id, ticketId)))
       .orderBy(asc(tickets.position));
 
-    const { position: candidatePosition, needsRenumber } = computeInsertPosition(
-      neighbors,
-      targetIndex,
-    );
+    const {
+      position: candidatePosition,
+      clampedIndex,
+      needsRenumber,
+    } = computeInsertPosition(neighbors, targetIndex);
 
     let finalPosition = candidatePosition;
 
     if (needsRenumber) {
-      const clampedIndex = Math.max(0, Math.min(targetIndex, neighbors.length));
       const finalOrderIds = [
         ...neighbors.slice(0, clampedIndex).map((neighbor) => neighbor.id),
         ticketId,
