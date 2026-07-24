@@ -4,8 +4,9 @@
 
 // TC-API-003: GET /api/tickets/:id — 단건 조회 (docs/TEST_CASES.md, docs/API_SPECS.md 참조)
 // TC-API-004: PATCH /api/tickets/:id — 티켓 수정 (docs/TEST_CASES.md, docs/API_SPECS.md 참조)
+// TC-API-006: DELETE /api/tickets/:id — 티켓 삭제 (docs/TEST_CASES.md, docs/API_SPECS.md 참조)
 import { NextRequest } from 'next/server';
-import { GET, PATCH } from '@/app/api/tickets/[id]/route';
+import { DELETE, GET, PATCH } from '@/app/api/tickets/[id]/route';
 import { POST } from '@/app/api/tickets/route';
 import { closeDb } from '@/server/db';
 import { cleanupTrackedTickets, trackTicketId } from '../helpers/ticketFixtures';
@@ -43,6 +44,11 @@ const patchTicket = (id: number | string, body: unknown) =>
     }),
     { params: Promise.resolve({ id: String(id) }) },
   );
+
+const deleteTicket = (id: number | string) =>
+  DELETE(new NextRequest(`http://localhost/api/tickets/${id}`, { method: 'DELETE' }), {
+    params: Promise.resolve({ id: String(id) }),
+  });
 
 describe('GET /api/tickets/:id', () => {
   it('TC-API-003-1: 존재하는 티켓을 조회하면 200과 함께 티켓 전체 객체를 반환한다', async () => {
@@ -128,5 +134,34 @@ describe('PATCH /api/tickets/:id', () => {
 
     expect(response.status).toBe(400);
     expect(body.error.code).toBe('VALIDATION_ERROR');
+  });
+});
+
+describe('DELETE /api/tickets/:id', () => {
+  it('TC-API-006-1: 존재하는 티켓을 삭제하면 204와 함께 본문 없이 응답한다', async () => {
+    const ticket = await createTicket();
+
+    const response = await deleteTicket(ticket.id);
+
+    expect(response.status).toBe(204);
+  });
+
+  it('TC-API-006-2: 삭제 후 재조회하면 404와 NOT_FOUND를 반환한다', async () => {
+    const ticket = await createTicket();
+    await deleteTicket(ticket.id);
+
+    const response = await getTicket(ticket.id);
+    const body = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(body.error.code).toBe('NOT_FOUND');
+  });
+
+  it('TC-API-006-3: 존재하지 않는 ID를 삭제하려 하면 404와 NOT_FOUND를 반환한다', async () => {
+    const response = await deleteTicket(999999);
+    const body = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(body.error.code).toBe('NOT_FOUND');
   });
 });

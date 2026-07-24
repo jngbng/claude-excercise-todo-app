@@ -34,7 +34,7 @@ quickstart.md
 
 ### Tests for User Story 1 (Red)
 
-- [ ] T001 [US1] TC-API-006-1~3 테스트 작성: 삭제 성공(204), 삭제 후 재조회(404), 존재하지
+- [x] T001 [US1] TC-API-006-1~3 테스트 작성: 삭제 성공(204), 삭제 후 재조회(404), 존재하지
   않는 ID 삭제(404) 검증 — `__tests__/api/tickets-id.test.ts` (기존 GET/PATCH 테스트 옆에
   추가)
 
