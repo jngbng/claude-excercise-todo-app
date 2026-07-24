@@ -43,9 +43,9 @@ position 재계산·재정렬·startedAt 자동 처리를 트랜잭션으로 원
 
 ### Implementation for User Story 1 (Green)
 
-- [ ] T002 [US1] `reorderTicketSchema` 정의(status enum에서 DONE 제외) —
+- [x] T002 [US1] `reorderTicketSchema` 정의(status enum에서 DONE 제외) —
   `src/shared/validations/ticket.ts` (의존: T001)
-- [ ] T003 [US1] `reorder()` 서비스 함수(이웃 조회, position 재계산, 간격<1 재정렬,
+- [x] T003 [US1] `reorder()` 서비스 함수(이웃 조회, position 재계산, 간격<1 재정렬,
   startedAt 자동 처리, 트랜잭션) + `app/api/tickets/reorder/route.ts` 생성 —
   `src/server/services/ticketService.ts`, `app/api/tickets/reorder/route.ts`
   (의존: T002)

@@ -112,9 +112,11 @@ describe('PATCH /api/tickets/reorder', () => {
     const ticketB = await createTicket({ title: 'B' });
     const ticketC = await createTicket({ title: 'C' });
 
-    // A, B의 position을 동일하게 만들어 간격 0(<1) 상태를 강제로 구성한다.
-    await db.update(tickets).set({ position: 100 }).where(eq(tickets.id, ticketA.id));
-    await db.update(tickets).set({ position: 100 }).where(eq(tickets.id, ticketB.id));
+    // A, B를 다른 모든 BACKLOG 티켓보다 확실히 앞서는 동일한 position으로 강제해, 이 파일의
+    // 다른 테스트가 이미 만들어 둔 BACKLOG 티켓들과 섞이지 않고 A, B가 정확히 이웃 0, 1번이
+    // 되도록 한다. 간격 0(<1) 상태를 구성하는 것이 목적이다.
+    await db.update(tickets).set({ position: -1000000 }).where(eq(tickets.id, ticketA.id));
+    await db.update(tickets).set({ position: -1000000 }).where(eq(tickets.id, ticketB.id));
 
     // C를 BACKLOG의 index 1(A와 B 사이)로 이동 — A, B(C 제외 이웃) 간격이 0이라 재정렬이 필요하다.
     const response = await reorderTicket({ ticketId: ticketC.id, status: 'BACKLOG', position: 1 });

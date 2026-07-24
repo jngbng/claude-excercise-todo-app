@@ -1,4 +1,4 @@
-import { asc, eq, min } from 'drizzle-orm';
+import { and, asc, eq, min, ne } from 'drizzle-orm';
 import { db } from '@/server/db';
 import { tickets } from '@/server/db/schema';
 import { today } from '@/shared/utils/today';
@@ -9,9 +9,14 @@ import {
   type TicketPriority,
   type TicketStatus,
 } from '@/shared/types';
-import type { CreateTicketInput, UpdateTicketInput } from '@/shared/validations/ticket';
+import type {
+  CreateTicketInput,
+  ReorderTicketInput,
+  UpdateTicketInput,
+} from '@/shared/validations/ticket';
 
 const DONE_VISIBLE_WINDOW_MS = 24 * 60 * 60 * 1000;
+const POSITION_GAP = 1024;
 
 const isOverdue = (dueDate: string | null, status: TicketStatus): boolean => {
   if (!dueDate || status === TICKET_STATUS.DONE) return false;
@@ -130,4 +135,88 @@ export const complete = async (id: number): Promise<Ticket | null> => {
   const [row] = await db.update(tickets).set(values).where(eq(tickets.id, id)).returning();
 
   return toTicket(row);
+};
+
+// position(=클라이언트가 계산한 대상 칼럼 내 0-based 삽입 인덱스, docs/TRD.md 드래그앤드롭 흐름
+// 참고)에 해당하는 이웃 카드들 사이의 실제 저장 position 값을 계산한다. 간격이 1 미만이면
+// 칼럼 전체 재정렬이 필요함을 함께 알린다 (docs/DATA_MODEL.md position 계산 규칙).
+const computeInsertPosition = (
+  neighbors: { position: number }[],
+  index: number,
+): { position: number; needsRenumber: boolean } => {
+  const clampedIndex = Math.max(0, Math.min(index, neighbors.length));
+  const prev = clampedIndex > 0 ? neighbors[clampedIndex - 1] : null;
+  const next = clampedIndex < neighbors.length ? neighbors[clampedIndex] : null;
+
+  if (!prev && !next) return { position: 0, needsRenumber: false };
+  if (!prev) return { position: next!.position - POSITION_GAP, needsRenumber: false };
+  if (!next) return { position: prev.position + POSITION_GAP, needsRenumber: false };
+
+  const gap = next.position - prev.position;
+  if (gap < 1) return { position: 0, needsRenumber: true };
+
+  return { position: Math.round((prev.position + next.position) / 2), needsRenumber: false };
+};
+
+export const reorder = async (input: ReorderTicketInput): Promise<Ticket | null> => {
+  const { ticketId, status: targetStatus, position: targetIndex } = input;
+
+  return db.transaction(async (tx) => {
+    const [existing] = await tx.select().from(tickets).where(eq(tickets.id, ticketId));
+    if (!existing) return null;
+
+    const previousStatus = existing.status as TicketStatus;
+
+    const neighbors = await tx
+      .select({ id: tickets.id, position: tickets.position })
+      .from(tickets)
+      .where(and(eq(tickets.status, targetStatus), ne(tickets.id, ticketId)))
+      .orderBy(asc(tickets.position));
+
+    const { position: candidatePosition, needsRenumber } = computeInsertPosition(
+      neighbors,
+      targetIndex,
+    );
+
+    let finalPosition = candidatePosition;
+
+    if (needsRenumber) {
+      const clampedIndex = Math.max(0, Math.min(targetIndex, neighbors.length));
+      const finalOrderIds = [
+        ...neighbors.slice(0, clampedIndex).map((neighbor) => neighbor.id),
+        ticketId,
+        ...neighbors.slice(clampedIndex).map((neighbor) => neighbor.id),
+      ];
+
+      for (const [index, id] of finalOrderIds.entries()) {
+        if (id === ticketId) {
+          finalPosition = index * POSITION_GAP;
+          continue;
+        }
+        await tx
+          .update(tickets)
+          .set({ position: index * POSITION_GAP })
+          .where(eq(tickets.id, id));
+      }
+    }
+
+    let startedAt: Date | null | undefined;
+    if (targetStatus === TICKET_STATUS.TODO) {
+      startedAt = new Date();
+    } else if (previousStatus === TICKET_STATUS.TODO && targetStatus === TICKET_STATUS.BACKLOG) {
+      startedAt = null;
+    }
+
+    const [row] = await tx
+      .update(tickets)
+      .set({
+        status: targetStatus,
+        position: finalPosition,
+        ...(startedAt !== undefined ? { startedAt } : {}),
+      })
+      .where(eq(tickets.id, ticketId))
+      .returning();
+
+    return toTicket(row);
+  });
 };

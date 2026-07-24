@@ -66,3 +66,13 @@ export const updateTicketSchema = z.object({
 });
 
 export type UpdateTicketInput = z.infer<typeof updateTicketSchema>;
+
+export const reorderTicketSchema = z.object({
+  ticketId: z.number().int(),
+  status: z.enum(['BACKLOG', 'TODO', 'IN_PROGRESS'], {
+    errorMap: () => ({ message: '상태는 BACKLOG, TODO, IN_PROGRESS 중 선택해주세요' }),
+  }),
+  position: z.number().int(),
+});
+
+export type ReorderTicketInput = z.infer<typeof reorderTicketSchema>;
