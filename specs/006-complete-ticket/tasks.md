@@ -35,7 +35,7 @@ research.md, quickstart.md
 
 ### Tests for User Story 1 (Red)
 
-- [ ] T001 [US1] TC-API-005-1~3 테스트 작성: DONE 전환, DONE→IN_PROGRESS 되돌리기, 존재하지
+- [x] T001 [US1] TC-API-005-1~3 테스트 작성: DONE 전환, DONE→IN_PROGRESS 되돌리기, 존재하지
   않는 ID(404) 검증 — `__tests__/api/tickets-id-complete.test.ts` (신규 파일)
 
 ### Implementation for User Story 1 (Green)
