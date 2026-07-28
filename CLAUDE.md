@@ -89,3 +89,15 @@ src/shared/에서 타입과 검증 스키마를 공유한다.
 ### SDD 워크플로
 - 새 기능은 spec-kit 기반 SDD 워크플로(constitution → specify → clarify → plan → tasks → analyze/checklist → implement)를 따른다
 - 상세 진행 순서, 준수 규칙, 문서 체계는 CLAUDE-SDD.md 참조
+
+### 변경 이력 기록
+- 코드 수정 후 `/changelog "요약"` 명령으로 CHANGELOG.md에 상세 이력을 기록할 수 있다 (Hook이 아닌 Skill 방식 — 사용자가 원할 때만 실행)
+- 상세 규칙은 `.claude/skills/changelog/SKILL.md` 참조
+
+<!-- CHANGELOG:AUTO-GENERATED:START -->
+## 최근 변경 이력 (자동 생성, 최근 14일)
+> 이 섹션은 `/changelog` 실행 시 자동으로 갱신됩니다. 직접 편집하지 마세요. 전체 이력은
+> [CHANGELOG.md](./CHANGELOG.md) 참고.
+
+- **[main] 2026-07-28 20:44** — changelog 자동 기록 시스템(Skill) 추가
+<!-- CHANGELOG:AUTO-GENERATED:END -->
