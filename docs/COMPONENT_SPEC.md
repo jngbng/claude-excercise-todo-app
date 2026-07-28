@@ -1,865 +1,463 @@
-# COMPONENT_SPEC - Tika (Component Specification)
+# Tika - 컴포넌트 명세 (COMPONENT_SPEC.md)
 
-> 최종 수정: 2026-06-28
-> 버전: 1.0 (MVP)
+> React 컴포넌트 계층, Props, 동작, 이벤트 흐름, Hook 정의
+> 관련 문서: PRD.md, REQUIREMENTS.md, API_SPEC.md, DATA_MODEL.md
 
 ---
 
 ## 1. 컴포넌트 계층 구조
 
 ```
-app/page.tsx  (BoardPage — RSC, 초기 데이터 패치)
-└── KanbanBoard                          # 보드 루트, DndContext, 전체 상태 관리
-    ├── FilterBar                        # 이번 주 / 오버듀 필터 버튼
-    ├── BoardColumn × 4                  # 칼럼 (BACKLOG / TODO / IN_PROGRESS / DONE)
-    │   ├── ColumnHeader                 # 칼럼명 + 카드 수 뱃지
-    │   └── TicketCard × N              # 개별 티켓 카드 (드래그 가능)
-    │       └── PriorityBadge           # 우선순위 색상 뱃지
-    ├── DragOverlay                      # 드래그 중 카드 미리보기
-    ├── TicketModal                      # 상세 보기 / 수정 오버레이
-    │   └── TicketForm                  # 생성·수정 공용 폼
-    └── ConfirmDialog                   # 삭제 확인 다이얼로그
+App (page.tsx - 서버 컴포넌트)
+│
+└── BoardContainer (클라이언트 컴포넌트, 상태 관리 + DnD 컨텍스트)
+    │
+    ├── BoardHeader
+    │   ├── SearchInput (2차 구현 예정, MVP에서는 placeholder)
+    │   └── CreateTicketButton ─── TicketForm (생성 모달)
+    │
+    ├── FilterBar (이번주 업무 | 일정 초과 필터)
+    │
+    ├── Board (DndContext + DragOverlay)
+    │   ├── Column (BACKLOG) ─── [좌측 사이드바]
+    │   │   ├── ColumnHeader (칼럼명 + 카드 수)
+    │   │   └── SortableContext
+    │   │       ├── TicketCard
+    │   │       └── ...
+    │   ├── Column (TODO) ─── [우측 메인 그리드]
+    │   │   └── ...
+    │   ├── Column (IN_PROGRESS)
+    │   │   └── ...
+    │   └── Column (DONE)
+    │       └── ...
+    │
+    └── TicketModal (상세/수정 모달)
+        ├── TicketDetailView (읽기 전용: 시작일, 종료일, 상태, 생성일)
+        ├── TicketForm (수정 모드)
+        └── DeleteButton ─── ConfirmDialog
 ```
 
-### 레이아웃 와이어프레임
-
-#### 메인 보드 화면
+### 레이아웃 구성 (PRD 기준)
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│ KanbanBoard                                                                     │
-│                                                                                 │
-│  Tika                                                           [+ 새 티켓]    │
-│ ┌───────────────────────────────────────────────────────────────────────────┐   │
-│ │ FilterBar                          [이번 주 업무]  [만기일이 지난 업무]    │   │
-│ └───────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                 │
-│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌───────────────┐ │
-│  │  BoardColumn    │ │  BoardColumn    │ │  BoardColumn    │ │ BoardColumn   │ │
-│  │ ┌─────────────┐ │ │ ┌─────────────┐ │ │ ┌─────────────┐ │ │ ┌───────────┐ │ │
-│  │ │ColumnHeader │ │ │ │ColumnHeader │ │ │ │ColumnHeader │ │ │ │ColumnHeader│ │ │
-│  │ │ BACKLOG (2) │ │ │ │  TODO  (1)  │ │ │ │IN PROGRESS  │ │ │ │  DONE (1) │ │ │
-│  │ └─────────────┘ │ │ └─────────────┘ │ │ │    (1)      │ │ │ └───────────┘ │ │
-│  │ ┌─────────────┐ │ │ ┌─────────────┐ │ │ └─────────────┘ │ │ ┌───────────┐ │ │
-│  │ │ TicketCard  │ │ │ │ TicketCard  │ │ │ ┌─────────────┐ │ │ │ TicketCard│ │ │
-│  │ │ 로그인 디자인│ │ │ │  API 연동   │ │ │ │ TicketCard  │ │ │ │  기획 완료│ │ │
-│  │ │ [HIGH] ~7/10│ │ │ │ [MED] ~7/15 │ │ │ │  DB 스키마  │ │ │ │     ✓     │ │ │
-│  │ └─────────────┘ │ │ └─────────────┘ │ │ │  [LOW]      │ │ │ └───────────┘ │ │
-│  │ ┌─────────────┐ │ │                 │ │ └─────────────┘ │ │               │ │
-│  │ │⚠ TicketCard │ │ │                 │ │                 │ │               │ │
-│  │ │  리뷰 작업  │ │ │                 │ │                 │ │               │ │
-│  │ │ [MED] ~6/20 │ │ │                 │ │                 │ │               │ │
-│  │ └─────────────┘ │ │                 │ │                 │ │               │ │
-│  └─────────────────┘ └─────────────────┘ └─────────────────┘ └───────────────┘ │
-└─────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────┐
+│ BoardHeader: [검색창(2차)]            [새 업무 버튼] │
+├──────────┬───────────────────────────────────────┤
+│          │ FilterBar: [이번주 업무] [일정 초과]     │
+│ Backlog  ├───────────┬───────────┬───────────────┤
+│ (사이드바) │   TODO    │In Progress│     Done      │
+│          │           │           │               │
+│          │           │           │               │
+└──────────┴───────────┴───────────┴───────────────┘
 ```
 
-**범례**
-- `⚠` — `isOverdue === true` (계획종료일 초과, 미완료)
-- `[HIGH]` / `[MED]` / `[LOW]` — `PriorityBadge`
-- `~7/10` — `dueDate` 표시
-- `✓` — DONE 칼럼 완료 표시
+- **Backlog**: 좌측 사이드바 (별도 스크롤)
+- **TODO / In Progress / Done**: 우측 메인 영역 3칼럼 그리드
+- **FilterBar**: 우측 메인 영역 상단에 배치
 
 ---
 
-#### TicketModal 오버레이
+## 2. 핵심 컴포넌트 상세
 
-카드 클릭 시 보드 위에 오버레이로 표시된다.
+### 2.1 BoardContainer
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│ KanbanBoard (반투명 배경)                                                        │
-│                                                                                 │
-│            ┌──────────────────────────────────────────────┐                    │
-│            │ TicketModal                          [×] 닫기 │                    │
-│            │ ──────────────────────────────────────────── │                    │
-│            │  제목      로그인 페이지 디자인                │                    │
-│            │  상태      BACKLOG          [HIGH]            │                    │
-│            │  생성일    2026-06-28                         │                    │
-│            │  시작일    —          종료일  —                │                    │
-│            │                                              │                    │
-│            │ TicketForm                                   │                    │
-│            │  설명   ┌─────────────────────────────────┐  │                    │
-│            │         │ OAuth 소셜 로그인 포함           │  │                    │
-│            │         └─────────────────────────────────┘  │                    │
-│            │  계획시작일  [ 2026-07-01              ]      │                    │
-│            │  계획종료일  [ 2026-07-10              ]      │                    │
-│            │                                              │                    │
-│            │  [삭제]                            [저장]    │                    │
-│            └──────────────────────────────────────────────┘                    │
-│                                                                                 │
-└─────────────────────────────────────────────────────────────────────────────────┘
-```
+**역할**: 보드 전체의 상태 관리, DnD 컨텍스트 제공, API 통신 총괄
 
----
+**Props**:
+| Prop | 타입 | 설명 |
+|------|------|------|
+| initialData | BoardData | 서버에서 초기 로드한 보드 데이터 |
 
-#### ConfirmDialog — 삭제 확인
-
-삭제 버튼 클릭 시 TicketModal 위에 중첩하여 표시된다.
-
-```
-│            ┌──────────────────────────────────────────────┐
-│            │ TicketModal (흐리게)                          │
-│            │                                              │
-│            │     ┌────────────────────────────────┐       │
-│            │     │ ConfirmDialog                  │       │
-│            │     │                                │       │
-│            │     │  티켓을 삭제하면 복구할 수       │       │
-│            │     │  없습니다. 삭제하시겠습니까?     │       │
-│            │     │                                │       │
-│            │     │  [취소]              [삭제]    │       │
-│            │     └────────────────────────────────┘       │
-│            └──────────────────────────────────────────────┘
-```
-
----
-
-### 파일 위치
-
-```
-src/client/
-├── components/
-│   ├── KanbanBoard.tsx
-│   ├── FilterBar.tsx
-│   ├── BoardColumn.tsx
-│   ├── ColumnHeader.tsx
-│   ├── TicketCard.tsx
-│   ├── PriorityBadge.tsx
-│   ├── TicketModal.tsx
-│   ├── TicketForm.tsx
-│   └── ConfirmDialog.tsx
-└── hooks/
-    ├── useBoard.ts
-    ├── useDragAndDrop.ts
-    └── useTicketFilter.ts
-```
-
----
-
-## 2. 페이지 컴포넌트
-
-### `app/page.tsx` — BoardPage (RSC)
-
-**책임**: 서버에서 초기 보드 데이터를 패치하여 `KanbanBoard`에 전달한다.
-
-```typescript
-// 서버 컴포넌트 — DB 직접 접근 없이 ticketApi.ts 또는 서비스 호출
-const data: BoardData = await ticketService.getBoard();
-return <KanbanBoard initialData={data} />;
-```
-
-- 클라이언트 상태 없음, 데이터 패치만 담당
-- 이후 모든 상태 변경은 `KanbanBoard` 내 클라이언트 훅이 처리
-
----
-
-## 3. 핵심 컴포넌트 명세
-
-### `KanbanBoard`
-
-**책임**: 보드 전체 레이아웃, 전역 상태 관리, DnD 컨텍스트 루트, 모달 개폐 조율.
-
-#### Props
-
-```typescript
-type KanbanBoardProps = {
-  initialData: BoardData;
-};
-```
-
-#### 상태
-
+**내부 상태**:
 | 상태 | 타입 | 설명 |
 |------|------|------|
-| `board` | `BoardData` | 칼럼별 티켓 목록 |
-| `activeTicketId` | `number \| null` | 드래그 중인 티켓 ID (DragOverlay용) |
-| `modalTicketId` | `number \| null` | 상세 모달에 표시할 티켓 ID |
-| `isCreateModalOpen` | `boolean` | 생성 폼 모달 열림 여부 |
-| `deleteTargetId` | `number \| null` | 삭제 확인 다이얼로그 대상 티켓 ID |
-| `filter` | `'THIS_WEEK' \| 'OVERDUE' \| null` | 현재 활성 필터 |
+| board | BoardData | 현재 보드 상태 (4개 칼럼의 티켓 배열) |
+| activeTicket | TicketWithMeta \| null | 드래그 중인 티켓 |
+| selectedTicket | TicketWithMeta \| null | 모달에 표시할 선택된 티켓 |
+| isCreating | boolean | 생성 모달 열림 여부 |
+| activeFilter | 'all' \| 'thisWeek' \| 'overdue' | 현재 필터 상태 |
 
-#### 동작
-
-- `useBoard(initialData)`로 보드 데이터와 CRUD 액션 주입
-- `useDragAndDrop(board, setBoard)`로 DnD 이벤트 핸들러 주입
-- `useTicketFilter(board, filter)`로 필터된 보드 데이터 계산
-- `DndContext`로 전체 보드를 감싸고 `onDragStart`, `onDragEnd` 핸들러 연결
-- 모달 상태(`modalTicketId`, `isCreateModalOpen`, `deleteTargetId`)는 이 컴포넌트에서 관리하고 하위로 콜백 전달
-
-#### 렌더 구조
-
-```tsx
-<DndContext onDragStart={...} onDragEnd={...}>
-  <FilterBar filter={filter} onFilterChange={setFilter} />
-  <div className="board-layout">
-    {COLUMN_ORDER.map(status => (
-      <BoardColumn
-        key={status}
-        status={status}
-        tickets={filteredBoard[status]}
-        onCardClick={(id) => setModalTicketId(id)}
-        onAddClick={() => setIsCreateModalOpen(true)}
-      />
-    ))}
-  </div>
-  <DragOverlay>
-    {activeTicketId && <TicketCard ticket={findTicket(activeTicketId)} isDragging />}
-  </DragOverlay>
-  {modalTicketId && (
-    <TicketModal
-      ticketId={modalTicketId}
-      onClose={() => setModalTicketId(null)}
-      onDelete={(id) => setDeleteTargetId(id)}
-    />
-  )}
-  {isCreateModalOpen && (
-    <TicketModal mode="create" onClose={() => setIsCreateModalOpen(false)} />
-  )}
-  {deleteTargetId && (
-    <ConfirmDialog
-      onConfirm={() => handleDelete(deleteTargetId)}
-      onCancel={() => setDeleteTargetId(null)}
-    />
-  )}
-</DndContext>
-```
+**핵심 동작**:
+1. useTickets Hook으로 티켓 CRUD 및 DnD 상태 관리
+2. DndContext의 onDragStart, onDragOver, onDragEnd 핸들링
+3. 드래그 완료 시 대상 칼럼에 따라 API 분기:
+   - Done 칼럼 → `useTickets.complete()` → `PATCH /api/tickets/:id/complete`
+   - 그 외 칼럼 → `useTickets.reorder()` → `PATCH /api/tickets/reorder`
+4. 낙관적 업데이트: UI 즉시 반영 → API 호출 → 실패 시 롤백
 
 ---
 
-### `FilterBar`
+### 2.2 BoardHeader
 
-**책임**: 이번 주 업무 / 만기일이 지난 업무 필터 버튼 렌더링 및 토글.
+**역할**: 상단 영역 — 검색과 새 업무 생성 버튼
 
-#### Props
-
-```typescript
-type FilterBarProps = {
-  filter: 'THIS_WEEK' | 'OVERDUE' | null;
-  onFilterChange: (filter: 'THIS_WEEK' | 'OVERDUE' | null) => void;
-};
-```
-
-#### 동작
-
-- 버튼 클릭 시: 현재 `filter`와 같으면 `null`(해제), 다르면 해당 필터로 변경
-- 활성 필터 버튼은 시각적으로 강조 (배경색 구분)
-- 두 필터는 동시에 활성화되지 않음 (단일 선택)
-
-| 버튼 | filter 값 | 필터 조건 |
-|------|-----------|-----------|
-| 이번 주 업무 | `'THIS_WEEK'` | `plannedStartDate` 또는 `dueDate`가 이번 주(월~일) 내 |
-| 만기일이 지난 업무 | `'OVERDUE'` | `isOverdue === true` |
-
----
-
-### `BoardColumn`
-
-**책임**: 단일 칼럼 렌더링. 드롭 대상 역할, 칼럼 내 카드 목록 표시.
-
-#### Props
-
-```typescript
-type BoardColumnProps = {
-  status: TicketStatus;
-  tickets: Ticket[];
-  onCardClick: (id: number) => void;
-  onAddClick?: () => void;   // BACKLOG 칼럼에서만 표시
-};
-```
-
-#### 동작
-
-- `useDroppable({ id: status })`로 칼럼 자체를 드롭 존으로 등록 (빈 칼럼에 카드 드롭 지원)
-- `SortableContext`로 칼럼 내 카드 목록 감싸기 (`verticalListSortingStrategy`)
-- 카드가 없을 때 드롭 가능 영역 최소 높이 유지 (빈 칼럼 드롭 UX)
-- DONE 칼럼은 `onAddClick` 버튼 미표시
-
----
-
-### `ColumnHeader`
-
-**책임**: 칼럼 제목과 카드 수 뱃지 표시.
-
-#### Props
-
-```typescript
-type ColumnHeaderProps = {
-  status: TicketStatus;
-  count: number;
-};
-```
-
-| status | 표시 이름 |
-|--------|-----------|
-| `BACKLOG` | Backlog |
-| `TODO` | TODO |
-| `IN_PROGRESS` | In Progress |
-| `DONE` | Done |
-
----
-
-### `TicketCard`
-
-**책임**: 단일 티켓 카드 렌더링. 드래그 가능한 항목.
-
-#### Props
-
-```typescript
-type TicketCardProps = {
-  ticket: Ticket;
-  onClick: () => void;
-  isDragging?: boolean;    // DragOverlay에서 사용 시 true
-};
-```
-
-#### 표시 요소
-
-| 요소 | 조건 | 설명 |
+**Props**:
+| Prop | 타입 | 설명 |
 |------|------|------|
-| 제목 | 항상 | 최대 2줄, 초과 시 말줄임(`line-clamp-2`) |
-| `PriorityBadge` | 항상 | 우선순위 색상 뱃지 |
-| 계획종료일 | `dueDate` 있을 때 | `YYYY-MM-DD` 형식 |
-| ⚠ 오버듀 경고 | `isOverdue === true` | 아이콘 + 텍스트, 카드 테두리 강조 |
-| 완료 체크 | `status === 'DONE'` | 완료 표시 아이콘 |
+| onCreateClick | () => void | "새 업무" 버튼 클릭 핸들러 |
 
-#### 동작
-
-- `useSortable({ id: ticket.id })`로 드래그 핸들 및 transform 스타일 적용
-- `isDragging`이 `true`면 원본 카드 자리는 반투명 placeholder로 표시
-- 클릭 이벤트는 드래그와 충돌 방지: `distance: 5` 이상 이동 시에만 드래그 시작
+**구성 요소**:
+- **SearchInput**: 2차 구현 예정. MVP에서는 비활성 placeholder로 렌더링
+- **CreateTicketButton**: "새 업무" 버튼. 클릭 시 TicketForm 생성 모달 열림
 
 ---
 
-### `PriorityBadge`
+### 2.3 FilterBar
 
-**책임**: 우선순위 값을 색상 뱃지로 표시.
+**역할**: 우측 메인 영역 상단의 필터 버튼 — 이번주 업무, 일정 초과 필터
 
-#### Props
-
-```typescript
-type PriorityBadgeProps = {
-  priority: TicketPriority;
-};
-```
-
-| priority | 색상 | 텍스트 |
-|----------|------|--------|
-| `LOW` | 회색 | Low |
-| `MEDIUM` | 파란색 | Medium |
-| `HIGH` | 빨간색 | High |
-
----
-
-### `TicketModal`
-
-**책임**: 티켓 상세 조회·수정 또는 신규 생성 모달 오버레이.
-
-#### Props
-
-```typescript
-type TicketModalProps =
-  | { mode?: 'edit'; ticketId: number; onClose: () => void; onDelete: (id: number) => void; }
-  | { mode: 'create'; onClose: () => void; };
-```
-
-#### 상태
-
-| 상태 | 타입 | 설명 |
+**Props**:
+| Prop | 타입 | 설명 |
 |------|------|------|
-| `ticket` | `Ticket \| null` | 조회된 티켓 데이터 (edit 모드) |
-| `isLoading` | `boolean` | 데이터 로딩 중 여부 |
-| `isEditing` | `boolean` | 편집 모드 활성 여부 |
+| activeFilter | 'all' \| 'thisWeek' \| 'overdue' | 현재 활성 필터 |
+| onFilterChange | (filter: 'all' \| 'thisWeek' \| 'overdue') => void | 필터 변경 핸들러 |
+| counts | { thisWeek: number; overdue: number } | 각 필터 해당 티켓 수 |
 
-#### 동작
+**동작**:
+1. "이번주 업무" 버튼: TODO, IN_PROGRESS 칼럼에서 이번 주 종료예정일(dueDate) 기준 필터링
+2. "일정 초과" 버튼: isOverdue === true인 티켓만 필터링
+3. 이미 활성화된 필터를 다시 클릭하면 필터 해제 (전체 보기)
+4. 필터는 클라이언트 사이드에서 board 데이터를 필터링 (별도 API 호출 없음)
+5. Backlog 칼럼에는 필터가 적용되지 않음 (항상 전체 표시)
 
-- **edit 모드**: 마운트 시 `GET /api/tickets/:id` 호출하여 최신 데이터 조회
-- **create 모드**: 빈 `TicketForm` 표시
-- 배경(오버레이) 클릭 또는 ESC 키 입력 시 `onClose` 호출
-- 수정 저장 성공 시 부모 보드 상태 갱신 후 모달 유지 (편집 모드 종료)
-- 삭제 버튼은 edit 모드에서만 표시, 클릭 시 `onDelete(ticketId)` 호출 (ConfirmDialog 진입)
-
----
-
-### `TicketForm`
-
-**책임**: 티켓 생성·수정 공용 폼. 필드 입력 및 클라이언트 Zod 검증.
-
-#### Props
-
+**필터 로직**:
 ```typescript
-type TicketFormProps = {
-  initialValues?: Partial<Ticket>;
-  onSubmit: (data: CreateTicketInput | UpdateTicketInput) => Promise<void>;
-  onCancel: () => void;
-  isSubmitting: boolean;
-};
+// 이번주 업무: 이번 주 월~일 범위 내 dueDate를 가진 TODO/IN_PROGRESS 티켓
+function isThisWeek(ticket: TicketWithMeta): boolean {
+  if (!ticket.dueDate) return false;
+  if (ticket.status === 'BACKLOG' || ticket.status === 'DONE') return false;
+  const today = new Date();
+  const monday = getMonday(today);
+  const sunday = getSunday(today);
+  return ticket.dueDate >= toDateString(monday)
+      && ticket.dueDate <= toDateString(sunday);
+}
 ```
 
-#### 필드
+---
 
-| 필드 | 입력 컴포넌트 | 검증 |
-|------|-------------|------|
-| `title` | `<input type="text">` | 필수, 1~200자, 공백만 불가 |
-| `description` | `<textarea>` | 선택, 최대 1000자 |
-| `priority` | `<select>` | LOW / MEDIUM / HIGH |
-| `plannedStartDate` | `<input type="date">` | 선택 |
-| `dueDate` | `<input type="date">` | 선택, 오늘 이후 |
+### 2.4 Board
 
-#### 동작
+**역할**: DnD 영역을 정의하고 Backlog 사이드바 + 3칼럼 메인 보드 배치
 
-- 제출 전 `createTicketSchema` 또는 `updateTicketSchema`(Zod)로 클라이언트 검증
-- 검증 실패 시 해당 필드 아래 에러 메시지 인라인 표시
-- `isSubmitting`이 `true`면 제출 버튼 비활성화 및 로딩 스피너 표시
-- 취소 시 폼 초기화 없이 `onCancel` 호출
+**Props**:
+| Prop | 타입 | 설명 |
+|------|------|------|
+| board | BoardData | 칼럼별 티켓 데이터 (필터 적용 후) |
+| onTicketClick | (ticket: TicketWithMeta) => void | 카드 클릭 핸들러 |
+
+**레이아웃**:
+- 데스크톱 (1024px~): Backlog 사이드바 + 3칼럼 가로 배치
+- 태블릿 (768px~): Backlog 접기 가능 + 2칼럼 그리드
+- 모바일 (360px~): 단일 칼럼 세로 스크롤, 탭으로 칼럼 전환
+
+**DnD 설정**:
+- DndContext: 전체 보드를 감싸는 드래그앤드롭 컨텍스트
+- DragOverlay: 드래그 중 카드의 복제본 표시
+- 칼럼 간 이동 + 칼럼 내 순서 변경 모두 지원
 
 ---
 
-### `ConfirmDialog`
+### 2.5 Column
 
-**책임**: 삭제 확인 다이얼로그. 사용자가 확인 또는 취소를 선택한다.
+**역할**: 단일 칼럼(상태)에 속하는 카드 목록 표시, 드롭 영역
 
-#### Props
+**Props**:
+| Prop | 타입 | 설명 |
+|------|------|------|
+| status | TicketStatus | 칼럼 상태 값 |
+| tickets | TicketWithMeta[] | 이 칼럼의 티켓 목록 (position 오름차순) |
+| onTicketClick | (ticket: TicketWithMeta) => void | 카드 클릭 핸들러 |
 
-```typescript
-type ConfirmDialogProps = {
-  message?: string;
-  confirmLabel?: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-};
-```
+**동작**:
+1. SortableContext로 칼럼 내 정렬 지원
+2. useDroppable로 드롭 대상 영역 설정
+3. 비어있을 때 "이 칼럼에 티켓이 없습니다" 안내 표시
+4. 칼럼 헤더에 칼럼명 + 티켓 수 뱃지 표시
 
-#### 기본값
+**칼럼별 특수 동작**:
+- **BACKLOG**: 사이드바 스타일, 필터 적용 대상 아님
+- **DONE**: completedAt 기준 24시간 이내 티켓만 표시 (서버에서 필터링)
 
-| prop | 기본값 |
-|------|--------|
-| `message` | `"티켓을 삭제하면 복구할 수 없습니다. 삭제하시겠습니까?"` |
-| `confirmLabel` | `"삭제"` |
-
-#### 동작
-
-- ESC 키 → `onCancel`
-- 배경(오버레이) 클릭 → `onCancel`
-- 확인 버튼은 삭제임을 명시하는 강조 색상(빨간색) 사용
+**스타일**:
+- 배경: 연한 회색 (구분감)
+- 최소 높이: 화면 높이에 맞춤
+- 카드 간격: 8px
 
 ---
 
-## 4. 커스텀 훅 명세
+### 2.6 TicketCard
 
-### `useBoard(initialData: BoardData)`
+**역할**: 개별 티켓을 카드 형태로 표시, 드래그 소스
 
-**책임**: 보드 데이터 상태와 모든 티켓 CRUD 액션을 제공한다.
+**Props**:
+| Prop | 타입 | 설명 |
+|------|------|------|
+| ticket | TicketWithMeta | 티켓 데이터 |
+| onClick | () => void | 클릭 핸들러 (상세 모달) |
 
-#### 반환값
+**표시 정보**:
+- 제목 (1줄, 넘치면 말줄임)
+- 우선순위 뱃지 (색상 구분: LOW 회색, MEDIUM 파란색, HIGH 빨간색)
+- 종료예정일 (있을 경우, YYYY-MM-DD 형식)
+- 오버듀 표시 (isOverdue === true일 때 빨간 테두리 또는 아이콘)
+
+**동작**:
+1. useSortable로 드래그 가능하게 설정
+2. 클릭 시 onClick 호출 (드래그와 클릭 구분 필요)
+3. 드래그 중일 때 반투명 + 그림자 스타일
+
+**접근성**:
+- `role="button"`
+- `aria-label="티켓: {title}"`
+- 키보드 포커스 가능 (Tab), Enter로 상세 열기
+
+---
+
+### 2.7 TicketModal
+
+**역할**: 티켓 상세 정보 표시 및 수정/삭제
+
+**Props**:
+| Prop | 타입 | 설명 |
+|------|------|------|
+| ticket | TicketWithMeta | 표시할 티켓 |
+| isOpen | boolean | 모달 열림 상태 |
+| onClose | () => void | 닫기 핸들러 |
+| onUpdate | (id: number, data: UpdateTicketInput) => void | 수정 핸들러 |
+| onDelete | (id: number) => void | 삭제 핸들러 |
+
+**표시 필드** (PRD FR-003 기준):
+
+| 필드 | 표시명 | 편집 가능 | 설명 |
+|------|--------|----------|------|
+| title | 제목 | O | 인라인 편집 |
+| description | 설명 | O | 인라인 편집 |
+| priority | 우선순위 | O | 셀렉트 변경 |
+| plannedStartDate | 시작예정일 | O | 날짜 선택 |
+| dueDate | 종료예정일 | O | 날짜 선택 |
+| status | 상태 | X (읽기 전용) | DnD로만 변경 |
+| startedAt | 시작일 | X (읽기 전용) | 시스템 자동 (TODO 이동 시) |
+| completedAt | 종료일 | X (읽기 전용) | 시스템 자동 (Done 이동 시) |
+| createdAt | 생성일 | X (읽기 전용) | 시스템 자동 |
+
+> startedAt, completedAt, status는 시스템이 관리하는 필드로, 모달에서 읽기 전용으로 표시한다.
+> 값이 없으면 "-" 또는 빈 상태로 표시한다.
+
+**동작**:
+1. 모달 열림 시 바깥 영역 클릭 또는 ESC로 닫기
+2. 인라인 편집: 필드 클릭 시 편집 모드 전환
+3. 삭제 버튼 클릭 시 ConfirmDialog 표시
+4. 수정 완료 시 onUpdate 호출 (PATCH /api/tickets/:id)
+5. body 스크롤 잠금
+
+---
+
+### 2.8 TicketForm
+
+**역할**: 티켓 생성/수정 폼
+
+**Props**:
+| Prop | 타입 | 설명 |
+|------|------|------|
+| mode | 'create' \| 'edit' | 폼 모드 |
+| initialData | Partial\<Ticket\> | 수정 시 기존 데이터 |
+| onSubmit | (data: CreateTicketInput \| UpdateTicketInput) => void | 제출 핸들러 |
+| onCancel | () => void | 취소 핸들러 |
+| isLoading | boolean | 제출 중 로딩 상태 |
+
+**폼 필드**:
+| 필드 | 컴포넌트 | 필수 | 검증 |
+|------|----------|------|------|
+| title | text input | O (생성 시) | 1~200자, 공백만 불가 |
+| description | textarea | X | 최대 1000자 |
+| priority | select (3옵션) | X | LOW, MEDIUM, HIGH (기본: MEDIUM) |
+| plannedStartDate | date input | X | YYYY-MM-DD |
+| dueDate | date input | X | 오늘 이후 날짜 |
+
+**동작**:
+1. 클라이언트 사이드 Zod 검증 → 에러 메시지 인라인 표시
+2. Enter 키 또는 제출 버튼으로 폼 제출
+3. 제출 중 버튼 비활성화 + 로딩 스피너
+4. 성공 시 폼 초기화 (생성 모드) 또는 모달 닫기 (수정 모드)
+
+**검증 에러 메시지** (REQUIREMENTS.md 기준):
+| 필드 | 규칙 | 에러 메시지 |
+|------|------|-------------|
+| title | 빈 값 / 공백만 | "제목을 입력해주세요" |
+| title | 200자 초과 | "제목은 200자 이내로 입력해주세요" |
+| description | 1000자 초과 | "설명은 1000자 이내로 입력해주세요" |
+| priority | 잘못된 값 | "우선순위는 LOW, MEDIUM, HIGH 중 선택해주세요" |
+| dueDate | 과거 날짜 | "종료예정일은 오늘 이후 날짜를 선택해주세요" |
+
+> 검증 스키마는 `src/shared/validations/ticket.ts`의 Zod 스키마를 공유한다.
+
+---
+
+## 3. 공통 UI 컴포넌트
+
+### Modal
+- 오버레이 + 중앙 정렬 컨테이너
+- ESC 키 닫기, 바깥 클릭 닫기
+- 열림/닫힘 애니메이션
+- body 스크롤 잠금
+
+### Badge
+- 우선순위 표시: LOW(회색), MEDIUM(파란색), HIGH(빨간색)
+- 크기: 작은 텍스트 + 둥근 패딩
+
+### ConfirmDialog
+- "정말 삭제하시겠습니까?" 확인 다이얼로그
+- 확인/취소 버튼
+- 위험 동작(삭제)은 빨간색 확인 버튼
+
+### Button
+- variant: primary, secondary, danger, ghost
+- size: sm, md, lg
+- 로딩 상태 지원
+
+---
+
+## 4. useTickets Hook
+
+**역할**: 티켓 CRUD 및 DnD 상태를 관리하는 커스텀 Hook. 모든 API 호출은 이 Hook을 통해 수행한다.
+
+**파일**: `src/client/hooks/useTickets.ts`
+
+### 인터페이스
 
 ```typescript
-type UseBoardReturn = {
+interface UseTicketsReturn {
+  // 상태
   board: BoardData;
-  setBoard: Dispatch<SetStateAction<BoardData>>;
-  createTicket: (data: CreateTicketInput) => Promise<void>;
-  updateTicket: (id: number, data: UpdateTicketInput) => Promise<void>;
-  deleteTicket: (id: number) => Promise<void>;
-  completeTicket: (id: number) => Promise<void>;
-};
+  isLoading: boolean;
+  error: string | null;
+
+  // 액션
+  create: (data: CreateTicketInput) => Promise<void>;
+  update: (id: number, data: UpdateTicketInput) => Promise<void>;
+  remove: (id: number) => Promise<void>;
+  reorder: (ticketId: number, status: ReorderableStatus, position: number) => Promise<void>;
+  complete: (id: number) => Promise<void>;
+}
+
+function useTickets(initialData: BoardData): UseTicketsReturn;
 ```
 
-#### 동작
+> `ReorderableStatus`(`Exclude<TicketStatus, 'DONE'>`)는 `useTickets.ts` 파일 내에 로컬로 정의한다. `src/shared/types`에는 두지 않는다 — reorder 액션의 시그니처일 뿐 서버·다른 클라이언트 코드가 공유할 필요가 없는 클라이언트 전용 타입이기 때문이다. `TicketStatus`만 `@/shared/types`에서 import해서 파생시킨다.
 
-- `board`는 `useState<BoardData>(initialData)`로 초기화
-- 각 액션은 `ticketApi.ts`를 호출하고 응답으로 `board` 상태를 갱신
-- 생성: 응답 티켓을 `board.backlog` 맨 앞에 추가
-- 수정: 해당 칼럼에서 id로 찾아 교체
-- 삭제: 해당 칼럼에서 id 제거
-- 완료: `completeTicket` 응답 기반으로 칼럼 간 이동 처리
-- API 실패 시 `board` 상태 롤백하지 않음 (CRUD는 낙관적 업데이트 미적용, 응답 기반 갱신)
+### 액션별 동작
+
+| 액션 | API | 설명 |
+|------|-----|------|
+| create | `POST /api/tickets` | 티켓 생성 → Backlog 맨 위에 추가 |
+| update | `PATCH /api/tickets/:id` | 제목, 설명, 우선순위, 시작예정일, 종료예정일 수정 |
+| remove | `DELETE /api/tickets/:id` | 티켓 영구 삭제 |
+| reorder | `PATCH /api/tickets/reorder` | 칼럼 이동 / 순서 변경 (Done 제외) |
+| complete | `PATCH /api/tickets/:id/complete` | Done으로 이동, completedAt 자동 설정 |
+
+### 낙관적 업데이트 패턴
+
+```
+1. 현재 board 상태 백업
+2. UI 즉시 반영 (board 상태 변경)
+3. API 호출
+4. 성공: board를 서버 응답으로 확정
+5. 실패: 백업한 상태로 롤백 + 에러 표시
+```
+
+### API 호출 함수
+
+모든 API 호출은 `src/client/api/ticketApi.ts`를 통해 수행한다. 컴포넌트에서 직접 fetch 호출 금지.
 
 ---
 
-### `useDragAndDrop(board: BoardData, setBoard: Dispatch<...>)`
+## 5. 이벤트 흐름
 
-**책임**: @dnd-kit DnD 이벤트 처리, 낙관적 업데이트, 실패 시 롤백.
-
-#### 반환값
-
-```typescript
-type UseDragAndDropReturn = {
-  activeTicketId: number | null;
-  handleDragStart: (event: DragStartEvent) => void;
-  handleDragEnd: (event: DragEndEvent) => void;
-};
-```
-
-#### 동작
+### 5.1 드래그앤드롭 흐름
 
 ```
-handleDragStart:
-  activeTicketId = event.active.id
+사용자 드래그 시작
+  → onDragStart: activeTicket 설정, 드래그 오버레이 표시
 
-handleDragEnd:
-  1. 스냅샷: 이전 board 저장
-  2. 낙관적 업데이트: board 상태에서 카드 이동 (칼럼 간 또는 칼럼 내 재정렬)
-  3. DONE 칼럼 드롭 감지:
-     → completeTicket(id) 호출
-  4. 그 외 칼럼 드롭:
-     → position 계산 (인접 카드의 position 기반)
-     → reorderTicket({ ticketId, status, position }) 호출
-  5. API 실패 시:
-     → 스냅샷으로 board 복원 (롤백)
-     → 에러 토스트 표시
-  6. activeTicketId = null
+사용자 드래그 중 (칼럼 위)
+  → onDragOver: 대상 칼럼 하이라이트
+
+사용자 드롭
+  → onDragEnd:
+    1. 대상 칼럼 판별
+    2-a. [대상 = Done]
+        → 낙관적 업데이트 (board 상태 즉시 반영)
+        → useTickets.complete(ticketId)
+        → PATCH /api/tickets/:id/complete
+        → completedAt 자동 설정
+    2-b. [대상 = BACKLOG / TODO / IN_PROGRESS]
+        → 낙관적 업데이트 (board 상태 즉시 반영)
+        → useTickets.reorder(ticketId, status, position)
+        → PATCH /api/tickets/reorder
+        → startedAt 규칙 적용 (TODO 이동 시 설정, BACKLOG 복귀 시 초기화)
+        → completedAt 규칙 적용 (Done에서 나올 때 초기화)
+    3. 성공: 확정
+    4. 실패: 롤백 (이전 board 상태로 복원) + 에러 토스트
 ```
 
-#### position 계산 (클라이언트)
-
-| 삽입 위치 | position |
-|-----------|----------|
-| 칼럼이 비어 있음 | `0` |
-| 맨 앞 | `첫 번째 position - 1024` |
-| 두 카드 사이 | `(prev.position + next.position) / 2` |
-| 맨 뒤 | `마지막 position + 1024` |
-
-> 최종 position 정규화(간격 < 1 시 재정렬)는 서버에서 처리한다.
-
----
-
-### `useTicketFilter(board: BoardData, filter: FilterType | null)`
-
-**책임**: 활성 필터 기준으로 보드 데이터를 파생 계산한다.
-
-#### 반환값
-
-```typescript
-type UseTicketFilterReturn = {
-  filteredBoard: BoardData;
-};
-```
-
-#### 필터 조건
-
-```typescript
-// THIS_WEEK: plannedStartDate 또는 dueDate가 이번 주 월~일 내
-const isThisWeek = (ticket: Ticket): boolean => {
-  const { start, end } = getThisWeekRange(); // 월요일 ~ 일요일
-  return (
-    (ticket.plannedStartDate !== null && ticket.plannedStartDate >= start && ticket.plannedStartDate <= end) ||
-    (ticket.dueDate !== null && ticket.dueDate >= start && ticket.dueDate <= end)
-  );
-};
-
-// OVERDUE: dueDate < 오늘 AND status !== DONE
-const isOverdue = (ticket: Ticket): boolean => ticket.isOverdue;
-```
-
-- `filter === null`이면 `filteredBoard = board` (필터 없음)
-- 필터는 모든 칼럼에 동일하게 적용
-
----
-
-## 5. 드래그앤드롭 구현 전략
-
-### @dnd-kit 구성 요소 역할
-
-| 구성 요소 | 적용 위치 | 역할 |
-|-----------|-----------|------|
-| `DndContext` | `KanbanBoard` | DnD 이벤트 루트, `onDragStart`/`onDragEnd` 수신 |
-| `SortableContext` | `BoardColumn` | 칼럼 내 카드 순서 관리, `verticalListSortingStrategy` |
-| `useSortable` | `TicketCard` | 카드를 드래그 가능한 항목으로 등록 |
-| `useDroppable` | `BoardColumn` | 빈 칼럼에 드롭 가능하도록 칼럼 자체 등록 |
-| `DragOverlay` | `KanbanBoard` | 드래그 중 카드 시각적 미리보기 (포탈 렌더링) |
-
-### 칼럼 간 이동 감지
+### 5.2 티켓 생성 흐름
 
 ```
-onDragEnd에서 대상 감지:
-  over.data.current?.type === 'column'  →  빈 칼럼에 드롭
-  over.data.current?.sortable.containerId  →  카드 위에 드롭 (해당 칼럼 식별)
+BoardHeader("새 업무" 클릭)
+  → TicketForm (생성 모달 열림)
+  → 폼 입력 (제목, 설명, 우선순위, 시작예정일, 종료예정일)
+  → 클라이언트 Zod 검증
+  → useTickets.create(data)
+  → POST /api/tickets
+  → 성공: Backlog 맨 위에 카드 추가 → 모달 닫기
 ```
 
-### DONE 칼럼 처리
-
-- DONE 칼럼은 `PATCH /api/tickets/reorder`가 아닌 `PATCH /api/tickets/:id/complete`를 사용
-- `handleDragEnd`에서 `targetStatus === 'DONE'`이면 분기하여 `completeTicket` 호출
-- DONE에서 다른 칼럼으로 이동 시에도 `completeTicket` 호출 (서버에서 `completedAt = null` 처리)
-
-### 드래그 활성화 임계값
-
-```typescript
-// 클릭과 드래그 충돌 방지
-const sensors = useSensors(
-  useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  useSensor(KeyboardSensor)  // 키보드 접근성 지원
-);
-```
-
-- 5px 이상 이동 시에만 드래그 시작 → 카드 클릭(모달 열기)과 분리
-- `KeyboardSensor`로 키보드 드래그 지원 (접근성 NFR-003)
-
-### 낙관적 업데이트 흐름
+### 5.3 티켓 수정 흐름
 
 ```
-onDragEnd
-  ├─ 이전 board 스냅샷 저장
-  ├─ board 상태 즉시 업데이트 (UI 반영)
-  └─ API 호출
-       ├─ 성공 → 스냅샷 폐기
-       └─ 실패 → 스냅샷으로 board 복원 + 에러 토스트
+TicketCard(클릭)
+  → TicketModal (상세 보기)
+  → 필드 인라인 편집 (제목, 설명, 우선순위, 시작예정일, 종료예정일)
+  → 클라이언트 Zod 검증
+  → useTickets.update(id, data)
+  → PATCH /api/tickets/:id
+  → 성공: board 카드 업데이트
 ```
 
-### 드래그 중 UX
-
-- 원본 위치: 반투명 placeholder 카드 표시
-- 드래그 중 카드: `DragOverlay`로 포탈 렌더링 (z-index 최상위, 그림자 강조)
-- 드롭 가능한 칼럼 위에 올라올 때: 칼럼 배경색 강조 (`isOver` 상태 활용)
-
----
-
-## 6. 이벤트 흐름
-
-핵심 기능별로 컴포넌트 간 데이터와 이벤트 흐름을 정리한다. 누가 상태를 소유하고 누가 이벤트를 발생시키는지 명확히 확인할 수 있다.
-
-**표기 규칙**
-
-| 기호 | 의미 |
-|------|------|
-| `[소유]` | 해당 컴포넌트·훅이 상태를 직접 관리 |
-| `──props──▶` | 부모 → 자식으로 데이터 전달 |
-| `◀──callback──` | 자식 → 부모로 이벤트 전달 |
-| `──API──▶` | `ticketApi.ts`를 통한 서버 호출 |
-
----
-
-### F-1. 티켓 생성
-
-> **상태 소유**: `KanbanBoard` (`isCreateModalOpen`, `board`)
-> **이벤트 발생**: 사용자 → 헤더 버튼 → `TicketForm` submit
+### 5.4 티켓 완료 흐름 (Done 이동)
 
 ```
-사용자
-  │  [+ 새 티켓] 클릭
-  ▼
-KanbanBoard [소유: isCreateModalOpen, board]
-  │  isCreateModalOpen = true
-  │──mode="create"──▶ TicketModal
-  │                        │
-  │                        │──▶ TicketForm [소유: formValues, errors]
-  │                                 │  사용자 입력 + Zod 검증
-  │                                 │  onSubmit(data)
-  │                        ◀────────┘
-  │◀──onSubmit(data)────────┘
-  │
-  │  useBoard.createTicket(data)
-  │──POST /api/tickets──▶ 서버
-  │◀──201: Ticket──────────┘
-  │
-  │  board.backlog 맨 앞에 추가
-  │  isCreateModalOpen = false
-  ▼
-BoardColumn(BACKLOG) ── TicketCard 신규 렌더
+Done 칼럼으로 드래그
+  → useTickets.complete(ticketId)
+  → PATCH /api/tickets/:id/complete
+  → completedAt 자동 설정
+  → Done 칼럼에 표시
+  → 24시간 경과 후 보드에서 숨김 (서버 필터링)
+```
+
+### 5.5 티켓 삭제 흐름
+
+```
+TicketModal(삭제 버튼 클릭)
+  → ConfirmDialog ("정말 삭제하시겠습니까?")
+  → 확인
+  → useTickets.remove(ticketId)
+  → DELETE /api/tickets/:id
+  → 성공: board에서 카드 제거 → 모달 닫기
 ```
 
 ---
 
-### F-2. 티켓 상세 모달 열기
+## 6. UseCase — 컴포넌트 — Hook 매핑
 
-> **상태 소유**: `KanbanBoard` (`modalTicketId`)
-> **이벤트 발생**: `TicketCard` 클릭 → `BoardColumn` → `KanbanBoard`
-
-```
-사용자
-  │  TicketCard 클릭 (드래그 없이, 5px 미만 이동)
-  ▼
-TicketCard
-  │  onClick() 호출
-  ▼
-BoardColumn
-  │  onCardClick(id) 호출
-  ▼
-KanbanBoard [소유: modalTicketId]
-  │  modalTicketId = id
-  │──ticketId, onClose, onDelete──▶ TicketModal
-  │                                     │
-  │                                     │──GET /api/tickets/:id──▶ 서버
-  │                                     │◀──200: Ticket───────────┘
-  │                                     ▼
-  │                                  TicketForm ── 기존 값으로 렌더 (읽기 모드)
-```
-
----
-
-### F-3. 티켓 수정 저장
-
-> **상태 소유**: `KanbanBoard` (`board`), `TicketForm` (`formValues`, `errors`)
-> **이벤트 발생**: `TicketForm` submit → `TicketModal` → `KanbanBoard`
-
-```
-사용자
-  │  필드 수정 후 [저장] 클릭
-  ▼
-TicketForm [소유: formValues, errors]
-  │  Zod 검증 통과
-  │  onSubmit(data) 호출
-  ▼
-TicketModal
-  │  onUpdate(ticketId, data) 호출
-  ▼
-KanbanBoard [소유: board]
-  │  useBoard.updateTicket(id, data)
-  │──PATCH /api/tickets/:id──▶ 서버
-  │◀──200: Ticket─────────────┘
-  │
-  │  board 내 해당 Ticket 교체
-  │  isEditing = false (모달 유지, 읽기 모드 복귀)
-  ▼
-TicketModal ── 갱신된 데이터로 재렌더
-```
-
----
-
-### F-4. 티켓 삭제
-
-> **상태 소유**: `KanbanBoard` (`deleteTargetId`, `modalTicketId`, `board`)
-> **이벤트 발생**: `TicketModal` 삭제 버튼 → `ConfirmDialog` 확인
-
-```
-사용자
-  │  TicketModal 내 [삭제] 클릭
-  ▼
-TicketModal
-  │  onDelete(id) 호출
-  ▼
-KanbanBoard [소유: deleteTargetId]
-  │  deleteTargetId = id
-  │──onConfirm, onCancel──▶ ConfirmDialog 렌더
-  │
-  │                  사용자 [삭제 확인] 클릭
-  │                        │  onConfirm() 호출
-  │◀─────────────────────────┘
-  │
-  │  useBoard.deleteTicket(id)
-  │──DELETE /api/tickets/:id──▶ 서버
-  │◀──204: No Content──────────┘
-  │
-  │  board에서 해당 Ticket 제거
-  │  deleteTargetId = null
-  │  modalTicketId = null  (모달 닫기)
-  ▼
-BoardColumn ── TicketCard 제거 후 재렌더
-
-  │  사용자 [취소] 클릭 시
-  │  onCancel() 호출 → deleteTargetId = null (모달 유지)
-```
-
----
-
-### F-5. 드래그앤드롭 — 칼럼 간/내 이동
-
-> **상태 소유**: `KanbanBoard` (`board`, `activeTicketId`), `useDragAndDrop` (스냅샷)
-> **이벤트 발생**: `TicketCard` 드래그 → `DndContext` 이벤트
-
-```
-사용자
-  │  TicketCard 드래그 시작 (5px 이상 이동)
-  ▼
-DndContext.onDragStart
-  │  activeTicketId = id
-  ▼
-KanbanBoard
-  │──isDragging=true──▶ DragOverlay ── 드래그 중 카드 미리보기 렌더
-  │  원본 TicketCard 자리 ── 반투명 placeholder 표시
-
-사용자
-  │  대상 칼럼(BACKLOG / TODO / IN_PROGRESS)에 드롭
-  ▼
-DndContext.onDragEnd
-  ▼
-useDragAndDrop [소유: snapshot]
-  │  1. 현재 board 스냅샷 저장
-  │  2. board 상태 즉시 업데이트 (낙관적)
-  │     ── 칼럼 이동 + position 재계산 (fractional indexing)
-  │  3. activeTicketId = null → DragOverlay 제거
-  │
-  │──PATCH /api/tickets/reorder──▶ 서버
-  │
-  ├── 성공: 스냅샷 폐기, 서버 응답 값으로 board 갱신
-  └── 실패: 스냅샷으로 board 복원 + 에러 토스트
-            ▼
-         BoardColumn ── 원래 위치로 롤백 재렌더
-```
-
----
-
-### F-6. 티켓 완료 처리 (DONE 이동)
-
-> **상태 소유**: `KanbanBoard` (`board`), `useDragAndDrop` (스냅샷)
-> **이벤트 발생**: `TicketCard` → DONE 칼럼 드롭 → `useDragAndDrop`
-
-```
-사용자
-  │  TicketCard를 DONE 칼럼에 드롭
-  ▼
-DndContext.onDragEnd
-  ▼
-useDragAndDrop
-  │  targetStatus === 'DONE' 감지
-  │  → reorder 대신 complete API 분기
-  │
-  │  1. board 스냅샷 저장
-  │  2. 낙관적 업데이트: 해당 카드를 board.done으로 이동
-  │
-  │──PATCH /api/tickets/:id/complete──▶ 서버
-  │◀──200: completedAt=NOW(), status='DONE'──┘
-  │
-  ├── 성공: 서버 응답 Ticket으로 board.done 갱신
-  └── 실패: 스냅샷 복원 + 에러 토스트
-
-[DONE → 다른 칼럼으로 역이동 시]
-  │  useDragAndDrop: targetStatus !== 'DONE' 이고 sourceStatus === 'DONE'
-  │──PATCH /api/tickets/:id/complete──▶ 서버
-  │◀──200: completedAt=null, status='IN_PROGRESS'──┘
-```
-
----
-
-### F-7. 필터 토글
-
-> **상태 소유**: `KanbanBoard` (`filter`), `useTicketFilter` (filteredBoard 계산)
-> **이벤트 발생**: `FilterBar` 버튼 클릭 → `KanbanBoard`
-
-```
-사용자
-  │  [이번 주 업무] 또는 [만기일이 지난 업무] 버튼 클릭
-  ▼
-FilterBar
-  │  onFilterChange(newFilter) 호출
-  │  (현재 활성 필터와 같으면 null 전달 → 필터 해제)
-  ▼
-KanbanBoard [소유: filter]
-  │  filter 상태 업데이트
-  ▼
-useTicketFilter(board, filter) [소유: filteredBoard 계산값]
-  │  filter 조건에 맞는 티켓만 추출
-  │  ── 'THIS_WEEK': plannedStartDate 또는 dueDate가 이번 주(월~일) 해당
-  │  ── 'OVERDUE':   isOverdue === true 인 티켓만
-  │  ── null:        전체 board 반환
-  ▼
-KanbanBoard
-  │──tickets(filteredBoard)──▶ BoardColumn × 4
-  │                                │──ticket──▶ TicketCard (필터 결과만 렌더)
-  │
-  │  FilterBar ── 활성 필터 버튼 강조 표시 업데이트
-```
-
----
-
-## 7. 사용자 스토리 × 컴포넌트·Hook 매핑
-
-| US | 사용자 스토리 | FR | 컴포넌트 | Hook |
-|----|--------------|----|----------|------|
-| US-003 | 칸반 보드 현황 파악 | FR-002 | `BoardPage` · `KanbanBoard` · `BoardColumn` · `TicketCard` | `useBoard` |
-| US-004 | 마감 초과 인지 | FR-008 | `TicketCard` | `useBoard` |
-| US-001 | 새 할 일 등록 | FR-001 | `KanbanBoard` · `TicketModal` · `TicketForm` | `useBoard` |
-| US-002 | 상세 정보 설정 | FR-001 | `TicketModal` · `TicketForm` | `useBoard` |
-| US-007 | 할 일 수정 | FR-003, FR-004 | `TicketCard` · `TicketModal` · `TicketForm` | `useBoard` |
-| US-008 | 할 일 삭제 | FR-006 | `TicketModal` · `ConfirmDialog` | `useBoard` |
-| US-005 | 드래그앤드롭 상태 변경 | FR-007 | `KanbanBoard` · `BoardColumn` · `TicketCard` · `DragOverlay` | `useDragAndDrop` |
-| US-006 | 할 일 완료 처리 | FR-005 | `KanbanBoard` · `BoardColumn` · `DragOverlay` | `useDragAndDrop` |
+| 사용자 스토리 | 주요 컴포넌트 | 사용하는 Hook 액션 |
+|-------------|-------------|-------------------|
+| US-001: 새 할 일 등록 | BoardHeader, TicketForm | useTickets.create |
+| US-002: 상세 정보 설정 | TicketForm | useTickets.create |
+| US-003: 칸반 보드 현황 파악 | Board, Column, TicketCard | useTickets (조회) |
+| US-004: 마감 초과 인지 | TicketCard, FilterBar | useTickets (조회), isOverdue |
+| US-005: 드래그앤드롭 상태 변경 | Board, Column | useTickets.reorder |
+| US-006: 할 일 완료 처리 | Board (Done 칼럼 드롭) | useTickets.complete |
+| US-007: 할 일 수정 | TicketModal, TicketForm | useTickets.update |
+| US-008: 할 일 삭제 | TicketModal, ConfirmDialog | useTickets.remove |

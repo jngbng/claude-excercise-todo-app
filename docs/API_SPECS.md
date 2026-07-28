@@ -64,7 +64,7 @@
 
 ### Ticket 객체 공통 구조
 
-모든 엔드포인트의 티켓 응답은 아래 구조를 따른다.
+모든 엔드포인트의 티켓 응답은 아래 구조(`TicketWithMeta`)를 따른다. `isOverdue`는 DB 컬럼이 아니라 조회 시 계산해 덧붙이는 파생 필드이므로, DB 컬럼과 1:1로 대응하는 `Ticket` 타입에는 포함되지 않는다 (자세한 구조는 DATA_MODEL.md 5장 참고).
 
 ```typescript
 type Ticket = {
@@ -80,7 +80,10 @@ type Ticket = {
   completedAt:      string | null;  // ISO 8601
   createdAt:        string;         // ISO 8601
   updatedAt:        string;         // ISO 8601
-  isOverdue:        boolean;        // 파생 필드 (DB 미저장)
+}
+
+type TicketWithMeta = Ticket & {
+  isOverdue: boolean;                // 파생 필드 (DB 미저장)
 }
 ```
 

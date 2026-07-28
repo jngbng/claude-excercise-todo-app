@@ -118,38 +118,38 @@
 | TC-COMP-001-2 | 오버듀 경고 표시 | isOverdue=true | 경고 아이콘/표시 렌더링 |
 | TC-COMP-001-3 | isOverdue=false면 경고 미표시 | isOverdue=false | 경고 아이콘 없음 |
 | TC-COMP-001-4 | dueDate 없으면 날짜 미표시 | dueDate=null | 날짜 영역 렌더링 안 됨 |
-| TC-COMP-001-5 | 카드 클릭 시 콜백 호출 | 카드 클릭 | onCardClick(id) 1회 호출 |
+| TC-COMP-001-5 | 카드 클릭 시 콜백 호출 | 카드 클릭 | onClick 1회 호출 |
 
 ---
 
-### TC-COMP-002: `BoardColumn`
+### TC-COMP-002: `Column`
 
 | TC ID | 시나리오 | 조건 | 기대 결과 |
 |-------|----------|------|-----------|
 | TC-COMP-002-1 | 칼럼명과 카드 수 표시 | status=BACKLOG, tickets 3개 | "BACKLOG"와 "3" 텍스트 표시 |
 | TC-COMP-002-2 | 티켓 목록 렌더링 | tickets 2개 | 2개의 카드 제목 화면에 표시 |
-| TC-COMP-002-3 | 빈 칼럼 | tickets=[] | 카드 없음, 카드 수 0 표시 |
+| TC-COMP-002-3 | 빈 칼럼 | tickets=[] | "이 칼럼에 티켓이 없습니다" 안내 표시, 카드 수 0 표시 |
 
 ---
 
-### TC-COMP-003: `KanbanBoard`
+### TC-COMP-003: `BoardContainer`
 
 | TC ID | 시나리오 | 조건 | 기대 결과 |
 |-------|----------|------|-----------|
 | TC-COMP-003-1 | 4개 칼럼 렌더링 | initialData 있음 | BACKLOG, TODO, IN PROGRESS, DONE 칼럼명 모두 표시 |
-| TC-COMP-003-2 | "+ 새 티켓" 버튼 클릭 | 버튼 클릭 | 생성 모드 TicketModal 렌더링 |
-| TC-COMP-003-3 | FilterBar 표시 | — | "이번 주 업무", "만기일이 지난 업무" 버튼 표시 |
+| TC-COMP-003-2 | "새 업무" 버튼 클릭 | BoardHeader의 CreateTicketButton 클릭 | 생성 모드 TicketForm 모달 렌더링 |
+| TC-COMP-003-3 | FilterBar 표시 | — | "이번주 업무", "일정 초과" 버튼 표시 |
 
 ---
 
-### TC-COMP-004: `TicketModal` + `TicketForm` — 생성 모드
+### TC-COMP-004: `TicketForm` — 생성 모드
 
 | TC ID | 시나리오 | 조건 | 기대 결과 |
 |-------|----------|------|-----------|
-| TC-COMP-004-1 | 생성 폼 초기 상태 | mode="create" 모달 열기 | 제목 빈칸, 우선순위 MEDIUM 기본 선택 |
+| TC-COMP-004-1 | 생성 폼 초기 상태 | mode="create"로 모달 열기 | 제목 빈칸, 우선순위 MEDIUM 기본 선택 |
 | TC-COMP-004-2 | 빈 title로 저장 시도 | 저장 클릭 (title 비어있음) | "제목을 입력해주세요" 에러 메시지 표시 |
-| TC-COMP-004-3 | 유효한 입력 후 저장 | title 입력 → 저장 클릭 | createTicket API 호출, 모달 닫힘 |
-| TC-COMP-004-4 | 닫기(×) 버튼 클릭 | × 클릭 | 모달 닫힘 |
+| TC-COMP-004-3 | 유효한 입력 후 저장 | title 입력 → 저장 클릭 | onSubmit 호출(createTicket API 연동), 모달 닫힘 |
+| TC-COMP-004-4 | 취소 버튼 클릭 | 취소 클릭 | onCancel 호출, 모달 닫힘 |
 
 ---
 
@@ -177,10 +177,10 @@
 
 | TC ID | 시나리오 | 조건 | 기대 결과 |
 |-------|----------|------|-----------|
-| TC-COMP-007-1 | 버튼 2개 렌더링 | — | "이번 주 업무", "만기일이 지난 업무" 버튼 표시 |
-| TC-COMP-007-2 | 필터 활성화 | [이번 주 업무] 클릭 | onFilterChange("THIS_WEEK") 호출, 버튼 강조 표시 |
-| TC-COMP-007-3 | 같은 버튼 재클릭으로 해제 | 활성 버튼 재클릭 | onFilterChange(null) 호출 |
-| TC-COMP-007-4 | 다른 필터로 전환 | [이번 주] 활성 중 [만기일] 클릭 | onFilterChange("OVERDUE") 호출 |
+| TC-COMP-007-1 | 버튼 2개 렌더링 | — | "이번주 업무", "일정 초과" 버튼 표시 |
+| TC-COMP-007-2 | 필터 활성화 | [이번주 업무] 클릭 | onFilterChange('thisWeek') 호출, 버튼 강조 표시 |
+| TC-COMP-007-3 | 같은 버튼 재클릭으로 해제 | 활성 버튼 재클릭 | onFilterChange('all') 호출 |
+| TC-COMP-007-4 | 다른 필터로 전환 | [이번주 업무] 활성 중 [일정 초과] 클릭 | onFilterChange('overdue') 호출 |
 
 ---
 
@@ -233,9 +233,9 @@
 | TC-API-007 | FR-007 | US-005, US-006 | PATCH /api/tickets/reorder 상태·순서 변경 |
 | TC-API-008 | FR-008 | US-004 | isOverdue 파생 필드 계산 |
 | TC-COMP-001 | FR-008 | US-004 | TicketCard 렌더링, 오버듀·우선순위 표시 |
-| TC-COMP-002 | FR-002 | US-003 | BoardColumn 칼럼·카드 수 렌더링 |
-| TC-COMP-003 | FR-001, FR-002 | US-001, US-003 | KanbanBoard 레이아웃 및 모달 제어 |
-| TC-COMP-004 | FR-001 | US-001, US-002 | TicketModal(생성) 폼 검증 및 저장 흐름 |
+| TC-COMP-002 | FR-002 | US-003 | Column 칼럼·카드 수 렌더링 |
+| TC-COMP-003 | FR-001, FR-002 | US-001, US-003 | BoardContainer 레이아웃 및 모달 제어 |
+| TC-COMP-004 | FR-001 | US-001, US-002 | TicketForm(생성) 폼 검증 및 저장 흐름 |
 | TC-COMP-005 | FR-003, FR-004 | US-007 | TicketModal(수정) 기존 데이터 표시 및 저장 |
 | TC-COMP-006 | FR-006 | US-008 | ConfirmDialog 삭제 확인 흐름 |
 | TC-COMP-007 | — | — | FilterBar 필터 토글 및 강조 상태 |

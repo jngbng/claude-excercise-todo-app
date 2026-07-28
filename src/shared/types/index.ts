@@ -28,12 +28,16 @@ export type Ticket = {
   completedAt: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+// DB에는 없는 파생 필드(isOverdue)를 조회 시점에 덧붙인 타입. API 응답은 항상 이 형태다.
+export type TicketWithMeta = Ticket & {
   isOverdue: boolean;
 };
 
 export type BoardData = {
-  backlog: Ticket[];
-  todo: Ticket[];
-  inProgress: Ticket[];
-  done: Ticket[];
+  backlog: TicketWithMeta[];
+  todo: TicketWithMeta[];
+  inProgress: TicketWithMeta[];
+  done: TicketWithMeta[];
 };

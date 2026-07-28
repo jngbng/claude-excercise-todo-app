@@ -99,5 +99,6 @@ src/shared/에서 타입과 검증 스키마를 공유한다.
 > 이 섹션은 `/changelog` 실행 시 자동으로 갱신됩니다. 직접 편집하지 마세요. 전체 이력은
 > [CHANGELOG.md](./CHANGELOG.md) 참고.
 
+- **[main] 2026-07-29 08:16** — COMPONENT_SPEC.md를 프론트엔드 실습 예제 기준으로 정리하고, TicketWithMeta 타입 분리 등 TRD/TEST_CASES/PRD/타입 코드 정합성 맞춤
 - **[main] 2026-07-28 20:44** — changelog 자동 기록 시스템(Skill) 추가
 <!-- CHANGELOG:AUTO-GENERATED:END -->

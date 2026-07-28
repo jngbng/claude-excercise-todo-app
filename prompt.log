@@ -366,3 +366,19 @@ API_SPECS.md 의 에러 응답 형식: {error: {code, message}}
 - `파일명` (+10, -2 lines)
 
 ---
+
+COMPONENT_SPEC.md 파일을 업데이트했는데, 다른 문서와 비교해서 오류가 없는지 검토해줘. 문제가 없으면 없다고 보고해줘.
+
+---
+
+TEST_CASES.md와 TRD.md를 COMPONENT_SPEC.md 기준으로 맞춰줘. Ticket 에 isOverDue 가 포함된게 문제야. Ticket은 DB 타입에 맞추기 위해 isOverDue가 빠져야 해. DB에서 조회한 후 계산된 필드(isOverDue)를 덧붙이기 위해 TicketWithMeta 타입이 필요해.
+
+---
+
+PRD.md 필터 버튼 문구도 COMPONENT_SPEC.md 기준으로 맞춰줘
+
+---
+
+ReorderableStatus 는 client에서만 쓰이는 타입이니깐 공용 shared/type 에 선언하면 안돼. 공용 모델에 클라이언트 로직이 섞이면 안돼지.
+
+---

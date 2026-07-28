@@ -177,6 +177,8 @@ export const tickets = pgTable(
 
 ## 5. 공유 TypeScript 타입
 
+`Ticket`은 `tickets` 테이블 컬럼과 1:1로 대응하는 타입이다. `isOverdue`는 DB 컬럼이 아니므로 `Ticket`에 포함하지 않고, 조회 시 계산해 덧붙인 `TicketWithMeta`로 분리한다. API 응답(단건·목록 모두)은 항상 `TicketWithMeta` 형태다.
+
 ```typescript
 // src/shared/types/index.ts
 
@@ -193,16 +195,22 @@ export type Ticket = {
   completedAt:      string | null;  // ISO 8601
   createdAt:        string;         // ISO 8601
   updatedAt:        string;         // ISO 8601
-  isOverdue:        boolean;        // 파생 필드
+};
+
+// DB에 없는 파생 필드(isOverdue)를 조회 시점에 덧붙인 타입
+export type TicketWithMeta = Ticket & {
+  isOverdue: boolean;
 };
 
 export type BoardData = {
-  backlog:    Ticket[];
-  todo:       Ticket[];
-  inProgress: Ticket[];
-  done:       Ticket[];
+  backlog:    TicketWithMeta[];
+  todo:       TicketWithMeta[];
+  inProgress: TicketWithMeta[];
+  done:       TicketWithMeta[];
 };
 ```
+
+> `ReorderableStatus`(reorder 시 허용되는 상태, `DONE` 제외)는 `useTickets` 훅에서만 쓰는 클라이언트 전용 타입이므로 여기 포함하지 않는다. COMPONENT_SPEC.md 4장 참고.
 
 ---
 

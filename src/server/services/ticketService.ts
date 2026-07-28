@@ -5,9 +5,9 @@ import { today } from '@/shared/utils/today';
 import {
   TICKET_STATUS,
   type BoardData,
-  type Ticket,
   type TicketPriority,
   type TicketStatus,
+  type TicketWithMeta,
 } from '@/shared/types';
 import type {
   CreateTicketInput,
@@ -23,7 +23,7 @@ const isOverdue = (dueDate: string | null, status: TicketStatus): boolean => {
   return new Date(dueDate) < today();
 };
 
-const toTicket = (row: typeof tickets.$inferSelect): Ticket => {
+const toTicket = (row: typeof tickets.$inferSelect): TicketWithMeta => {
   const status = row.status as TicketStatus;
 
   return {
@@ -73,7 +73,7 @@ export const getBoard = async (): Promise<BoardData> => {
   return board;
 };
 
-export const create = async (input: CreateTicketInput): Promise<Ticket> => {
+export const create = async (input: CreateTicketInput): Promise<TicketWithMeta> => {
   const [{ minPosition }] = await db
     .select({ minPosition: min(tickets.position) })
     .from(tickets)
@@ -97,13 +97,16 @@ export const create = async (input: CreateTicketInput): Promise<Ticket> => {
   return toTicket(ticket);
 };
 
-export const getById = async (id: number): Promise<Ticket | null> => {
+export const getById = async (id: number): Promise<TicketWithMeta | null> => {
   const [row] = await db.select().from(tickets).where(eq(tickets.id, id));
 
   return row ? toTicket(row) : null;
 };
 
-export const update = async (id: number, input: UpdateTicketInput): Promise<Ticket | null> => {
+export const update = async (
+  id: number,
+  input: UpdateTicketInput,
+): Promise<TicketWithMeta | null> => {
   const values: Partial<typeof tickets.$inferInsert> = {};
 
   if ('title' in input) values.title = input.title;
@@ -123,7 +126,7 @@ export const remove = async (id: number): Promise<boolean> => {
   return row !== undefined;
 };
 
-export const complete = async (id: number): Promise<Ticket | null> => {
+export const complete = async (id: number): Promise<TicketWithMeta | null> => {
   const [existing] = await db.select().from(tickets).where(eq(tickets.id, id));
   if (!existing) return null;
 
@@ -162,7 +165,7 @@ const computeInsertPosition = (
   };
 };
 
-export const reorder = async (input: ReorderTicketInput): Promise<Ticket | null> => {
+export const reorder = async (input: ReorderTicketInput): Promise<TicketWithMeta | null> => {
   const { ticketId, status: targetStatus, position: targetIndex } = input;
 
   return db.transaction(async (tx) => {

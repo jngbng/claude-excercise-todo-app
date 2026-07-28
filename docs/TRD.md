@@ -187,40 +187,47 @@ onDragEnd 이벤트
 
 ## 5. 프론트엔드 아키텍처
 
+> 컴포넌트 계층·Props·이벤트 흐름의 상세 명세는 COMPONENT_SPEC.md를 단일 소스로 한다. 아래는 그 요약이다.
+
 ### 컴포넌트 계층 구조
 
 ```
 app/page.tsx (BoardPage — RSC, 초기 데이터 패치)
 └── src/client/components/
-    ├── KanbanBoard             # 보드 전체 레이아웃, DndContext 루트
-    │   ├── BoardColumn         # 칼럼 단위 (Backlog / TODO / In Progress / Done)
-    │   │   ├── ColumnHeader    # 칼럼명 + 카드 수 뱃지
-    │   │   └── TicketCard      # 개별 티켓 카드 (드래그 가능)
-    │   └── FilterBar           # 이번 주 업무 / 만기일 지난 업무 필터 버튼
-    ├── TicketModal             # 티켓 상세 보기 / 수정 오버레이
-    │   └── TicketForm          # 생성·수정 공용 폼
-    └── ConfirmDialog           # 삭제 확인 다이얼로그
+    └── BoardContainer          # 상태 관리 총괄, DndContext 루트
+        ├── BoardHeader
+        │   └── CreateTicketButton ─── TicketForm  # 생성 모달
+        ├── FilterBar            # 이번주 업무 / 일정 초과 필터 버튼
+        ├── Board                # DndContext + DragOverlay
+        │   └── Column × 4       # Backlog(사이드바) / TODO / In Progress / Done
+        │       ├── ColumnHeader # 칼럼명 + 카드 수 뱃지
+        │       └── TicketCard   # 개별 티켓 카드 (드래그 가능)
+        └── TicketModal          # 상세 보기 / 수정 오버레이
+            ├── TicketDetailView # 읽기 전용 필드 (시작일, 종료일, 상태, 생성일)
+            ├── TicketForm       # 수정 모드
+            └── DeleteButton ─── ConfirmDialog
 ```
 
 ### 상태 관리
 
-외부 상태 관리 라이브러리(Redux, Zustand 등)를 사용하지 않는다. React 내장 훅(`useState`, `useReducer`, `useOptimistic`)으로 로컬 상태를 관리한다.
+외부 상태 관리 라이브러리(Redux, Zustand 등)를 사용하지 않는다. React 내장 훅(`useState`)으로 로컬 상태를 관리하며, `BoardContainer`가 필터·모달·드래그 상태를 소유하고 하위 컴포넌트에는 controlled prop으로 내려준다.
 
 | 상태 | 위치 | 관리 방법 |
 |------|------|-----------|
-| 보드 전체 티켓 목록 | `KanbanBoard` | `useState<BoardData>` |
-| 드래그 중 임시 상태 | `KanbanBoard` | `useOptimistic` (낙관적 업데이트) |
-| 모달 열림/닫힘 | `KanbanBoard` | `useState<TicketId \| null>` |
-| 필터 선택 상태 | `FilterBar` | `useState<FilterType \| null>` |
+| 보드 전체 티켓 목록 | `BoardContainer` | `useTickets(initialData)`가 제공하는 `board: BoardData` |
+| 드래그 중인 티켓 | `BoardContainer` | `useState<TicketWithMeta \| null>` (`activeTicket`) |
+| 모달에 표시할 선택 티켓 | `BoardContainer` | `useState<TicketWithMeta \| null>` (`selectedTicket`) |
+| 생성 모달 열림 여부 | `BoardContainer` | `useState<boolean>` (`isCreating`) |
+| 필터 선택 상태 | `BoardContainer` | `useState<'all' \| 'thisWeek' \| 'overdue'>` (`activeFilter`), `FilterBar`에 controlled prop으로 전달 |
 | 폼 입력값 | `TicketForm` | `useState<FormData>` |
 
 ### 커스텀 훅
 
 | 훅 | 위치 | 역할 |
 |----|------|------|
-| `useBoard` | `hooks/useBoard.ts` | 보드 데이터 패치, 티켓 CRUD 액션, 낙관적 업데이트 조율 |
-| `useDragAndDrop` | `hooks/useDragAndDrop.ts` | @dnd-kit 이벤트 핸들러, reorder 호출, 롤백 처리 |
-| `useTicketFilter` | `hooks/useTicketFilter.ts` | 이번 주 / 오버듀 필터 로직, 파생 티켓 목록 계산 |
+| `useTickets` | `hooks/useTickets.ts` | 보드 데이터 패치, 티켓 CRUD(`create`/`update`/`remove`)와 DnD 액션(`reorder`/`complete`)을 단일 인터페이스로 제공, 낙관적 업데이트 조율 |
+
+> 필터 계산(이번 주/오버듀)은 별도 훅 없이 `FilterBar`/`BoardContainer` 내부 순수 함수(`isThisWeek` 등)로 처리한다 (COMPONENT_SPEC.md 2.3 참고).
 
 ### API 호출 단일 진입점 (`ticketApi.ts`)
 
@@ -239,23 +246,23 @@ reorderTicket(ticketId, status, position) // PATCH /api/tickets/reorder
 
 ### 낙관적 업데이트 패턴
 
-드래그앤드롭·생성·삭제는 API 응답을 기다리지 않고 UI를 즉시 반영한다.
+드래그앤드롭·생성·삭제는 API 응답을 기다리지 않고 UI를 즉시 반영한다. `useTickets`가 이 패턴을 통일된 방식으로 구현한다.
 
 ```
 사용자 액션
-  └─ 이전 상태 스냅샷 저장
+  └─ 이전 board 상태 백업
         └─ UI 즉시 반영 (낙관적)
               └─ API 호출
-                    ├─ 성공: 스냅샷 폐기 (UI 유지)
-                    └─ 실패: 스냅샷으로 UI 롤백 + 에러 메시지 표시
+                    ├─ 성공: board를 서버 응답으로 확정
+                    └─ 실패: 백업한 상태로 롤백 + 에러 표시
 ```
 
 ### 드래그 앤 드롭 (@dnd-kit)
 
-- `DndContext`: `KanbanBoard` 루트에 배치, `onDragEnd`에서 `useDragAndDrop` 훅 호출
-- `SortableContext`: 각 `BoardColumn`에 적용, `position` 기준 정렬 유지
+- `DndContext`: `Board`(`BoardContainer` 하위) 루트에 배치, `onDragStart`/`onDragOver`/`onDragEnd`를 `BoardContainer`가 직접 핸들링
+- `SortableContext`: 각 `Column`에 적용, `position` 기준 정렬 유지
 - `useSortable`: 각 `TicketCard`에 적용, 드래그 핸들 및 transform 스타일 제공
-- 칼럼 간 이동: `active.data.current.sortable.containerId`로 출발 칼럼 판별
+- `onDragEnd`에서 대상 칼럼이 `DONE`이면 `useTickets.complete()`, 그 외 칼럼이면 `useTickets.reorder()` 호출 (COMPONENT_SPEC.md 5.1 참고)
 
 ---
 
@@ -377,12 +384,12 @@ PATCH  /api/tickets/reorder      # 순서/상태 변경 (드래그앤드롭)
 // 단건 응답 (생성·수정·조회)
 { id, title, status, priority, position, ... }
 
-// 목록 응답 (보드 조회)
+// 목록 응답 (보드 조회) — 각 티켓은 isOverdue가 포함된 TicketWithMeta
 {
-  backlog: Ticket[],
-  todo: Ticket[],
-  inProgress: Ticket[],
-  done: Ticket[]
+  backlog: TicketWithMeta[],
+  todo: TicketWithMeta[],
+  inProgress: TicketWithMeta[],
+  done: TicketWithMeta[]
 }
 
 // 삭제 성공 (204 No Content)
