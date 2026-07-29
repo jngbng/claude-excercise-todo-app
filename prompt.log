@@ -391,3 +391,11 @@ ReorderableStatus 는 client에서만 쓰이는 타입이니깐 공용 shared/ty
 - 요구사항 정의는 @docs/REQUIREMENTS.md 참고
 
 ---
+
+@docs/COMPONENT_SPEC.md 를 기반으로 프런트엔드 구현 계획을 만들어줘.
+- 말단 컴포넌트부터 컨테이너까지 bottom-up 순서
+- Phase별 그룹핑과 의존성 그래프
+- 각 컴포넌트별 TDD 체크리스트
+docs/FRONTEND_TASKS.md로 저장해줘
+
+---
