@@ -1,1 +1,108 @@
 @import "tailwindcss";
+
+@theme {
+  /* Font */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Pretendard Variable", Pretendard,
+    "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+
+  /* Brand (버튼, 활성 필터, 포커스 링) */
+  --color-brand-50: #eef4ff;
+  --color-brand-500: #2563eb;
+  --color-brand-600: #1d4ed8;
+  --color-brand-700: #1e40af;
+
+  /* Surface */
+  --color-surface-app: #f4f5f7;
+  --color-surface-header: #ffffff;
+  --color-surface-sidebar: #fafbfc;
+  --color-surface-column: #f1f2f4;
+  --color-surface-card: #ffffff;
+
+  /* Border */
+  --color-border-default: #dfe1e6;
+  --color-border-strong: #c1c7d0;
+
+  /* Text */
+  --color-text-primary: #172b4d;
+  --color-text-secondary: #5e6c84;
+  --color-text-muted: #97a0af;
+
+  /* 우선순위 (REQUIREMENTS.md #6) */
+  --color-priority-low: #6b7280;
+  --color-priority-medium: #2563eb;
+  --color-priority-high: #dc2626;
+
+  /* 위험/오버듀 (FR-006 삭제, FR-008 오버듀 공용) */
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+
+  /* Radius */
+  --radius-card: 0.5rem;
+  --radius-button: 0.375rem;
+  --radius-modal: 0.75rem;
+
+  /* Shadow (카드 평상시 / 호버 / 드래그 중 / 모달) */
+  --shadow-card: 0 1px 2px rgba(9, 30, 66, 0.15), 0 0px 1px rgba(9, 30, 66, 0.1);
+  --shadow-card-hover: 0 4px 8px rgba(9, 30, 66, 0.18), 0 1px 3px rgba(9, 30, 66, 0.12);
+  --shadow-card-dragging: 0 8px 16px rgba(9, 30, 66, 0.24);
+  --shadow-modal: 0 12px 32px rgba(9, 30, 66, 0.28);
+
+  /* 모달 열림 애니메이션 (COMPONENT_SPEC.md 3. Modal) */
+  --animate-overlay-in: overlay-in 0.15s ease-out;
+  --animate-modal-in: modal-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes overlay-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes modal-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+}
+
+body {
+  background-color: var(--color-surface-app);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+/* TicketModal 열림 시 배경 스크롤 잠금 (COMPONENT_SPEC.md 2.7) */
+.body-scroll-locked {
+  overflow: hidden;
+}
+
+/* Column / Backlog 스크롤 영역 (COMPONENT_SPEC.md 2.5) */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-strong);
+  border-radius: 9999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}

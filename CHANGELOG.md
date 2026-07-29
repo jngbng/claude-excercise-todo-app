@@ -3,6 +3,27 @@
 이 파일은 `/changelog "요약"` 명령으로 자동 기록된다. 새 항목은 항상 최상단에 추가되며, 기존 항목은
 삭제·수정하지 않는다. CLAUDE.md의 "최근 변경 이력" 섹션은 이 파일에서 최근 14일 항목만 요약한 것이다.
 
+## [main] - 2026-07-30 07:32
+
+### Prompt
+> "이제 프런트엔드 화면을 개발할 거야. reference/image/트렐로.png 와 reference/image/tika-wireframe.png 를
+> 살펴보고 이 화면 구성에 맞는 핵심 스타일을 app/globals.css 에 정의해줘. 화면 관련 스펙은
+> docs/COMPONENT_SPEC.md 참고, 요구사항 정의는 docs/REQUIREMENTS.md 참고"
+
+### Changes
+- **Modified**: Tailwind CSS 4 `@theme` 디렉티브로 디자인 토큰(brand/surface/border/text 색상, 우선순위별
+  색상 `priority-low/medium/high` — REQUIREMENTS.md §6 매핑, danger, radius, shadow, 모달 열림
+  애니메이션 `overlay-in`/`modal-in`)을 정의하고, body 기본 스타일·포커스 아웃라인(NFR-003)·모달 스크롤
+  잠금(`body-scroll-locked`)·칼럼 스크롤바(`scrollbar-thin`) 유틸리티 추가. 트렐로 스크린샷의 카드/칼럼
+  비주얼과 tika-wireframe.png의 Backlog 사이드바 + 3칼럼 레이아웃(COMPONENT_SPEC.md §1)을 기준으로 설계
+  (`app/globals.css`)
+- **Modified**: 세션 중 입력한 프롬프트가 자동으로 이어서 기록됨 (추정 — 자동 로깅 파일로 보이며 이번
+  세션에서 직접 수정한 적은 없음) (`prompt.log`)
+
+### Files Modified
+- `app/globals.css` (+107, -0 lines)
+- `prompt.log` (+9, -0 lines)
+
 ## [main] - 2026-07-29 08:16
 
 ### Prompt

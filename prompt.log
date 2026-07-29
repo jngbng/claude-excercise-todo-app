@@ -382,3 +382,12 @@ PRD.md 필터 버튼 문구도 COMPONENT_SPEC.md 기준으로 맞춰줘
 ReorderableStatus 는 client에서만 쓰이는 타입이니깐 공용 shared/type 에 선언하면 안돼. 공용 모델에 클라이언트 로직이 섞이면 안돼지.
 
 ---
+
+이제 프런트엔드 화면을 개발할 거야.
+
+@reference/image/트렐로.png 와 @reference/image/tika-wireframe.png 를 살펴보고 이 화면 구성에 맞는 핵심 스타일을 @app/globals.css 에 정의해줘.
+
+- 화면 관련 스펙은 @docs/COMPONENT_SPE.md 참고
+- 요구사항 정의는 @docs/REQUIREMENTS.md 참고
+
+---
