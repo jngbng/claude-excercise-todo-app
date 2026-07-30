@@ -425,3 +425,11 @@ Button 컴포넌트의 테스트를 작성해줘. 아직 구현하지 말고 테
 방금 만든 테스트는 컴포넌트 파일이 없어서 실패하는데, 최소한 로딩 에러로 실패하진 않게 해줘. 파일 만들고 더미 Button 컴포넌트 까지는 만들어줘.
 
 ---
+
+__tests__/components/Button.test.tsx의 테스트를 통과하는 Button 컴포넌트를 구현해줘.
+- 파일: src/client/components/Button.tsx
+- globals.css 클래스 사용
+- 최소한의 구현으로 테스트만 통과하면 돼.
+
+
+---

@@ -3,6 +3,21 @@
 이 파일은 `/changelog "요약"` 명령으로 자동 기록된다. 새 항목은 항상 최상단에 추가되며, 기존 항목은
 삭제·수정하지 않는다. CLAUDE.md의 "최근 변경 이력" 섹션은 이 파일에서 최근 14일 항목만 요약한 것이다.
 
+## [main] - 2026-07-31 08:09
+
+### Prompt
+> "__tests__/components/Button.test.tsx의 테스트를 통과하는 Button 컴포넌트를 구현해줘. 파일:
+> src/client/components/Button.tsx, globals.css 클래스 사용, 최소한의 구현으로 테스트만 통과하면 돼."
+
+### Changes
+- **Modified**: Button 컴포넌트 Green 단계 구현 — variant(primary/secondary/danger/ghost)·
+  size(sm/md/lg)별 클래스 매핑, 기본값 primary/md, onClick 연결, isLoading일 때 버튼 비활성화 +
+  "처리중..." 텍스트 표시로 테스트 12건 모두 통과 (`src/client/components/Button.tsx`)
+- **Modified**: 세션 프롬프트 자동 기록 갱신 (`prompt.log`)
+
+### Test Results
+- ✅ 12 passed, 0 failed (`npx jest __tests__/components/Button.test.tsx`)
+
 ## [main] - 2026-07-31 07:53
 
 ### Prompt
