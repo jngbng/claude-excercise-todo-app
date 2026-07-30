@@ -3,6 +3,19 @@
 이 파일은 `/changelog "요약"` 명령으로 자동 기록된다. 새 항목은 항상 최상단에 추가되며, 기존 항목은
 삭제·수정하지 않는다. CLAUDE.md의 "최근 변경 이력" 섹션은 이 파일에서 최근 14일 항목만 요약한 것이다.
 
+## [main] - 2026-07-31 08:14
+
+### Prompt
+> "changelog 스킬에서 CLAUDE.md 파일 끝에 최신 변경이력을 업데이트 하는 부분을 제거해줘. 기존에
+> 생성된 내용도 지워줘."
+
+### Changes
+- **Modified**: `/changelog` 스킬에서 CLAUDE.md 최근 변경사항 요약 갱신 단계(옛 7단계)를 삭제하고
+  description/목적 문구에서 CLAUDE.md 언급 제거 — 이제 CHANGELOG.md만 수정함
+  (`.claude/skills/changelog/SKILL.md`)
+- **Modified**: `<!-- CHANGELOG:AUTO-GENERATED:START/END -->` 마커와 그 안의 최근 변경 이력 요약
+  블록을 파일 끝에서 삭제 (`CLAUDE.md`)
+
 ## [main] - 2026-07-31 08:09
 
 ### Prompt

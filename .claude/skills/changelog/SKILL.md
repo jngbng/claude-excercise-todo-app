@@ -1,6 +1,6 @@
 ---
 name: "changelog"
-description: "코드 변경 후 CHANGELOG.md에 상세 작업 이력을 기록하고, CLAUDE.md의 최근 변경사항 요약(최근 14일)을 갱신한다. 프롬프트 내용, 변경 파일, 브랜치/일시, 테스트 결과를 자동 수집한다."
+description: "코드 변경 후 CHANGELOG.md에 상세 작업 이력을 기록한다. 프롬프트 내용, 변경 파일, 브랜치/일시, 테스트 결과를 자동 수집한다."
 argument-hint: "이번 변경에 대한 한 줄 요약 (예: \"로그인 버그 수정\")"
 user-invocable: true
 disable-model-invocation: true
@@ -11,7 +11,7 @@ disable-model-invocation: true
 `/changelog "요약"` 명령이 실행되었을 때만 동작한다. Hook이 아니라 Skill이므로 코드를 수정하거나
 git에 반영할 때마다 자동으로 실행되지 않는다 — 사용자가 명시적으로 호출했을 때만 이력을 기록한다.
 
-이 스킬은 **CHANGELOG.md와 CLAUDE.md만** 수정한다. `app/`, `src/` 등 실제 소스 코드는 절대 건드리지
+이 스킬은 **CHANGELOG.md만** 수정한다. `app/`, `src/` 등 실제 소스 코드는 절대 건드리지
 않는다. 또한 git add/commit을 대신 수행하지 않는다 — 기록만 남기고, 커밋 여부는 사용자가 결정한다.
 
 ## User Input
@@ -88,30 +88,7 @@ $ARGUMENTS
 - ✅ 12 passed, 0 failed (`npm test`)
 ```
 
-### 7. CLAUDE.md 최근 변경사항 요약 갱신
+### 7. 결과 보고
 
-- CLAUDE.md에서 `<!-- CHANGELOG:AUTO-GENERATED:START -->` ~ `<!-- CHANGELOG:AUTO-GENERATED:END -->`
-  마커를 찾는다. 없으면 파일 맨 끝에 새로 만든다.
-- CHANGELOG.md의 모든 항목 중 날짜가 **오늘 기준 최근 14일 이내**인 것만 골라, 최신순으로 한 줄씩
-  요약한 불릿 리스트를 만들어 두 마커 사이 내용을 통째로 교체한다 (14일 초과 항목은 CLAUDE.md
-  요약에서는 자연히 빠지지만 CHANGELOG.md에는 그대로 남는다 — 절대 삭제하지 않는다).
-- 마커 밖 CLAUDE.md의 다른 내용은 절대 수정하지 않는다.
-- 블록 형식:
-
-```markdown
-<!-- CHANGELOG:AUTO-GENERATED:START -->
-## 최근 변경 이력 (자동 생성, 최근 14일)
-> 이 섹션은 `/changelog` 실행 시 자동으로 갱신됩니다. 직접 편집하지 마세요. 전체 이력은
-> [CHANGELOG.md](./CHANGELOG.md) 참고.
-
-- **[브랜치명] YYYY-MM-DD HH:MM** — 한 줄 요약
-- **[브랜치명] YYYY-MM-DD HH:MM** — 한 줄 요약
-<!-- CHANGELOG:AUTO-GENERATED:END -->
-```
-
-이 기간 내 항목이 하나도 없으면 "최근 14일간 기록된 변경사항이 없습니다."라는 한 줄만 남긴다.
-
-### 8. 결과 보고
-
-CHANGELOG.md에 추가한 항목 미리보기(제목 줄)와 CLAUDE.md 요약 블록 갱신 여부를 사용자에게 짧게
-보고한다. git add/commit은 수행하지 않았음을 함께 알린다.
+CHANGELOG.md에 추가한 항목 미리보기(제목 줄)를 사용자에게 짧게 보고한다. git add/commit은
+수행하지 않았음을 함께 알린다.

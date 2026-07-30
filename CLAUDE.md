@@ -93,17 +93,3 @@ src/shared/에서 타입과 검증 스키마를 공유한다.
 ### 변경 이력 기록
 - 코드 수정 후 `/changelog "요약"` 명령으로 CHANGELOG.md에 상세 이력을 기록할 수 있다 (Hook이 아닌 Skill 방식 — 사용자가 원할 때만 실행)
 - 상세 규칙은 `.claude/skills/changelog/SKILL.md` 참조
-
-<!-- CHANGELOG:AUTO-GENERATED:START -->
-## 최근 변경 이력 (자동 생성, 최근 14일)
-> 이 섹션은 `/changelog` 실행 시 자동으로 갱신됩니다. 직접 편집하지 마세요. 전체 이력은
-> [CHANGELOG.md](./CHANGELOG.md) 참고.
-
-- **[main] 2026-07-31 08:09** — Button 컴포넌트 Green 단계 구현 (variant/size 클래스, isLoading 처리) — 테스트 12건 통과
-- **[main] 2026-07-31 07:53** — Button 컴포넌트 Red 단계 테스트 작성 및 모듈 미발견 에러 방지용 더미 스텁 생성
-- **[main] 2026-07-31 07:37** — changelog 스킬에서 "Files Modified" 섹션 제거 및 CHANGELOG.md 기존 항목에서도 해당 섹션 삭제
-- **[main] 2026-07-31 07:30** — app/preview/page.tsx에 목데이터 갤러리 형식 컴포넌트 프리뷰 페이지 신설 (Phase 1/2/3 섹션 뼈대)
-- **[main] 2026-07-30 07:32** — 트렐로/tika-wireframe 참고해 app/globals.css에 Tailwind v4 @theme 디자인 토큰(색상/radius/shadow/애니메이션) 정의
-- **[main] 2026-07-29 08:16** — COMPONENT_SPEC.md를 프론트엔드 실습 예제 기준으로 정리하고, TicketWithMeta 타입 분리 등 TRD/TEST_CASES/PRD/타입 코드 정합성 맞춤
-- **[main] 2026-07-28 20:44** — changelog 자동 기록 시스템(Skill) 추가
-<!-- CHANGELOG:AUTO-GENERATED:END -->
