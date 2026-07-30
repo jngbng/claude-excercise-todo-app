@@ -399,3 +399,12 @@ ReorderableStatus 는 client에서만 쓰이는 타입이니깐 공용 shared/ty
 docs/FRONTEND_TASKS.md로 저장해줘
 
 ---
+
+프런트엔드 컴포넌트를 개발하면서 시각적으로 확인할 프리뷰 페이지를 만들어줘.
+- app/preview/page.tsx (클라이언트 컴포넌트)
+- 목(mock) 데이터로 개별 컴포넌트를 렌더링하는 갤러리 형식
+- 지금은 빈 컨테이너만 만들고, Phase별로 컴포넌트를 추가해 나갈 거야.
+- DB 연결 없이 `yarn dev`로 `localhost:3000/preview`에서 확인 가능해야 해.
+- 각 Phase 개발이 완료되면 run test 후 화면 확인 후 다음 과정으로 넘어가는 거야.
+
+---
