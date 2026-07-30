@@ -444,3 +444,19 @@ docs/FRONTEND_TASKS.md 의 Phase 1 나머지 컴포넌트를 TDD로 구현해줘
 - 각 컴포넌트 작업을 마칠 때마다 커밋을 해줘.
 
 ---
+
+Phase 1 컴포넌트를 프리뷰 페이지에 추가해줘.
+app/preview/page.tsx에:
+- Button: 네 가지 variat를 나란히 렌더링
+- Button: isLoading 상태도 보여줘
+- Modal: 버튼 클릭으로 열기/닫기
+- ConfirmDialog: 버튼 클릭으로 열기
+
+---
+
+아래 사항도 추가해줘.
+
+- Button: 크기 variant별로 나란히 렌더링
+- Badge: priority variant별로 나란히 렌더링
+
+---

@@ -3,6 +3,24 @@
 이 파일은 `/changelog "요약"` 명령으로 자동 기록된다. 새 항목은 항상 최상단에 추가되며, 기존 항목은
 삭제·수정하지 않는다.
 
+## [main] - 2026-07-31 08:39
+
+### Prompt
+> "Phase 1 컴포넌트를 프리뷰 페이지에 추가해줘. app/preview/page.tsx에: Button 네 가지 variant를
+> 나란히 렌더링, Button isLoading 상태도 보여줘, Modal은 버튼 클릭으로 열기/닫기, ConfirmDialog는
+> 버튼 클릭으로 열기." 이어서 "아래 사항도 추가해줘. Button 크기 variant별로 나란히 렌더링, Badge
+> priority variant별로 나란히 렌더링."
+
+### Changes
+- **Modified**: 프리뷰 페이지 Phase 1 섹션에 `Button`(variant 4종 primary/secondary/danger/ghost,
+  isLoading 상태, size 3종 sm/md/lg), `Badge`(priority 3종 LOW/MEDIUM/HIGH), `Modal`(버튼 클릭으로
+  열기/닫기, useState로 isOpen 관리), `ConfirmDialog`(버튼 클릭으로 열기) 데모를 추가
+  (`app/preview/page.tsx`)
+- **Modified**: 세션 프롬프트 자동 기록 — 이번 두 요청이 이어서 append됨 (`prompt.log`)
+
+### Test Results
+- ✅ `npx tsc --noEmit` 에러 없음
+
 ## [main] - 2026-07-31 08:30
 
 ### Prompt
