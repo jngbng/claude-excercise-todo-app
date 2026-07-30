@@ -3,6 +3,20 @@
 이 파일은 `/changelog "요약"` 명령으로 자동 기록된다. 새 항목은 항상 최상단에 추가되며, 기존 항목은
 삭제·수정하지 않는다. CLAUDE.md의 "최근 변경 이력" 섹션은 이 파일에서 최근 14일 항목만 요약한 것이다.
 
+## [main] - 2026-07-31 07:37
+
+### Prompt
+> "changelog 스킬에서 변경된 파일 리스팅 하는 부분 제거해줘. 기존에 생성된 CHANGELOG.md 에서도 해당
+> 부분 제거해줘."
+
+### Changes
+- **Modified**: 항목 생성 절차에서 "Files Modified" 섹션(numstat 기반 변경 파일·라인 수 리스팅)을
+  제거하고, 이에 맞춰 실행 단계 번호를 재정렬(9단계 → 8단계)하고 더 이상 필요 없는
+  `git diff --numstat` 호출도 함께 제거 (`.claude/skills/changelog/SKILL.md`)
+- **Modified**: 기존 4개 항목(2026-07-31 07:30, 2026-07-30, 2026-07-29, 2026-07-28)에서
+  "Files Modified" 섹션을 모두 삭제 — 나머지 내용(Prompt/Changes/Test Results)은 그대로 보존
+  (`CHANGELOG.md`)
+
 ## [main] - 2026-07-31 07:30
 
 ### Prompt
@@ -21,10 +35,6 @@
 - **Modified**: 세션 중 입력한 프롬프트가 자동으로 이어서 기록됨 (추정 — 자동 로깅 파일로 보이며 이번
   세션에서 직접 수정한 적은 없음) (`prompt.log`)
 
-### Files Modified
-- `app/preview/page.tsx` (+41, -0 lines)
-- `prompt.log` (+9, -0 lines)
-
 ## [main] - 2026-07-30 07:32
 
 ### Prompt
@@ -41,10 +51,6 @@
   (`app/globals.css`)
 - **Modified**: 세션 중 입력한 프롬프트가 자동으로 이어서 기록됨 (추정 — 자동 로깅 파일로 보이며 이번
   세션에서 직접 수정한 적은 없음) (`prompt.log`)
-
-### Files Modified
-- `app/globals.css` (+107, -0 lines)
-- `prompt.log` (+9, -0 lines)
 
 ## [main] - 2026-07-29 08:16
 
@@ -76,17 +82,6 @@
 - **Modified**: 세션 중 입력한 프롬프트가 자동으로 이어서 기록됨 (추정 — 자동 로깅 파일로 보이며 이번
   세션에서 직접 수정한 적은 없음) (`prompt.log`)
 
-### Files Modified
-- `docs/API_SPECS.md` (+5, -2 lines)
-- `docs/COMPONENT_SPEC.md` (+344, -746 lines)
-- `docs/DATA_MODEL.md` (+13, -5 lines)
-- `docs/PRD.md` (+2, -2 lines)
-- `docs/TEST_CASES.md` (+17, -17 lines)
-- `docs/TRD.md` (+35, -28 lines)
-- `prompt.log` (+23, -0 lines)
-- `src/server/services/ticketService.ts` (+10, -7 lines)
-- `src/shared/types/index.ts` (+8, -4 lines)
-
 ### Test Results
 - ✅ 36 passed, 0 failed (`npx jest`)
 
@@ -102,8 +97,3 @@
   최상단 삽입, CLAUDE.md 자동 요약 블록 갱신 로직 (`.claude/skills/changelog/SKILL.md`)
 - **Added**: 변경 이력을 누적 기록할 CHANGELOG.md 신설 (`CHANGELOG.md`)
 - **Modified**: "변경 이력 기록" 절 및 `CHANGELOG:AUTO-GENERATED` 마커 블록 추가 (`CLAUDE.md`)
-
-### Files Modified
-- `.claude/skills/changelog/SKILL.md` (+130, -0 lines)
-- `CHANGELOG.md` (+4, -0 lines)
-- `CLAUDE.md` (+12, -0 lines)

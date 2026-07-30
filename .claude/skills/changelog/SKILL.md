@@ -1,6 +1,6 @@
 ---
 name: "changelog"
-description: "코드 변경 후 CHANGELOG.md에 상세 작업 이력을 기록하고, CLAUDE.md의 최근 변경사항 요약(최근 14일)을 갱신한다. 프롬프트 내용, 변경 파일과 라인 수, 브랜치/일시, 테스트 결과를 자동 수집한다."
+description: "코드 변경 후 CHANGELOG.md에 상세 작업 이력을 기록하고, CLAUDE.md의 최근 변경사항 요약(최근 14일)을 갱신한다. 프롬프트 내용, 변경 파일, 브랜치/일시, 테스트 결과를 자동 수집한다."
 argument-hint: "이번 변경에 대한 한 줄 요약 (예: \"로그인 버그 수정\")"
 user-invocable: true
 disable-model-invocation: true
@@ -20,7 +20,7 @@ git에 반영할 때마다 자동으로 실행되지 않는다 — 사용자가 
 $ARGUMENTS
 ```
 
-`$ARGUMENTS`는 이번 변경에 대한 한 줄 요약이다 (예: `"로그인 버그 수정"`). 비어 있으면 6번 단계에서
+`$ARGUMENTS`는 이번 변경에 대한 한 줄 요약이다 (예: `"로그인 버그 수정"`). 비어 있으면 3번 단계에서
 대화 맥락으로부터 요약을 생성한다.
 
 ## Execution Steps
@@ -34,10 +34,10 @@ $ARGUMENTS
 
 ### 2. 변경 범위 결정
 
-- 작업 트리에 staged/unstaged 변경이 있으면(dirty): `git diff HEAD --numstat` 와
-  `git diff HEAD --name-status` 로 워킹 트리 vs HEAD 차이를 사용한다.
+- 작업 트리에 staged/unstaged 변경이 있으면(dirty): `git diff HEAD --name-status` 로 워킹 트리 vs
+  HEAD 차이를 사용한다.
 - 작업 트리가 깨끗하면(clean, 즉 이미 커밋됨): 가장 최근 커밋 하나를 대상으로
-  `git diff HEAD~1 HEAD --numstat` 와 `git diff HEAD~1 HEAD --name-status` 를 사용한다.
+  `git diff HEAD~1 HEAD --name-status` 를 사용한다.
 - 두 경우 모두 변경 파일이 없으면(즉 기록할 것이 없으면) 사용자에게 "기록할 변경사항이 없습니다"라고
   알리고 중단한다. 이 스킬을 억지로 실행하지 않는다.
 
@@ -60,28 +60,18 @@ $ARGUMENTS
 각 파일에 대해, 세션 대화 맥락을 근거로 "무엇이 왜 바뀌었는지"를 한 줄로 작성한다. 대화에서 근거를
 찾을 수 없는 파일은 diff 내용만 보고 최대한 사실 기반으로 짧게 설명하되 추측은 명시한다.
 
-### 5. Files Modified 섹션 구성
-
-numstat 결과(`added\tdeleted\tpath`)를 그대로 사용해 다음 형식으로 나열한다:
-
-```
-- `path/to/file.ts` (+10, -2 lines)
-```
-
-바이너리 파일 등 numstat이 `-`로 나오는 경우 `(binary)`로 표기한다.
-
-### 6. Test Results 섹션 (선택적 — 있는 경우에만)
+### 5. Test Results 섹션 (선택적 — 있는 경우에만)
 
 이번 세션에서 이미 실행한 테스트 명령(`npm test`, `npx jest`, `jest` 등)의 결과가 대화 기록에
 있으면 pass/fail 개수와 명령을 요약해 기록한다. **이 스킬은 테스트를 새로 실행하지 않는다** —
 세션에 기록이 없으면 이 섹션 전체를 생략한다 (억지로 "N/A"를 쓰지 않고 섹션 자체를 뺀다).
 
-### 7. CHANGELOG.md 갱신
+### 6. CHANGELOG.md 갱신
 
 - 파일이 없으면 `# Changelog\n\n` 로 새로 만든다.
 - 새 항목은 **최상단(헤더 바로 아래)**에 삽입한다 — 최신 항목이 위로 오도록 유지한다.
 - 기존 항목은 절대 삭제·수정하지 않는다. append가 아니라 prepend라는 점에 유의.
-- 항목 형식은 정확히 아래를 따른다 (Test Results는 6번 단계에서 내용이 있을 때만 포함):
+- 항목 형식은 정확히 아래를 따른다 (Test Results는 5번 단계에서 내용이 있을 때만 포함):
 
 ```markdown
 ## [브랜치명] - YYYY-MM-DD HH:MM
@@ -94,14 +84,11 @@ numstat 결과(`added\tdeleted\tpath`)를 그대로 사용해 다음 형식으�
 - **Modified**: 수정 내용 설명 (`파일경로`)
 - **Deleted**: 삭제 내용 설명 (`파일경로`)
 
-### Files Modified
-- `파일명` (+10, -2 lines)
-
 ### Test Results
 - ✅ 12 passed, 0 failed (`npm test`)
 ```
 
-### 8. CLAUDE.md 최근 변경사항 요약 갱신
+### 7. CLAUDE.md 최근 변경사항 요약 갱신
 
 - CLAUDE.md에서 `<!-- CHANGELOG:AUTO-GENERATED:START -->` ~ `<!-- CHANGELOG:AUTO-GENERATED:END -->`
   마커를 찾는다. 없으면 파일 맨 끝에 새로 만든다.
@@ -124,7 +111,7 @@ numstat 결과(`added\tdeleted\tpath`)를 그대로 사용해 다음 형식으�
 
 이 기간 내 항목이 하나도 없으면 "최근 14일간 기록된 변경사항이 없습니다."라는 한 줄만 남긴다.
 
-### 9. 결과 보고
+### 8. 결과 보고
 
-CHANGELOG.md에 추가한 항목 미리보기(제목 줄 + Files Modified 개수)와 CLAUDE.md 요약 블록 갱신
-여부를 사용자에게 짧게 보고한다. git add/commit은 수행하지 않았음을 함께 알린다.
+CHANGELOG.md에 추가한 항목 미리보기(제목 줄)와 CLAUDE.md 요약 블록 갱신 여부를 사용자에게 짧게
+보고한다. git add/commit은 수행하지 않았음을 함께 알린다.
