@@ -433,3 +433,14 @@ __tests__/components/Button.test.tsx의 테스트를 통과하는 Button 컴포�
 
 
 ---
+
+docs/FRONTEND_TASKS.md 의 Phase 1 나머지 컴포넌트를 TDD로 구현해줘.
+- Badge (PriorityBadge, DueDateBadge)
+- Modal (5개 테스트: isOpen, ESC키로 닫기, 오버레이클릭시 닫기, 컨텐츠클릭 무시, role=dialog)
+- ConfirmDialog (5개 테스트: 메시지표시, 확인->onConfirm, 취소->onCancel)
+
+작업을 진행할 때 아래 방식으로 해줘.
+- 각 컴포넌트마다 Red -> Green -> Refactor 사이클을 적용해.
+- 각 컴포넌트 작업을 마칠 때마다 커밋을 해줘.
+
+---
