@@ -1,7 +1,27 @@
 # Changelog
 
 이 파일은 `/changelog "요약"` 명령으로 자동 기록된다. 새 항목은 항상 최상단에 추가되며, 기존 항목은
-삭제·수정하지 않는다. CLAUDE.md의 "최근 변경 이력" 섹션은 이 파일에서 최근 14일 항목만 요약한 것이다.
+삭제·수정하지 않는다.
+
+## [main] - 2026-07-31 08:30
+
+### Prompt
+> "docs/FRONTEND_TASKS.md 의 Phase 1 나머지 컴포넌트를 TDD로 구현해줘 — Badge, Modal,
+> ConfirmDialog(5개 테스트: 메시지표시, 확인->onConfirm, 취소->onCancel). 각 컴포넌트마다
+> Red -> Green -> Refactor 사이클을 적용하고, 작업을 마칠 때마다 커밋해줘."
+
+### Changes
+- **Added**: `ConfirmDialog` 컴포넌트 테스트 — TC-COMP-006-1(확인 메시지 + [취소]/[삭제] 버튼
+  표시), TC-COMP-006-2([취소] 클릭 → onCancel 호출), TC-COMP-006-3([삭제] 클릭 → onConfirm 호출),
+  isOpen=false 시 미표시, [삭제] 버튼 danger variant 클래스 검증
+  (`__tests__/components/ConfirmDialog.test.tsx`)
+- **Added**: `ConfirmDialog` 컴포넌트 구현 — `Modal` + `Button`(secondary 취소/danger 삭제)
+  조합으로 "정말 삭제하시겠습니까?" 확인 다이얼로그 구현, 메시지는 스펙상 고정 문구라 하드코딩
+  유지 (`src/client/components/ConfirmDialog.tsx`)
+
+### Test Results
+- ✅ 5 passed, 0 failed (`npx jest __tests__/components/ConfirmDialog.test.tsx`)
+- ✅ `npx tsc --noEmit` 에러 없음
 
 ## [main] - 2026-07-31 08:14
 
