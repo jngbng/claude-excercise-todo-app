@@ -3,6 +3,26 @@
 이 파일은 `/changelog "요약"` 명령으로 자동 기록된다. 새 항목은 항상 최상단에 추가되며, 기존 항목은
 삭제·수정하지 않는다. CLAUDE.md의 "최근 변경 이력" 섹션은 이 파일에서 최근 14일 항목만 요약한 것이다.
 
+## [main] - 2026-07-31 07:53
+
+### Prompt
+> "Button 컴포넌트 테스트를 작성해줘 (아직 구현 없이, variant/size별 클래스·기본값(primary/md)·
+> onClick 호출·isLoading 비활성화 및 '처리중...' 표시·children 렌더링 검증). 이후 방금 만든
+> 테스트는 컴포넌트 파일이 없어서 실패하는데, 최소한 모듈을 찾지 못하는 에러로 실패하진 않게
+> 해줘 — 파일 만들고 더미 Button 컴포넌트까지는 만들어줘."
+
+### Changes
+- **Added**: Button 컴포넌트 Red 단계 테스트 — variant(primary/secondary/danger/ghost)별 클래스,
+  size(sm/md/lg)별 클래스, 기본값 primary/md, onClick 1회 호출, isLoading일 때 비활성화 +
+  "처리중..." 표시 및 클릭 무시, children 렌더링을 검증 (`__tests__/components/Button.test.tsx`)
+- **Added**: 테스트 스위트가 "모듈을 찾을 수 없음" 에러 없이 실행되도록 하는 더미 Button 스텁 —
+  variant/size/isLoading 로직은 아직 구현하지 않은 최소 컴포넌트 (`src/client/components/Button.tsx`)
+- **Modified**: 세션 프롬프트 자동 기록 갱신 (`prompt.log`)
+
+### Test Results
+- ⚠️ 2 passed, 10 failed (`npx jest __tests__/components/Button.test.tsx`) — 더미 스텁이라
+  variant/size/isLoading 관련 assertion은 의도적으로 실패 중 (Green 단계에서 통과 예정)
+
 ## [main] - 2026-07-31 07:37
 
 ### Prompt

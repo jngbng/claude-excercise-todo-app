@@ -408,3 +408,20 @@ docs/FRONTEND_TASKS.md로 저장해줘
 - 각 Phase 개발이 완료되면 run test 후 화면 확인 후 다음 과정으로 넘어가는 거야.
 
 ---
+
+Button 컴포넌트의 테스트를 작성해줘. 아직 구현하지 말고 테스트만.
+
+검증할 것:
+- variant별 css 클래스 (primary, secondary, danger, ghost)
+- size별 css 클래스 (sm, md, lg)
+- 기본값 variant=primary, size=md
+- onClick 핸들러 호출
+- isLoading=true -> 비활성화 + "처리중..." 표시
+- isLoading=true일 때 클릭 무시
+- children 정상 렌더링
+
+---
+
+방금 만든 테스트는 컴포넌트 파일이 없어서 실패하는데, 최소한 로딩 에러로 실패하진 않게 해줘. 파일 만들고 더미 Button 컴포넌트 까지는 만들어줘.
+
+---
