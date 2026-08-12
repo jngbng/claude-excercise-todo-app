@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json,sys,datetime,os; d=json.load(sys.stdin); p=d.get('prompt',''); ts=datetime.datetime.now().strftime('%Y-%m-%d %H:%M'); path=os.path.join(os.environ.get('CLAUDE_PROJECT_DIR', os.getcwd()), 'prompt.log'); open(path,'a').write('\\n---\\n\\n'+ts+'\\n'+p+'\\n')\""
+          }
+        ]
+      }
+    ]
+  }
+}
