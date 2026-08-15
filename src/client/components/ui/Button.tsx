@@ -12,10 +12,11 @@ type ButtonProps = {
 };
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
-  primary: "bg-brand-500 text-white",
-  secondary: "bg-white border border-border-default text-text-primary",
-  danger: "bg-danger text-white",
-  ghost: "bg-transparent text-text-primary",
+  primary: "bg-brand-500 text-white hover:bg-brand-600 transition-colors",
+  secondary:
+    "bg-white border border-border-default text-text-primary hover:bg-surface-app transition-colors",
+  danger: "bg-danger text-white hover:bg-danger-hover transition-colors",
+  ghost: "bg-transparent text-text-primary hover:bg-surface-app transition-colors",
 };
 
 const SIZE_CLASS: Record<ButtonSize, string> = {
