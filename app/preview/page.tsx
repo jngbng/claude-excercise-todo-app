@@ -17,6 +17,8 @@ import { SearchInput } from "@/client/components/SearchInput";
 import { TicketDetailView } from "@/client/components/TicketDetailView";
 import { TicketForm } from "@/client/components/TicketForm";
 import { FilterBar } from "@/client/components/FilterBar";
+import { TicketModal } from "@/client/components/TicketModal";
+import type { TicketWithMeta } from "@/shared/types";
 
 type PreviewSectionProps = {
   title: string;
@@ -60,6 +62,23 @@ const PreviewPage = () => {
   const [clickCount, setClickCount] = useState(0);
   const [ticketFormResult, setTicketFormResult] = useState<string>("");
   const [activeFilter, setActiveFilter] = useState<"all" | "thisWeek" | "overdue">("all");
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [ticketModalTicket, setTicketModalTicket] = useState<TicketWithMeta>({
+    id: 1,
+    title: "로그인 페이지 리팩토링",
+    description: null,
+    status: "IN_PROGRESS",
+    priority: "HIGH",
+    position: 0,
+    plannedStartDate: null,
+    dueDate: "2026-08-20",
+    startedAt: "2026-08-01T00:00:00.000Z",
+    completedAt: null,
+    createdAt: "2026-07-30T00:00:00.000Z",
+    updatedAt: "2026-08-01T00:00:00.000Z",
+    isOverdue: false,
+  });
+  const [ticketModalLog, setTicketModalLog] = useState<string>("");
   const isBodyScrollLocked = useBodyScrollLocked();
 
   return (
@@ -230,6 +249,31 @@ const PreviewPage = () => {
           <p data-testid="active-filter" className="mt-2 text-sm text-text-secondary">
             현재 필터: {activeFilter}
           </p>
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm text-text-primary">
+            TicketModal (수정 모드 — 저장은 로컬 상태만 갱신, 삭제는 확인 다이얼로그 확인)
+          </p>
+          <Button onClick={() => setIsTicketModalOpen(true)}>TicketModal 열기</Button>
+          <TicketModal
+            ticket={ticketModalTicket}
+            isOpen={isTicketModalOpen}
+            onClose={() => setIsTicketModalOpen(false)}
+            onUpdate={(id, data) => {
+              setTicketModalTicket((prev) => ({ ...prev, ...data }));
+              setTicketModalLog(`onUpdate(${id}, ${JSON.stringify(data)})`);
+            }}
+            onDelete={(id) => {
+              setTicketModalLog(`onDelete(${id})`);
+              setIsTicketModalOpen(false);
+            }}
+          />
+          {ticketModalLog && (
+            <p data-testid="ticket-modal-log" className="mt-3 text-sm text-text-secondary">
+              {ticketModalLog}
+            </p>
+          )}
         </div>
       </PreviewSection>
 
