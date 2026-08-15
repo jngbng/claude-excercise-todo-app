@@ -198,11 +198,11 @@ graph BT
 
 **역할**: "새 업무" 버튼. 클릭 시 생성 모달을 여는 트리거.
 
-- [ ] Red — `__tests__/components/CreateTicketButton.test.tsx` (TEST_CASES.md 미기재)
+- [x] Red — `__tests__/components/CreateTicketButton.test.tsx` (TEST_CASES.md 미기재)
   - "새 업무" 텍스트 렌더링
   - 클릭 시 `onClick` 1회 호출
-- [ ] Green — `Button`(primary) 래핑
-- [ ] Refactor — 불필요
+- [x] Green — `Button`(primary) 래핑
+- [x] Refactor — 불필요
 
 ---
 

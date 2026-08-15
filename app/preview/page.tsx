@@ -14,6 +14,7 @@ import { ConfirmDialog } from "@/client/components/ui/ConfirmDialog";
 import { PriorityBadge } from "@/client/components/ui/PriorityBadge";
 import { DueDateBadge } from "@/client/components/ui/DueDateBadge";
 import { SearchInput } from "@/client/components/SearchInput";
+import { CreateTicketButton } from "@/client/components/CreateTicketButton";
 
 type PreviewSectionProps = {
   title: string;
@@ -55,6 +56,7 @@ const PreviewPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [clickCount, setClickCount] = useState(0);
+  const [createClickCount, setCreateClickCount] = useState(0);
   const isBodyScrollLocked = useBodyScrollLocked();
 
   return (
@@ -180,6 +182,18 @@ const PreviewPage = () => {
             SearchInput (MVP: 비활성 placeholder)
           </p>
           <SearchInput />
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm text-text-primary">
+            CreateTicketButton (클릭 시 카운트 증가)
+          </p>
+          <div className="flex items-center gap-3">
+            <CreateTicketButton onClick={() => setCreateClickCount((count) => count + 1)} />
+            <span data-testid="create-click-count" className="text-sm text-text-secondary">
+              클릭 횟수: {createClickCount}
+            </span>
+          </div>
         </div>
       </PreviewSection>
 
