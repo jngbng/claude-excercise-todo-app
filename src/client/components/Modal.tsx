@@ -30,7 +30,11 @@ export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
       className="animate-overlay-in fixed inset-0 flex items-center justify-center bg-black/50"
       onClick={onClose}
     >
-      <div role="dialog" className="animate-modal-in" onClick={(event) => event.stopPropagation()}>
+      <div
+        role="dialog"
+        className="animate-modal-in rounded-modal bg-surface-card p-6 shadow-modal"
+        onClick={(event) => event.stopPropagation()}
+      >
         {children}
       </div>
     </div>
