@@ -3,7 +3,7 @@
 // Green 단계 구현은 이 클래스를 그대로 적용해야 한다.
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Button } from "@/client/components/Button";
+import { Button } from "@/client/components/ui/Button";
 
 const VARIANT_CLASSES = {
   primary: ["bg-brand-500", "text-white"],

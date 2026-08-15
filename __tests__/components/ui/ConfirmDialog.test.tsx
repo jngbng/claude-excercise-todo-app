@@ -1,7 +1,7 @@
 // ConfirmDialog — Phase 1 (docs/COMPONENT_SPEC.md §3 ConfirmDialog, TC-COMP-006)
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ConfirmDialog } from "@/client/components/ConfirmDialog";
+import { ConfirmDialog } from "@/client/components/ui/ConfirmDialog";
 
 describe("ConfirmDialog", () => {
   it("TC-COMP-006-1: isOpen=true일 때 확인 메시지와 [취소]/[삭제] 버튼이 표시된다", () => {

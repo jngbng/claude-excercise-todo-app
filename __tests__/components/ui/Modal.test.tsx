@@ -3,7 +3,7 @@
 // isOpen, ESC키로 닫기, 오버레이클릭시 닫기, 컨텐츠클릭 무시, role=dialog
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Modal } from "@/client/components/Modal";
+import { Modal } from "@/client/components/ui/Modal";
 
 describe("Modal", () => {
   it("isOpen=false이면 아무것도 렌더링하지 않는다", () => {

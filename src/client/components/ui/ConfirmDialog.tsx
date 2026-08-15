@@ -1,5 +1,5 @@
-import { Modal } from "@/client/components/Modal";
-import { Button } from "@/client/components/Button";
+import { Modal } from "@/client/components/ui/Modal";
+import { Button } from "@/client/components/ui/Button";
 
 type ConfirmDialogProps = {
   isOpen: boolean;

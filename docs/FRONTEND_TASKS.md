@@ -17,7 +17,8 @@
   수정하지 않는다 (프론트엔드 작업 중 공유 타입 변경이 필요하다고 판단되면 먼저 별도로 논의).
 - **테스트 파일 위치**: 기존 API 테스트 컨벤션(`__tests__/api/*.test.ts`)을 따라 최상위
   `__tests__/`에 영역별로 배치한다.
-  - `__tests__/components/*.test.tsx`
+  - `__tests__/components/*.test.tsx` (도메인 컴포넌트), `__tests__/components/ui/*.test.tsx`
+    (범용 UI 유틸리티 컴포넌트 — `src/client/components/ui/`와 구조를 맞춘다)
   - `__tests__/hooks/useTickets.test.ts`
   - `__tests__/api-client/ticketApi.test.ts`
   - `__tests__/integration/*.test.tsx` (TC-INT-*, MSW 사용)
@@ -79,15 +80,15 @@ graph BT
 
 | 컴포넌트 | 파일 | COMPONENT_SPEC 참조 |
 |---|---|---|
-| Button | `src/client/components/Button.tsx` | §3 Button |
-| Badge | `src/client/components/Badge.tsx` | §3 Badge |
-| Modal | `src/client/components/Modal.tsx` | §3 Modal |
+| Button | `src/client/components/ui/Button.tsx` | §3 Button |
+| Badge | `src/client/components/ui/Badge.tsx` | §3 Badge |
+| Modal | `src/client/components/ui/Modal.tsx` | §3 Modal |
 
 #### Button
 
 **역할**: variant(primary/secondary/danger/ghost) × size(sm/md/lg), 로딩 상태 지원.
 
-- [ ] Red — `__tests__/components/Button.test.tsx` (TEST_CASES.md 미기재)
+- [ ] Red — `__tests__/components/ui/Button.test.tsx` (TEST_CASES.md 미기재)
   - variant별 클래스/스타일이 다르게 적용되는지 (primary/secondary/danger/ghost 각 1건)
   - `isLoading=true`일 때 클릭 불가(disabled) + 로딩 인디케이터 표시
   - 클릭 시 `onClick` 1회 호출
@@ -103,7 +104,7 @@ graph BT
 
 **역할**: 우선순위 표시 — LOW(회색)/MEDIUM(파란색)/HIGH(빨간색), 작은 텍스트 + 둥근 패딩.
 
-- [ ] Red — `__tests__/components/Badge.test.tsx` (TEST_CASES.md 미기재)
+- [ ] Red — `__tests__/components/ui/Badge.test.tsx` (TEST_CASES.md 미기재)
   - `priority="LOW"` → 회색 계열 스타일 + "LOW" 텍스트
   - `priority="MEDIUM"` → 파란색 계열 스타일 + "MEDIUM" 텍스트
   - `priority="HIGH"` → 빨간색 계열 스타일 + "HIGH" 텍스트
@@ -117,7 +118,7 @@ graph BT
 
 **역할**: 오버레이 + 중앙 정렬 컨테이너, ESC/바깥 클릭 닫기, 열림/닫힘 애니메이션, body 스크롤 잠금.
 
-- [ ] Red — `__tests__/components/Modal.test.tsx` (TEST_CASES.md 미기재)
+- [ ] Red — `__tests__/components/ui/Modal.test.tsx` (TEST_CASES.md 미기재)
   - `isOpen=false`면 아무것도 렌더링하지 않음
   - `isOpen=true`면 children 렌더링
   - ESC 키 입력 시 `onClose` 호출
@@ -135,7 +136,7 @@ graph BT
 
 | 컴포넌트 | 파일 | 관련 TC |
 |---|---|---|
-| ConfirmDialog | `src/client/components/ConfirmDialog.tsx` | TC-COMP-006 |
+| ConfirmDialog | `src/client/components/ui/ConfirmDialog.tsx` | TC-COMP-006 |
 | SearchInput | `src/client/components/SearchInput.tsx` | (TEST_CASES.md 미기재) |
 | CreateTicketButton | `src/client/components/CreateTicketButton.tsx` | (TEST_CASES.md 미기재) |
 | DeleteButton | `src/client/components/DeleteButton.tsx` | (TEST_CASES.md 미기재) |
@@ -148,7 +149,7 @@ graph BT
 
 **역할**: "정말 삭제하시겠습니까?" 확인 다이얼로그. 확인 버튼은 danger variant.
 
-- [ ] Red — `__tests__/components/ConfirmDialog.test.tsx` (TC-COMP-006)
+- [ ] Red — `__tests__/components/ui/ConfirmDialog.test.tsx` (TC-COMP-006)
   - TC-COMP-006-1: `isOpen=true`일 때 확인 메시지 + [취소]/[삭제] 버튼 표시
   - TC-COMP-006-2: [취소] 클릭 → `onCancel` 호출 (다이얼로그 닫힘은 부모 책임이므로 콜백
     호출만 검증)

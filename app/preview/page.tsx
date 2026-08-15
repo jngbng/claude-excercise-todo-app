@@ -8,10 +8,10 @@
  */
 
 import { useState } from "react";
-import { Button } from "@/client/components/Button";
-import { Modal } from "@/client/components/Modal";
-import { ConfirmDialog } from "@/client/components/ConfirmDialog";
-import { Badge } from "@/client/components/Badge";
+import { Button } from "@/client/components/ui/Button";
+import { Modal } from "@/client/components/ui/Modal";
+import { ConfirmDialog } from "@/client/components/ui/ConfirmDialog";
+import { Badge } from "@/client/components/ui/Badge";
 
 type PreviewSectionProps = {
   title: string;
