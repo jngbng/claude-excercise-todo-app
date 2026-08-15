@@ -575,3 +575,12 @@ TicketForm을 container를 form 태그를 이용해서 구현하니깐 button에
 
 2026-08-15 21:45
 CreateTicketButton과 DeleteButton은 독립된 컴포넌트로 존재하기에는 너무 과도해. 필요한 곳에서 inline으로 구현하면 돼. 문서 수정하고 관련 구현 제거해줘
+
+---
+
+2026-08-15 21:55
+FRONTEND_TASKS.md 의 phase 2을 순차적으로 구현해줘.
+
+- RED 단계 작성 후 GREEN으로 넘어갈 때 운영 코드에 interface만 가지는 더미 컴포넌트를 추가하여 테스트가 의도대로 실패하는 지 검사해줘.
+- 매 컴포넌트 완료 후에 작업을 커밋해줘.
+- 매 컴포넌트 완료 후에 preview 페이지의 phase1에 렌더링 예제를 추가해줘.
