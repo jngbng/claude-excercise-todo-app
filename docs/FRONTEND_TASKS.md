@@ -211,11 +211,11 @@ graph BT
 **역할**: TicketModal 내 삭제 버튼. 클릭 시 `ConfirmDialog`를 여는 트리거 (다이얼로그 상태는
 `TicketModal`이 보유).
 
-- [ ] Red — `__tests__/components/DeleteButton.test.tsx` (TEST_CASES.md 미기재)
+- [x] Red — `__tests__/components/DeleteButton.test.tsx` (TEST_CASES.md 미기재)
   - "삭제" 텍스트 렌더링, danger variant 스타일
   - 클릭 시 `onClick` 1회 호출
-- [ ] Green — `Button`(danger) 래핑
-- [ ] Refactor — 불필요
+- [x] Green — `Button`(danger) 래핑
+- [x] Refactor — 불필요
 
 ---
 
