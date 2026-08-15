@@ -34,7 +34,7 @@ export const Button = ({
 }: ButtonProps) => {
   return (
     <button
-      className={`${VARIANT_CLASS[variant]} ${SIZE_CLASS[size]}`}
+      className={`rounded-button ${VARIANT_CLASS[variant]} ${SIZE_CLASS[size]}`}
       disabled={isLoading}
       onClick={onClick}
     >
