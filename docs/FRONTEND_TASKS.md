@@ -185,12 +185,12 @@ graph BT
 
 **역할**: MVP에서는 비활성 placeholder (2차 구현 예정).
 
-- [ ] Red — `__tests__/components/SearchInput.test.tsx` (TEST_CASES.md 미기재)
+- [x] Red — `__tests__/components/SearchInput.test.tsx` (TEST_CASES.md 미기재)
   - `disabled` 속성이 적용된 input이 렌더링되는지
   - placeholder 텍스트가 표시되는지
-- [ ] Green — `disabled` input 렌더링만 하는 최소 구현 (상태/이벤트 핸들러 없음 — 2차 구현
+- [x] Green — `disabled` input 렌더링만 하는 최소 구현 (상태/이벤트 핸들러 없음 — 2차 구현
       범위를 넘어서지 않는다)
-- [ ] Refactor — 불필요
+- [x] Refactor — 불필요
 
 ---
 

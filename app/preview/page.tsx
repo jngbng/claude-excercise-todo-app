@@ -13,6 +13,7 @@ import { Modal } from "@/client/components/ui/Modal";
 import { ConfirmDialog } from "@/client/components/ui/ConfirmDialog";
 import { PriorityBadge } from "@/client/components/ui/PriorityBadge";
 import { DueDateBadge } from "@/client/components/ui/DueDateBadge";
+import { SearchInput } from "@/client/components/SearchInput";
 
 type PreviewSectionProps = {
   title: string;
@@ -172,6 +173,13 @@ const PreviewPage = () => {
             onConfirm={() => setIsConfirmOpen(false)}
             onCancel={() => setIsConfirmOpen(false)}
           />
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm text-text-primary">
+            SearchInput (MVP: 비활성 placeholder)
+          </p>
+          <SearchInput />
         </div>
       </PreviewSection>
 
