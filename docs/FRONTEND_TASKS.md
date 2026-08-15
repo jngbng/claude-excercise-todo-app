@@ -268,8 +268,9 @@ graph BT
   - description 1000자 초과 / dueDate 과거 날짜 → 각각의 에러 메시지 표시 (REQUIREMENTS.md
     검증 에러 메시지 표)
 - [x] Green — `src/shared/validations/ticket.ts`의 `createTicketSchema`/`updateTicketSchema`로
-      클라이언트 사이드 검증, `Button` 재사용 (취소 버튼이 폼을 submit하지 않도록 `Button`에
-      `type` prop 추가)
+      클라이언트 사이드 검증, `Button` 재사용 (`<form>` 대신 `<div>` 컨테이너 + 저장 버튼
+      `onClick`으로 제출 로직 호출 — `Button`에 `type` prop을 추가하지 않고도 취소 버튼의
+      의도치 않은 submit 문제를 피함)
 - [x] Refactor — 필드별 에러 표시 로직을 `FieldError` 헬퍼 컴포넌트로 중복 제거
 
 ---
