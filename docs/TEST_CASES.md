@@ -2,7 +2,7 @@
 
 > 최종 수정: 2026-06-28
 > 버전: 1.0 (MVP)
-> 테스트 프레임워크: Jest + React Testing Library (API), MSW (통합)
+> 테스트 프레임워크: Jest + React Testing Library (API, 통합 모두 `jest.mock`으로 API 모킹)
 
 ---
 
@@ -188,7 +188,7 @@
 
 ## 3. 통합 테스트 (TC-INT)
 
-핵심 기능의 UI 동작 + API 연동을 엔드투엔드 관점으로 검증한다. API는 MSW(Mock Service Worker)로 모킹한다.
+핵심 기능의 UI 동작 + API 연동을 엔드투엔드 관점으로 검증한다. API는 `jest.mock`으로 `ticketApi` 모듈을 모킹한다.
 
 ---
 

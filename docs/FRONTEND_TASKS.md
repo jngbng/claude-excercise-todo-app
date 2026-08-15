@@ -21,7 +21,7 @@
     (범용 UI 유틸리티 컴포넌트 — `src/client/components/ui/`와 구조를 맞춘다)
   - `__tests__/hooks/useTickets.test.ts`
   - `__tests__/api-client/ticketApi.test.ts`
-  - `__tests__/integration/*.test.tsx` (TC-INT-*, MSW 사용)
+  - `__tests__/integration/*.test.tsx` (TC-INT-*, `jest.mock`으로 `ticketApi` 모킹)
 - **TC ID 매핑**: `docs/TEST_CASES.md`에 이미 정의된 TC-COMP-*/TC-INT-*는 그대로 인용한다.
   TEST_CASES.md에 없는 컴포넌트(공통 UI 프리미티브, 데이터 레이어 등)는 표에
   **"(TEST_CASES.md 미기재)"** 로 표시했다 — 해당 컴포넌트의 Red 단계 진입 전, 필요하면
@@ -331,21 +331,8 @@ graph BT
 
 | 대상 | 파일 |
 |---|---|
-| MSW 목 서버 설정 | `__tests__/mocks/handlers.ts`, `__tests__/mocks/server.ts` |
 | ticketApi | `src/client/api/ticketApi.ts` |
 | useTickets | `src/client/hooks/useTickets.ts` |
-
-#### MSW 목 서버 설정 (선행 작업)
-
-`useTickets`와 Phase 4의 TC-INT-* 통합 테스트가 공유할 MSW 핸들러를 먼저 구성한다. 이 자체는
-TDD 대상 "컴포넌트"가 아니라 테스트 인프라이므로 Red/Green 사이클을 적용하지 않는다.
-
-- [ ] `docs/API_SPECS.md` 기준으로 5개 엔드포인트(POST/GET/PATCH/DELETE/reorder/complete) 목
-      핸들러 작성
-- [ ] `jest.setup.ts`에 `beforeAll(() => server.listen())` / `afterEach(() => server.resetHandlers())`
-      / `afterAll(() => server.close())` 연결
-
----
 
 #### ticketApi
 
@@ -361,8 +348,8 @@ TDD 대상 "컴포넌트"가 아니라 테스트 인프라이므로 Red/Green �
   - `reorderTicket(ticketId, status, position)` → `PATCH /api/tickets/reorder`
   - `completeTicket(id)` → `PATCH /api/tickets/:id/complete`
   - 각 함수의 실패 응답(400/404) 시 에러를 throw/반환하는 공통 에러 처리 검증
-- [ ] Green — MSW 핸들러 대상으로 위 함수들을 `fetch` 기반으로 구현 (에러 응답 형식
-      `{ error: { code, message } }` 파싱 포함)
+- [ ] Green — 전역 `fetch`를 `jest.mock`/`jest.spyOn`으로 모킹해 위 함수들을 `fetch` 기반으로
+      구현 (에러 응답 형식 `{ error: { code, message } }` 파싱 포함)
 - [ ] Refactor — 공통 fetch 래퍼(에러 처리, JSON 파싱) 추출해 중복 제거
 
 ---
@@ -372,7 +359,7 @@ TDD 대상 "컴포넌트"가 아니라 테스트 인프라이므로 Red/Green �
 **역할**: 티켓 CRUD + 낙관적 업데이트 상태 관리 (COMPONENT_SPEC §4).
 
 - [ ] Red — `__tests__/hooks/useTickets.test.ts` (TEST_CASES.md 미기재 — `@testing-library/react`의
-      `renderHook` 사용, MSW로 API 모킹)
+      `renderHook` 사용, `jest.mock('@/client/api/ticketApi')`로 API 모킹)
   - `create` 성공 시 `board.backlog` 맨 앞에 낙관적으로 추가되고, 성공 응답으로 확정됨
   - `update` 성공 시 해당 티켓 필드만 갱신
   - `remove` 성공 시 board에서 제거
@@ -424,7 +411,7 @@ TDD 대상 "컴포넌트"가 아니라 테스트 인프라이므로 Red/Green �
       상태(`isCreating`/`selectedTicket`) 관리
 - [ ] Refactor — 필터 로직(`isThisWeek` 등)을 순수 함수로 분리해 별도 유닛 테스트 가능하게 정리
 
-- [ ] Red — `__tests__/integration/dragAndDrop.test.tsx` (TC-INT-001, MSW 사용)
+- [ ] Red — `__tests__/integration/dragAndDrop.test.tsx` (TC-INT-001, `jest.mock('@/client/api/ticketApi')` 사용)
   - TC-INT-001-1: BACKLOG → TODO 드래그 → 카드가 TODO에 표시, `PATCH /api/tickets/reorder` 호출
   - TC-INT-001-2: 칼럼 내 순서 변경 → reorder 호출
   - TC-INT-001-3: 드래그 중 원위치 반투명 placeholder + `DragOverlay` 렌더링
@@ -433,14 +420,14 @@ TDD 대상 "컴포넌트"가 아니라 테스트 인프라이므로 Red/Green �
       완성본 기준 조정)
 - [ ] Refactor — 불필요(이미 Board/useTickets 단계에서 구현됨 — 통합 테스트로 배선만 확인)
 
-- [ ] Red — `__tests__/integration/completeTicket.test.tsx` (TC-INT-002, MSW 사용)
+- [ ] Red — `__tests__/integration/completeTicket.test.tsx` (TC-INT-002, `jest.mock('@/client/api/ticketApi')` 사용)
   - TC-INT-002-1: DONE으로 드래그 → `PATCH /:id/complete` 호출, DONE 칼럼에 표시
   - TC-INT-002-2: DONE → IN_PROGRESS로 역이동 → `PATCH /:id/complete` 호출(토글)
   - TC-INT-002-3: DONE 이동 후 완료 표시(✓) 렌더링
 - [ ] Green — `onDragEnd`에서 대상이 DONE이면 `useTickets.complete` 호출하도록 배선
 - [ ] Refactor — 불필요
 
-- [ ] Red — `__tests__/integration/deleteTicket.test.tsx` (TC-INT-003, MSW 사용)
+- [ ] Red — `__tests__/integration/deleteTicket.test.tsx` (TC-INT-003, `jest.mock('@/client/api/ticketApi')` 사용)
   - TC-INT-003-1: 카드 클릭 → [삭제] → [확인] → `DELETE /:id` 호출, 카드 제거, 모달 닫힘
   - TC-INT-003-2: [삭제] → [취소] → `DELETE` 미호출, 카드/모달 유지
 - [ ] Green — `TicketModal.onDelete` → `useTickets.remove` → 성공 시 `selectedTicket=null`로
@@ -484,7 +471,7 @@ TDD 대상 "컴포넌트"가 아니라 테스트 인프라이므로 Red/Green �
 | 0 | 공통 UI 프리미티브 | Button, PriorityBadge, DueDateBadge, Modal |
 | 1 | 1차 리프 (Phase 0 의존) | ConfirmDialog, SearchInput, TicketDetailView, TicketCard, TicketForm, FilterBar |
 | 2 | 2차 조합 | TicketModal, Column, BoardHeader |
-| 3 | 데이터 레이어 | MSW 설정, ticketApi, useTickets |
+| 3 | 데이터 레이어 | ticketApi, useTickets |
 | 4 | 보드 오케스트레이션 | Board, BoardContainer (+ 통합 테스트 3종) |
 | 5 | 페이지 엔트리 | app/page.tsx (+ 수동 브라우저 검증) |
 
