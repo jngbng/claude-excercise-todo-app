@@ -278,15 +278,14 @@ graph BT
 
 **역할**: "이번주 업무" / "일정 초과" 토글 필터. 다른 커스텀 컴포넌트에 의존하지 않는 독립 리프.
 
-- [ ] Red — `__tests__/components/FilterBar.test.tsx` (TC-COMP-007)
+- [x] Red — `__tests__/components/FilterBar.test.tsx` (TC-COMP-007)
   - TC-COMP-007-1: 두 버튼 렌더링
   - TC-COMP-007-2: [이번주 업무] 클릭 → `onFilterChange('thisWeek')` 호출 + 강조 스타일
   - TC-COMP-007-3: 활성 버튼 재클릭 → `onFilterChange('all')` 호출
   - TC-COMP-007-4: 다른 필터로 전환 → `onFilterChange('overdue')` 호출
   - `counts` prop 값이 버튼에 표시되는지 (있다면)
-- [ ] Green — `activeFilter` 기반 강조 스타일 + 클릭 핸들러 최소 구현
-- [ ] Refactor — 두 버튼의 반복 구조를 배열 매핑으로 정리할지 검토 (버튼이 2개뿐이라 과설계면
-      생략 가능)
+- [x] Green — `activeFilter` 기반 강조 스타일(`Button` variant 전환) + 클릭 핸들러 최소 구현
+- [x] Refactor — 두 필터를 `FILTERS` 배열 매핑으로 바로 작성(중복 없음) — 별도 정리 불필요
 
 ---
 

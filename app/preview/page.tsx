@@ -18,6 +18,7 @@ import { CreateTicketButton } from "@/client/components/CreateTicketButton";
 import { DeleteButton } from "@/client/components/DeleteButton";
 import { TicketDetailView } from "@/client/components/TicketDetailView";
 import { TicketForm } from "@/client/components/TicketForm";
+import { FilterBar } from "@/client/components/FilterBar";
 
 type PreviewSectionProps = {
   title: string;
@@ -62,6 +63,7 @@ const PreviewPage = () => {
   const [createClickCount, setCreateClickCount] = useState(0);
   const [deleteClickCount, setDeleteClickCount] = useState(0);
   const [ticketFormResult, setTicketFormResult] = useState<string>("");
+  const [activeFilter, setActiveFilter] = useState<"all" | "thisWeek" | "overdue">("all");
   const isBodyScrollLocked = useBodyScrollLocked();
 
   return (
@@ -240,6 +242,20 @@ const PreviewPage = () => {
               {ticketFormResult}
             </p>
           )}
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm text-text-primary">
+            FilterBar (활성 필터 재클릭 시 해제되는지 확인)
+          </p>
+          <FilterBar
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
+            counts={{ thisWeek: 3, overdue: 5 }}
+          />
+          <p data-testid="active-filter" className="mt-2 text-sm text-text-secondary">
+            현재 필터: {activeFilter}
+          </p>
         </div>
       </PreviewSection>
 
