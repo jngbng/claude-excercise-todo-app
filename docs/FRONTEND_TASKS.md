@@ -40,8 +40,9 @@ graph BT
   Button --> ConfirmDialog
   Modal --> ConfirmDialog
   Button --> TicketForm
-  Badge --> TicketCard
-  Badge --> TicketDetailView
+  PriorityBadge --> TicketCard
+  DueDateBadge --> TicketCard
+  PriorityBadge --> TicketDetailView
 
   Button --> SearchInput_group[SearchInput]
   Button --> CreateTicketButton
@@ -81,7 +82,8 @@ graph BT
 | 컴포넌트 | 파일 | COMPONENT_SPEC 참조 |
 |---|---|---|
 | Button | `src/client/components/ui/Button.tsx` | §3 Button |
-| Badge | `src/client/components/ui/Badge.tsx` | §3 Badge |
+| PriorityBadge | `src/client/components/ui/PriorityBadge.tsx` | §3 PriorityBadge |
+| DueDateBadge | `src/client/components/ui/DueDateBadge.tsx` | §3 DueDateBadge |
 | Modal | `src/client/components/ui/Modal.tsx` | §3 Modal |
 
 #### Button
@@ -100,17 +102,32 @@ graph BT
 
 ---
 
-#### Badge
+#### PriorityBadge
 
 **역할**: 우선순위 표시 — LOW(회색)/MEDIUM(파란색)/HIGH(빨간색), 작은 텍스트 + 둥근 패딩.
 
-- [ ] Red — `__tests__/components/ui/Badge.test.tsx` (TEST_CASES.md 미기재)
+- [x] Red — `__tests__/components/ui/PriorityBadge.test.tsx` (TEST_CASES.md 미기재)
   - `priority="LOW"` → 회색 계열 스타일 + "LOW" 텍스트
   - `priority="MEDIUM"` → 파란색 계열 스타일 + "MEDIUM" 텍스트
   - `priority="HIGH"` → 빨간색 계열 스타일 + "HIGH" 텍스트
-- [ ] Green — `priority` prop 기반 색상 매핑 구현 (`app/globals.css`의 `priority-low/medium/high`
+- [x] Green — `priority` prop 기반 색상 매핑 구현 (`app/globals.css`의 `priority-low/medium/high`
       토큰 사용)
 - [ ] Refactor — 색상 매핑 로직을 상수 객체로 추출
+
+---
+
+#### DueDateBadge
+
+**역할**: 마감일(dueDate)을 `YYYY-MM-DD` 형식으로 표시. 오늘 기준 마감일이 지났으면(over-due)
+붉은색, 아니면(before-due) 회색 텍스트.
+
+- [x] Red — `__tests__/components/ui/DueDateBadge.test.tsx` (TEST_CASES.md 미기재)
+  - `dueDate`를 `YYYY-MM-DD` 형식 텍스트로 표시
+  - 오늘보다 이전 날짜 → `text-danger` 클래스
+  - 오늘이거나 이후 날짜 → `text-text-secondary` 클래스
+- [x] Green — `dueDate` prop과 현재 날짜 비교 기반 색상 매핑 구현 (`app/globals.css`의 `danger`,
+      `text-secondary` 토큰 사용)
+- [ ] Refactor — 불필요
 
 ---
 
@@ -226,7 +243,7 @@ graph BT
   - TC-COMP-001-5: 카드 클릭 → `onClick` 1회 호출
   - 접근성: `role="button"`, `aria-label="티켓: {title}"`, Tab 포커스 가능, Enter로 `onClick` 호출
 - [ ] Green — `useSortable` 연결(드래그 자체는 이 단계에서 시각 스타일만, 실제 DnD 통합은
-      Phase 4 Board에서 검증), Badge 재사용, 오버듀 시 `app/globals.css`의 danger 톤 테두리 적용
+      Phase 4 Board에서 검증), PriorityBadge, DueDateBadge 재사용, 오버듀 시 `app/globals.css`의 danger 톤 테두리 적용
 - [ ] Refactor — 드래그 중 반투명/그림자 스타일과 정적 스타일 분리 정리
 
 **주의**: `onClick`은 드래그 제스처와 구분해야 한다(COMPONENT_SPEC §2.6) — `useSortable`의
@@ -479,7 +496,7 @@ TDD 대상 "컴포넌트"가 아니라 테스트 인프라이므로 Red/Green �
 
 | Phase | 성격 | 컴포넌트/대상 |
 |---|---|---|
-| 0 | 공통 UI 프리미티브 | Button, Badge, Modal |
+| 0 | 공통 UI 프리미티브 | Button, PriorityBadge, DueDateBadge, Modal |
 | 1 | 1차 리프 (Phase 0 의존) | ConfirmDialog, SearchInput, CreateTicketButton, DeleteButton, TicketDetailView, TicketCard, TicketForm, FilterBar |
 | 2 | 2차 조합 | TicketModal, Column, BoardHeader |
 | 3 | 데이터 레이어 | MSW 설정, ticketApi, useTickets |

@@ -11,7 +11,8 @@ import { useState } from "react";
 import { Button } from "@/client/components/ui/Button";
 import { Modal } from "@/client/components/ui/Modal";
 import { ConfirmDialog } from "@/client/components/ui/ConfirmDialog";
-import { Badge } from "@/client/components/ui/Badge";
+import { PriorityBadge } from "@/client/components/ui/PriorityBadge";
+import { DueDateBadge } from "@/client/components/ui/DueDateBadge";
 
 type PreviewSectionProps = {
   title: string;
@@ -69,11 +70,19 @@ const PreviewPage = () => {
         </div>
 
         <div className="mb-6">
-          <p className="mb-2 text-sm text-text-primary">Badge priority</p>
+          <p className="mb-2 text-sm text-text-primary">PriorityBadge priority</p>
           <div className="flex items-center gap-3">
-            <Badge priority="LOW" />
-            <Badge priority="MEDIUM" />
-            <Badge priority="HIGH" />
+            <PriorityBadge priority="LOW" />
+            <PriorityBadge priority="MEDIUM" />
+            <PriorityBadge priority="HIGH" />
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <p className="mb-2 text-sm text-text-primary">DueDateBadge (over-due / before-due)</p>
+          <div className="flex items-center gap-3">
+            <DueDateBadge dueDate="2020-01-01" />
+            <DueDateBadge dueDate="2099-01-01" />
           </div>
         </div>
 

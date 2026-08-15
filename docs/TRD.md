@@ -65,7 +65,7 @@ app/
 src/
 ├── client/                       # [프론트엔드] — src/server/ import 금지
 │   ├── components/               # React 컴포넌트 (PascalCase)
-│   │   └── ui/                   # 범용 UI 유틸리티 컴포넌트 (Button, Badge, Modal, ConfirmDialog 등)
+│   │   └── ui/                   # 범용 UI 유틸리티 컴포넌트 (Button, PriorityBadge, DueDateBadge, Modal, ConfirmDialog 등)
 │   ├── hooks/                    # 커스텀 훅
 │   └── api/
 │       └── ticketApi.ts          # API 호출 함수 (유일한 진입점)
@@ -201,7 +201,7 @@ app/page.tsx (BoardPage — RSC, 초기 데이터 패치)
         ├── FilterBar            # 이번주 업무 / 일정 초과 필터 버튼
         ├── Board                # DndContext + DragOverlay
         │   └── Column × 4       # Backlog(사이드바) / TODO / In Progress / Done
-        │       ├── ColumnHeader # 칼럼명 + 카드 수 뱃지 (ui/Badge)
+        │       ├── ColumnHeader # 칼럼명 + 카드 수 뱃지
         │       └── TicketCard   # 개별 티켓 카드 (드래그 가능)
         └── TicketModal          # 상세 보기 / 수정 오버레이
             ├── TicketDetailView # 읽기 전용 필드 (시작일, 종료일, 상태, 생성일)
@@ -211,12 +211,13 @@ app/page.tsx (BoardPage — RSC, 초기 데이터 패치)
 # ui/ — 범용 UI 유틸리티 컴포넌트 (도메인 로직 없음, 여러 화면에서 재사용)
 src/client/components/ui/
 ├── Button.tsx
-├── Badge.tsx
+├── PriorityBadge.tsx
+├── DueDateBadge.tsx
 ├── Modal.tsx
 └── ConfirmDialog.tsx        # Modal + Button 조합
 ```
 
-**컴포넌트 배치 규칙**: 특정 도메인(티켓·보드)과 무관하게 재사용 가능한 범용 UI 컴포넌트(Button, Badge, Modal 등)는 `src/client/components/ui/`에 둔다. `BoardContainer`, `TicketCard`, `TicketForm`처럼 도메인 로직·데이터를 다루는 컴포넌트는 `src/client/components/` 바로 아래에 둔다. 테스트 파일도 동일하게 `__tests__/components/ui/`로 구조를 맞춘다.
+**컴포넌트 배치 규칙**: 특정 도메인(티켓·보드)과 무관하게 재사용 가능한 범용 UI 컴포넌트(Button, PriorityBadge, DueDateBadge, Modal 등)는 `src/client/components/ui/`에 둔다. `BoardContainer`, `TicketCard`, `TicketForm`처럼 도메인 로직·데이터를 다루는 컴포넌트는 `src/client/components/` 바로 아래에 둔다. 테스트 파일도 동일하게 `__tests__/components/ui/`로 구조를 맞춘다.
 
 ### 상태 관리
 

@@ -1,6 +1,6 @@
 import type { TicketPriority } from "@/shared/types";
 
-type BadgeProps = {
+type PriorityBadgeProps = {
   priority: TicketPriority;
 };
 
@@ -12,6 +12,6 @@ const PRIORITY_CLASS: Record<TicketPriority, string> = {
   HIGH: "bg-priority-high/10 text-priority-high",
 };
 
-export const Badge = ({ priority }: BadgeProps) => {
+export const PriorityBadge = ({ priority }: PriorityBadgeProps) => {
   return <span className={`${BASE_CLASS} ${PRIORITY_CLASS[priority]}`}>{priority}</span>;
 };
