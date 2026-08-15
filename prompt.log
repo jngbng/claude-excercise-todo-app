@@ -497,3 +497,13 @@ ConfirmDialog 에 배경색이 없어서 뒤쪽 화면이 비쳐보여. 스타�
 
 2026-08-15 15:36
 버튼들이 너무 각진데, 참조하고 있는 스타일 가이드에 따라 round를 조금 넣어봐.
+
+---
+
+2026-08-15 16:06
+Badge들의 데이터는 data-attribute로 노출하게 하고 싶어.
+
+- PriorityBadge는 priority를 data-priority로 노출한다.
+- DueDateBadge는 isOverdue(bool)를 data-overdue 로 노출한다.
+
+필요하면 관련 문서 업데이트하고 수정해줘.

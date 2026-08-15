@@ -17,6 +17,7 @@ describe("PriorityBadge", () => {
 
       const badge = screen.getByText(priority);
       expect(badge).toHaveClass(...classes);
+      expect(badge).toHaveAttribute("data-priority", priority);
     });
   });
 });

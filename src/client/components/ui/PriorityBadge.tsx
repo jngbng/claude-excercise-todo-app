@@ -13,5 +13,9 @@ const PRIORITY_CLASS: Record<TicketPriority, string> = {
 };
 
 export const PriorityBadge = ({ priority }: PriorityBadgeProps) => {
-  return <span className={`${BASE_CLASS} ${PRIORITY_CLASS[priority]}`}>{priority}</span>;
+  return (
+    <span className={`${BASE_CLASS} ${PRIORITY_CLASS[priority]}`} data-priority={priority}>
+      {priority}
+    </span>
+  );
 };

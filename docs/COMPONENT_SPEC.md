@@ -305,10 +305,12 @@ function isThisWeek(ticket: TicketWithMeta): boolean {
 ### PriorityBadge
 - 우선순위 표시: LOW(회색), MEDIUM(파란색), HIGH(빨간색)
 - 크기: 작은 텍스트 + 둥근 패딩
+- `data-priority` 속성으로 priority 값을 노출
 
 ### DueDateBadge
 - 마감일(dueDate)을 YYYY-MM-DD 형식으로 표시
 - 오늘 기준 마감일이 지났으면(over-due) 붉은색, 아니면(before-due) 회색 텍스트
+- `data-overdue` 속성으로 isOverdue(bool) 값을 노출
 
 ### ConfirmDialog
 - "정말 삭제하시겠습니까?" 확인 다이얼로그

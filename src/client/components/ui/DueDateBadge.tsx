@@ -11,7 +11,12 @@ const isOverdue = (dueDate: string): boolean => {
 };
 
 export const DueDateBadge = ({ dueDate }: DueDateBadgeProps) => {
-  const colorClass = isOverdue(dueDate) ? "text-danger" : "text-text-secondary";
+  const overdue = isOverdue(dueDate);
+  const colorClass = overdue ? "text-danger" : "text-text-secondary";
 
-  return <span className={`${BASE_CLASS} ${colorClass}`}>{dueDate}</span>;
+  return (
+    <span className={`${BASE_CLASS} ${colorClass}`} data-overdue={overdue}>
+      {dueDate}
+    </span>
+  );
 };

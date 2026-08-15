@@ -20,15 +20,19 @@ describe("DueDateBadge", () => {
     expect(screen.getByText("2026-08-20")).toBeInTheDocument();
   });
 
-  it("dueDate가 오늘보다 이전이면(over-due) 붉은색 텍스트 클래스가 적용된다", () => {
+  it("dueDate가 오늘보다 이전이면(over-due) 붉은색 텍스트 클래스와 data-overdue=true가 적용된다", () => {
     render(<DueDateBadge dueDate="2026-08-14" />);
 
-    expect(screen.getByText("2026-08-14")).toHaveClass("text-danger");
+    const badge = screen.getByText("2026-08-14");
+    expect(badge).toHaveClass("text-danger");
+    expect(badge).toHaveAttribute("data-overdue", "true");
   });
 
-  it("dueDate가 오늘이거나 이후면(before-due) 회색 텍스트 클래스가 적용된다", () => {
+  it("dueDate가 오늘이거나 이후면(before-due) 회색 텍스트 클래스와 data-overdue=false가 적용된다", () => {
     render(<DueDateBadge dueDate="2026-08-15" />);
 
-    expect(screen.getByText("2026-08-15")).toHaveClass("text-text-secondary");
+    const badge = screen.getByText("2026-08-15");
+    expect(badge).toHaveClass("text-text-secondary");
+    expect(badge).toHaveAttribute("data-overdue", "false");
   });
 });
