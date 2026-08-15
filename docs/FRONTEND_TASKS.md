@@ -278,7 +278,7 @@ graph BT
 **역할**: 상세 표시 + 인라인 편집 + 삭제. `Modal` + `TicketDetailView` + `TicketForm` +
 삭제 버튼(`Button` danger variant, 인라인) + `ConfirmDialog` 조합.
 
-- [ ] Red — `__tests__/components/TicketModal.test.tsx` (TC-COMP-005)
+- [x] Red — `__tests__/components/TicketModal.test.tsx` (TC-COMP-005)
   - TC-COMP-005-1: 기존 `ticket` 데이터로 폼/상세 필드 초기화 (title, priority 등)
   - TC-COMP-005-2: 필드 수정 → 저장 클릭 → `onUpdate(id, data)` 호출, 모달은 닫히지 않음
     (`isOpen`은 부모 상태이므로 `onClose` 미호출로 검증)
@@ -288,9 +288,10 @@ graph BT
   - `status`/`startedAt`/`completedAt`/`createdAt`은 `TicketDetailView`를 통해 읽기 전용으로
     표시 (편집 불가 확인)
   - ESC/바깥 클릭 시 `onClose` 호출 (Modal 위임 동작이 실제로 연결됐는지)
-- [ ] Green — 각 하위 컴포넌트를 조합하고("삭제" 버튼은 `Button`(danger)을 직접 인라인 렌더링),
+- [x] Green — 각 하위 컴포넌트를 조합하고("삭제" 버튼은 `Button`(danger)을 직접 인라인 렌더링),
       삭제 확인 다이얼로그 열림 여부를 로컬 state로 관리
-- [ ] Refactor — 인라인 편집 상태(필드별 편집 모드)와 폼 제출 로직 분리 정리
+- [x] Refactor — 불필요 (조합만 하는 얇은 컴포넌트라 추가 정리 대상 없음). 삭제 확인
+      다이얼로그가 열려 있는 동안에는 바깥 "삭제" 트리거 버튼을 숨겨 접근성 이름 중복을 피함
 
 ---
 
