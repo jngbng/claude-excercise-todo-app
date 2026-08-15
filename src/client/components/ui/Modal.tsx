@@ -22,6 +22,13 @@ export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    document.body.classList.add("body-scroll-locked");
+    return () => document.body.classList.remove("body-scroll-locked");
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (

@@ -90,13 +90,13 @@ graph BT
 
 **역할**: variant(primary/secondary/danger/ghost) × size(sm/md/lg), 로딩 상태 지원.
 
-- [ ] Red — `__tests__/components/ui/Button.test.tsx` (TEST_CASES.md 미기재)
+- [x] Red — `__tests__/components/ui/Button.test.tsx` (TEST_CASES.md 미기재)
   - variant별 클래스/스타일이 다르게 적용되는지 (primary/secondary/danger/ghost 각 1건)
-  - `isLoading=true`일 때 클릭 불가(disabled) + 로딩 인디케이터 표시
+  - `isLoading=true`일 때 클릭 불가(disabled) + 로딩 텍스트("처리중...") 표시
   - 클릭 시 `onClick` 1회 호출
-  - `disabled=true`일 때 클릭해도 `onClick` 미호출
-- [ ] Green — 위 테스트를 통과하는 최소 구현 (네이티브 `<button>` + variant/size별 className 매핑)
-- [ ] Refactor — variant/size 클래스 매핑 테이블 정리, 중복 제거
+  - (별도 `disabled` prop은 두지 않음 — `isLoading`이 비활성 상태를 겸함)
+- [x] Green — 위 테스트를 통과하는 최소 구현 (네이티브 `<button>` + variant/size별 className 매핑)
+- [x] Refactor — variant/size 클래스 매핑 테이블(`VARIANT_CLASS`/`SIZE_CLASS`) 정리 완료
 
 **완료 조건**: 이후 모든 컴포넌트가 이 Button만 재사용하고 직접 `<button>` 스타일링을 하지 않는다.
 
@@ -112,22 +112,24 @@ graph BT
   - `priority="HIGH"` → 빨간색 계열 스타일 + "HIGH" 텍스트
 - [x] Green — `priority` prop 기반 색상 매핑 구현 (`app/globals.css`의 `priority-low/medium/high`
       토큰 사용)
-- [ ] Refactor — 색상 매핑 로직을 상수 객체로 추출
+- [x] Refactor — 색상 매핑 로직을 `PRIORITY_CLASS` 상수 객체로 추출 완료
 
 ---
 
 #### DueDateBadge
 
-**역할**: 마감일(dueDate)을 `YYYY-MM-DD` 형식으로 표시. 오늘 기준 마감일이 지났으면(over-due)
-붉은색, 아니면(before-due) 회색 텍스트.
+**역할**: 마감일(dueDate)을 `YYYY-MM-DD` 형식으로 표시. `isOverdue` prop(오늘 기준 마감 초과
+여부는 상위 컴포넌트가 계산해 전달)에 따라 지났으면(over-due) 붉은색, 아니면(before-due) 회색
+텍스트. (당초 계획한 "컴포넌트 내부에서 날짜 비교" 방식은 09d42aa에서 `isOverdue` prop 방식으로
+변경됨 — 오늘 날짜 기준 계산은 `TicketCard` 등 사용처 책임.)
 
 - [x] Red — `__tests__/components/ui/DueDateBadge.test.tsx` (TEST_CASES.md 미기재)
   - `dueDate`를 `YYYY-MM-DD` 형식 텍스트로 표시
-  - 오늘보다 이전 날짜 → `text-danger` 클래스
-  - 오늘이거나 이후 날짜 → `text-text-secondary` 클래스
-- [x] Green — `dueDate` prop과 현재 날짜 비교 기반 색상 매핑 구현 (`app/globals.css`의 `danger`,
+  - `isOverdue=true` → `text-danger` 클래스 + `data-overdue="true"`
+  - `isOverdue=false` → `text-text-secondary` 클래스 + `data-overdue="false"`
+- [x] Green — `isOverdue` prop 기반 색상 매핑 구현 (`app/globals.css`의 `danger`,
       `text-secondary` 토큰 사용)
-- [ ] Refactor — 불필요
+- [x] Refactor — 불필요 (prop 기반으로 단순화되어 추가 정리 대상 없음)
 
 ---
 
@@ -135,15 +137,16 @@ graph BT
 
 **역할**: 오버레이 + 중앙 정렬 컨테이너, ESC/바깥 클릭 닫기, 열림/닫힘 애니메이션, body 스크롤 잠금.
 
-- [ ] Red — `__tests__/components/ui/Modal.test.tsx` (TEST_CASES.md 미기재)
-  - `isOpen=false`면 아무것도 렌더링하지 않음
-  - `isOpen=true`면 children 렌더링
-  - ESC 키 입력 시 `onClose` 호출
-  - 오버레이(바깥 영역) 클릭 시 `onClose` 호출, 모달 콘텐츠 내부 클릭 시 `onClose` 미호출
-  - 열릴 때 `document.body`에 `body-scroll-locked` 클래스 부여, 닫히면 제거
-- [ ] Green — Portal 없이(또는 필요시 `createPortal`) 오버레이/컨테이너 구조 구현,
-      `useEffect`로 keydown 리스너와 body 클래스 토글
-- [ ] Refactor — 이벤트 리스너 cleanup 누락 여부 재확인
+- [x] Red — `__tests__/components/ui/Modal.test.tsx` (TEST_CASES.md 미기재)
+  - [x] `isOpen=false`면 아무것도 렌더링하지 않음
+  - [x] `isOpen=true`면 children 렌더링 (`role="dialog"`로 렌더링되는지 포함)
+  - [x] ESC 키 입력 시 `onClose` 호출
+  - [x] 오버레이(바깥 영역) 클릭 시 `onClose` 호출, 모달 콘텐츠 내부 클릭 시 `onClose` 미호출
+  - [x] 열릴 때 `document.body`에 `body-scroll-locked` 클래스 부여, 닫히면(isOpen=false 리렌더
+        또는 언마운트) 제거
+- [x] Green — Portal 없이 오버레이/컨테이너 구조 구현, `useEffect` 2개로 keydown 리스너와 body
+      클래스(`body-scroll-locked`) 토글을 각각 분리 구현 (`Modal.tsx`)
+- [x] Refactor — 두 `useEffect` 모두 cleanup 함수 존재 확인, 추가 정리 대상 없음
 
 **완료 조건**: `ConfirmDialog`, `TicketModal`은 직접 오버레이를 그리지 않고 이 `Modal`을 감싼다.
 

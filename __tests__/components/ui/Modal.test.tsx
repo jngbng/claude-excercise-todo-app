@@ -77,4 +77,54 @@ describe("Modal", () => {
 
     expect(handleClose).not.toHaveBeenCalled();
   });
+
+  it("열리면 document.body에 body-scroll-locked 클래스가 부여된다", () => {
+    render(
+      <Modal isOpen onClose={jest.fn()}>
+        <p>모달 내용</p>
+      </Modal>,
+    );
+
+    expect(document.body).toHaveClass("body-scroll-locked");
+  });
+
+  it("isOpen=false이면 document.body에 body-scroll-locked 클래스가 부여되지 않는다", () => {
+    render(
+      <Modal isOpen={false} onClose={jest.fn()}>
+        <p>모달 내용</p>
+      </Modal>,
+    );
+
+    expect(document.body).not.toHaveClass("body-scroll-locked");
+  });
+
+  it("닫히면 document.body에서 body-scroll-locked 클래스가 제거된다", () => {
+    const { rerender } = render(
+      <Modal isOpen onClose={jest.fn()}>
+        <p>모달 내용</p>
+      </Modal>,
+    );
+    expect(document.body).toHaveClass("body-scroll-locked");
+
+    rerender(
+      <Modal isOpen={false} onClose={jest.fn()}>
+        <p>모달 내용</p>
+      </Modal>,
+    );
+
+    expect(document.body).not.toHaveClass("body-scroll-locked");
+  });
+
+  it("언마운트되면 document.body에서 body-scroll-locked 클래스가 제거된다", () => {
+    const { unmount } = render(
+      <Modal isOpen onClose={jest.fn()}>
+        <p>모달 내용</p>
+      </Modal>,
+    );
+    expect(document.body).toHaveClass("body-scroll-locked");
+
+    unmount();
+
+    expect(document.body).not.toHaveClass("body-scroll-locked");
+  });
 });
