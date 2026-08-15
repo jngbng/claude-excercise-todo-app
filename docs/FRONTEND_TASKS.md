@@ -169,14 +169,14 @@ graph BT
 
 **역할**: "정말 삭제하시겠습니까?" 확인 다이얼로그. 확인 버튼은 danger variant.
 
-- [ ] Red — `__tests__/components/ui/ConfirmDialog.test.tsx` (TC-COMP-006)
+- [x] Red — `__tests__/components/ui/ConfirmDialog.test.tsx` (TC-COMP-006)
   - TC-COMP-006-1: `isOpen=true`일 때 확인 메시지 + [취소]/[삭제] 버튼 표시
   - TC-COMP-006-2: [취소] 클릭 → `onCancel` 호출 (다이얼로그 닫힘은 부모 책임이므로 콜백
     호출만 검증)
   - TC-COMP-006-3: [삭제] 클릭 → `onConfirm` 1회 호출
   - 삭제 확인 버튼이 danger variant(Button)로 렌더링되는지
-- [ ] Green — `Modal` + `Button`(danger/secondary) 조합으로 최소 구현
-- [ ] Refactor — 메시지 텍스트를 prop으로 뺄지 여부 검토 (스펙상 고정 문구이므로 하드코딩 유지
+- [x] Green — `Modal` + `Button`(danger/secondary) 조합으로 최소 구현
+- [x] Refactor — 메시지 텍스트를 prop으로 뺄지 여부 검토 (스펙상 고정 문구이므로 하드코딩 유지
       가능 — 과설계 금지)
 
 ---
@@ -238,16 +238,16 @@ graph BT
 
 **역할**: 개별 티켓 카드, 드래그 소스 (`useSortable`).
 
-- [ ] Red — `__tests__/components/TicketCard.test.tsx` (TC-COMP-001)
+- [x] Red — `__tests__/components/TicketCard.test.tsx` (TC-COMP-001)
   - TC-COMP-001-1: title, `[HIGH]` 뱃지, dueDate 텍스트 표시
   - TC-COMP-001-2: `isOverdue=true` → 경고 표시 렌더링
   - TC-COMP-001-3: `isOverdue=false` → 경고 표시 없음
   - TC-COMP-001-4: `dueDate=null` → 날짜 영역 미렌더링
   - TC-COMP-001-5: 카드 클릭 → `onClick` 1회 호출
   - 접근성: `role="button"`, `aria-label="티켓: {title}"`, Tab 포커스 가능, Enter로 `onClick` 호출
-- [ ] Green — `useSortable` 연결(드래그 자체는 이 단계에서 시각 스타일만, 실제 DnD 통합은
+- [x] Green — `useSortable` 연결(드래그 자체는 이 단계에서 시각 스타일만, 실제 DnD 통합은
       Phase 4 Board에서 검증), PriorityBadge, DueDateBadge 재사용, 오버듀 시 `app/globals.css`의 danger 톤 테두리 적용
-- [ ] Refactor — 드래그 중 반투명/그림자 스타일과 정적 스타일 분리 정리
+- [x] Refactor — 드래그 중 반투명/그림자 스타일과 정적 스타일 분리 정리 (`DRAGGING_CLASS`/`OVERDUE_CLASS` 상수로 분리 완료)
 
 **주의**: `onClick`은 드래그 제스처와 구분해야 한다(COMPONENT_SPEC §2.6) — `useSortable`의
 `isDragging` 또는 dnd-kit의 클릭/드래그 구분 패턴(activation constraint)을 Green 단계에서 반영.
