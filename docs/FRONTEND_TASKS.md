@@ -258,7 +258,7 @@ graph BT
 
 **역할**: 생성/수정 공용 폼. `mode` prop으로 분기.
 
-- [ ] Red — `__tests__/components/TicketForm.test.tsx` (TC-COMP-004, 생성 모드 기준. 수정 모드
+- [x] Red — `__tests__/components/TicketForm.test.tsx` (TC-COMP-004, 생성 모드 기준. 수정 모드
       데이터 바인딩은 TC-COMP-005-1과 겹치므로 TicketModal 테스트에서 통합 검증)
   - TC-COMP-004-1: `mode="create"` → title 빈칸, priority "MEDIUM" 기본 선택
   - TC-COMP-004-2: title 빈 값으로 저장 시도 → "제목을 입력해주세요" 인라인 에러
@@ -267,9 +267,10 @@ graph BT
   - `isLoading=true` → 제출 버튼 비활성화 + 로딩 스피너
   - description 1000자 초과 / dueDate 과거 날짜 → 각각의 에러 메시지 표시 (REQUIREMENTS.md
     검증 에러 메시지 표)
-- [ ] Green — `src/shared/validations/ticket.ts`의 `createTicketSchema`/`updateTicketSchema`로
-      클라이언트 사이드 검증, `Button` 재사용
-- [ ] Refactor — 필드별 에러 표시 로직 중복 제거
+- [x] Green — `src/shared/validations/ticket.ts`의 `createTicketSchema`/`updateTicketSchema`로
+      클라이언트 사이드 검증, `Button` 재사용 (취소 버튼이 폼을 submit하지 않도록 `Button`에
+      `type` prop 추가)
+- [x] Refactor — 필드별 에러 표시 로직을 `FieldError` 헬퍼 컴포넌트로 중복 제거
 
 ---
 

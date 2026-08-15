@@ -17,6 +17,7 @@ import { SearchInput } from "@/client/components/SearchInput";
 import { CreateTicketButton } from "@/client/components/CreateTicketButton";
 import { DeleteButton } from "@/client/components/DeleteButton";
 import { TicketDetailView } from "@/client/components/TicketDetailView";
+import { TicketForm } from "@/client/components/TicketForm";
 
 type PreviewSectionProps = {
   title: string;
@@ -60,6 +61,7 @@ const PreviewPage = () => {
   const [clickCount, setClickCount] = useState(0);
   const [createClickCount, setCreateClickCount] = useState(0);
   const [deleteClickCount, setDeleteClickCount] = useState(0);
+  const [ticketFormResult, setTicketFormResult] = useState<string>("");
   const isBodyScrollLocked = useBodyScrollLocked();
 
   return (
@@ -219,6 +221,25 @@ const PreviewPage = () => {
             completedAt={null}
             createdAt="2026-07-30T12:00:00.000Z"
           />
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm text-text-primary">
+            TicketForm (mode=&quot;create&quot;) — 빈 title로 저장하면 인라인 에러 확인
+          </p>
+          <div className="max-w-md">
+            <TicketForm
+              mode="create"
+              onSubmit={(data) => setTicketFormResult(`onSubmit: ${JSON.stringify(data)}`)}
+              onCancel={() => setTicketFormResult("onCancel 호출됨")}
+              isLoading={false}
+            />
+          </div>
+          {ticketFormResult && (
+            <p data-testid="ticket-form-result" className="mt-3 text-sm text-text-secondary">
+              {ticketFormResult}
+            </p>
+          )}
         </div>
       </PreviewSection>
 
