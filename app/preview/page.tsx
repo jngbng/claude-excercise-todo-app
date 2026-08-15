@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { Button } from "@/client/components/ui/Button";
 import { Modal } from "@/client/components/ui/Modal";
 import { ConfirmDialog } from "@/client/components/ui/ConfirmDialog";
@@ -18,6 +19,7 @@ import { TicketDetailView } from "@/client/components/TicketDetailView";
 import { TicketForm } from "@/client/components/TicketForm";
 import { FilterBar } from "@/client/components/FilterBar";
 import { TicketModal } from "@/client/components/TicketModal";
+import { Column } from "@/client/components/Column";
 import type { TicketWithMeta } from "@/shared/types";
 
 type PreviewSectionProps = {
@@ -79,7 +81,11 @@ const PreviewPage = () => {
     isOverdue: false,
   });
   const [ticketModalLog, setTicketModalLog] = useState<string>("");
+  const [columnClickLog, setColumnClickLog] = useState<string>("");
   const isBodyScrollLocked = useBodyScrollLocked();
+  const previewDndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+  );
 
   return (
     <main className="mx-auto max-w-5xl p-8">
@@ -272,6 +278,30 @@ const PreviewPage = () => {
           {ticketModalLog && (
             <p data-testid="ticket-modal-log" className="mt-3 text-sm text-text-secondary">
               {ticketModalLog}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm text-text-primary">
+            Column (칼럼명 + 카드 수, 빈 칼럼 안내, 카드 클릭 위임 확인)
+          </p>
+          <DndContext sensors={previewDndSensors}>
+            <div className="grid max-w-3xl grid-cols-2 gap-4">
+              <Column
+                status="TODO"
+                tickets={[
+                  { ...ticketModalTicket, id: 101, title: "TODO 티켓 A", status: "TODO" },
+                  { ...ticketModalTicket, id: 102, title: "TODO 티켓 B", status: "TODO" },
+                ]}
+                onTicketClick={(ticket) => setColumnClickLog(`onTicketClick(${ticket.id})`)}
+              />
+              <Column status="DONE" tickets={[]} onTicketClick={() => {}} />
+            </div>
+          </DndContext>
+          {columnClickLog && (
+            <p data-testid="column-click-log" className="mt-3 text-sm text-text-secondary">
+              {columnClickLog}
             </p>
           )}
         </div>

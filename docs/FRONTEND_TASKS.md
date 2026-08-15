@@ -299,14 +299,18 @@ graph BT
 
 **역할**: 단일 칼럼의 카드 목록 + 드롭 영역 (`SortableContext` + `useDroppable`).
 
-- [ ] Red — `__tests__/components/Column.test.tsx` (TC-COMP-002)
+- [x] Red — `__tests__/components/Column.test.tsx` (TC-COMP-002)
   - TC-COMP-002-1: 칼럼명 + 카드 수 표시 (예: "BACKLOG", "3")
   - TC-COMP-002-2: `tickets` 2개 → 카드 제목 2개 렌더링
   - TC-COMP-002-3: `tickets=[]` → "이 칼럼에 티켓이 없습니다" 안내 + 카드 수 0
   - 카드 클릭 시 `onTicketClick(ticket)` 호출 (TicketCard 위임 확인)
-- [ ] Green — `TicketCard` 목록 렌더링 + `SortableContext`/`useDroppable` 연결 (DnD 컨텍스트가
-      필요하므로 테스트 시 `DndContext`로 래핑)
-- [ ] Refactor — BACKLOG(사이드바)와 나머지 칼럼의 공통 로직/스타일 분기 정리
+- [x] Green — `TicketCard` 목록 렌더링 + `SortableContext`/`useDroppable` 연결 (DnD 컨텍스트가
+      필요하므로 테스트 시 `DndContext`로 래핑). PointerSensor는 `activationConstraint` 없이는
+      pointerdown에서 바로 preventDefault를 호출해 뒤따르는 click을 막으므로, 테스트의
+      `DndContext`에 distance 제약을 둔 sensor를 구성해 클릭 테스트가 가능하게 함 (Board도
+      동일하게 구성 필요 — Phase 4에서 유지)
+- [x] Refactor — 불필요 (BACKLOG/TODO/IN_PROGRESS/DONE 모두 동일 렌더링 로직이라 칼럼별 특수
+      분기가 아직 없음 — 조기 분리 금지)
 
 ---
 
