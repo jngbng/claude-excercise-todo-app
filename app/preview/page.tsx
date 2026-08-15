@@ -20,6 +20,7 @@ import { TicketForm } from "@/client/components/TicketForm";
 import { FilterBar } from "@/client/components/FilterBar";
 import { TicketModal } from "@/client/components/TicketModal";
 import { Column } from "@/client/components/Column";
+import { BoardHeader } from "@/client/components/BoardHeader";
 import type { TicketWithMeta } from "@/shared/types";
 
 type PreviewSectionProps = {
@@ -82,6 +83,7 @@ const PreviewPage = () => {
   });
   const [ticketModalLog, setTicketModalLog] = useState<string>("");
   const [columnClickLog, setColumnClickLog] = useState<string>("");
+  const [boardHeaderLog, setBoardHeaderLog] = useState<string>("");
   const isBodyScrollLocked = useBodyScrollLocked();
   const previewDndSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -302,6 +304,18 @@ const PreviewPage = () => {
           {columnClickLog && (
             <p data-testid="column-click-log" className="mt-3 text-sm text-text-secondary">
               {columnClickLog}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm text-text-primary">
+            BoardHeader (SearchInput 비활성 + &quot;새 업무&quot; 버튼)
+          </p>
+          <BoardHeader onCreateClick={() => setBoardHeaderLog("onCreateClick 호출됨")} />
+          {boardHeaderLog && (
+            <p data-testid="board-header-log" className="mt-3 text-sm text-text-secondary">
+              {boardHeaderLog}
             </p>
           )}
         </div>

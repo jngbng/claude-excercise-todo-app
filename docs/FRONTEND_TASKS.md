@@ -318,12 +318,12 @@ graph BT
 
 **역할**: 검색(placeholder) + "새 업무" 버튼.
 
-- [ ] Red — `__tests__/components/BoardHeader.test.tsx` (TC-COMP-003 중 -2 관련 부분만: 버튼
+- [x] Red — `__tests__/components/BoardHeader.test.tsx` (TC-COMP-003 중 -2 관련 부분만: 버튼
       존재 및 클릭 위임. 모달이 실제로 열리는지는 BoardContainer 레벨에서 TC-COMP-003-2로 검증)
   - `SearchInput`(비활성) 렌더링
   - "새 업무" 버튼 렌더링, 클릭 시 `onCreateClick` 1회 호출
-- [ ] Green — `SearchInput` + "새 업무" 버튼(`Button` primary variant, 인라인) 배치
-- [ ] Refactor — 불필요
+- [x] Green — `SearchInput` + "새 업무" 버튼(`Button` primary variant, 인라인) 배치
+- [x] Refactor — 불필요
 
 ---
 
