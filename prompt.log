@@ -512,3 +512,27 @@ Badge들의 데이터는 data-attribute로 노출하게 하고 싶어.
 
 2026-08-15 16:17
 DueDateBadge가 내부적으로 isOverdue를 계산하고 있어. 유틸리티 컴포넌트니 isOverdue를 파라미터로 받도록 수정해줘.
+
+---
+
+2026-08-15 16:20
+TEST_CASES.md의 TC-COMP-001 (TicketCard) 테스트 케이스를 React Testing Library 테스트 코드로 변환해줘.
+
+테스트 케이스: TC-COMP-001-1 ~ 7
+
+dnd-kit은 mock 처리해줘. 아직 구현은 하지마.
+
+---
+
+2026-08-15 16:24
+Green 단계로 진행하기 전에 운영코드 TicketCard 인터페이스만 만들어서 RED 단계 테스트들이 더 유의미하게 의도대로 실패하게 만들어줘.
+
+---
+
+2026-08-15 16:28
+Green 단계로 진행해서 TicketCard 구현해줘
+
+---
+
+2026-08-15 16:31
+Green 단계 진행해줘
