@@ -119,6 +119,8 @@
 | TC-COMP-001-3 | isOverdue=false면 경고 미표시 | isOverdue=false | 경고 아이콘 없음 |
 | TC-COMP-001-4 | dueDate 없으면 날짜 미표시 | dueDate=null | 날짜 영역 렌더링 안 됨 |
 | TC-COMP-001-5 | 카드 클릭 시 콜백 호출 | 카드 클릭 | onClick 1회 호출 |
+| TC-COMP-001-6 | 제목이 너무 길경우 말줄임 형태로 표시한다 | title 200글자 | 말줄임(...) 처리 |
+| TC-COMP-001-7 | 우선순위 뱃지 색상 | priority=LOW/MEDIUM/HIGH | 각각 회색/파란색/빨간색 |
 
 ---
 

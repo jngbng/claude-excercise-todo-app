@@ -81,8 +81,8 @@ const PreviewPage = () => {
         <div className="mb-6">
           <p className="mb-2 text-sm text-text-primary">DueDateBadge (over-due / before-due)</p>
           <div className="flex items-center gap-3">
-            <DueDateBadge dueDate="2020-01-01" />
-            <DueDateBadge dueDate="2099-01-01" />
+            <DueDateBadge dueDate="2020-01-01" isOverdue={true} />
+            <DueDateBadge dueDate="2099-01-01" isOverdue={false} />
           </div>
         </div>
 

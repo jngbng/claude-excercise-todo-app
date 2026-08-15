@@ -5,31 +5,22 @@ import { render, screen } from "@testing-library/react";
 import { DueDateBadge } from "@/client/components/ui/DueDateBadge";
 
 describe("DueDateBadge", () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date("2026-08-15"));
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   it("dueDate를 YYYY-MM-DD 형식으로 표시한다", () => {
-    render(<DueDateBadge dueDate="2026-08-20" />);
+    render(<DueDateBadge dueDate="2026-08-20" isOverdue={false} />);
 
     expect(screen.getByText("2026-08-20")).toBeInTheDocument();
   });
 
-  it("dueDate가 오늘보다 이전이면(over-due) 붉은색 텍스트 클래스와 data-overdue=true가 적용된다", () => {
-    render(<DueDateBadge dueDate="2026-08-14" />);
+  it("isOverdue가 true면 붉은색 텍스트 클래스와 data-overdue=true가 적용된다", () => {
+    render(<DueDateBadge dueDate="2026-08-14" isOverdue={true} />);
 
     const badge = screen.getByText("2026-08-14");
     expect(badge).toHaveClass("text-danger");
     expect(badge).toHaveAttribute("data-overdue", "true");
   });
 
-  it("dueDate가 오늘이거나 이후면(before-due) 회색 텍스트 클래스와 data-overdue=false가 적용된다", () => {
-    render(<DueDateBadge dueDate="2026-08-15" />);
+  it("isOverdue가 false면 회색 텍스트 클래스와 data-overdue=false가 적용된다", () => {
+    render(<DueDateBadge dueDate="2026-08-15" isOverdue={false} />);
 
     const badge = screen.getByText("2026-08-15");
     expect(badge).toHaveClass("text-text-secondary");

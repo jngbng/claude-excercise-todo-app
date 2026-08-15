@@ -309,7 +309,7 @@ function isThisWeek(ticket: TicketWithMeta): boolean {
 
 ### DueDateBadge
 - 마감일(dueDate)을 YYYY-MM-DD 형식으로 표시
-- 오늘 기준 마감일이 지났으면(over-due) 붉은색, 아니면(before-due) 회색 텍스트
+- isOverdue(bool)를 prop으로 전달받아 지났으면(over-due) 붉은색, 아니면(before-due) 회색 텍스트
 - `data-overdue` 속성으로 isOverdue(bool) 값을 노출
 
 ### ConfirmDialog
