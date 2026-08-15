@@ -80,16 +80,4 @@ describe("Button", () => {
 
     expect(screen.getByRole("button", { name: "티켓 생성" })).toBeInTheDocument();
   });
-
-  it("type을 지정하지 않으면 기본값 'button'이 적용된다 (form 내부 의도치 않은 submit 방지)", () => {
-    render(<Button>버튼</Button>);
-
-    expect(screen.getByRole("button")).toHaveAttribute("type", "button");
-  });
-
-  it("type='submit'을 지정하면 해당 값이 적용된다", () => {
-    render(<Button type="submit">저장</Button>);
-
-    expect(screen.getByRole("button")).toHaveAttribute("type", "submit");
-  });
 });

@@ -7,7 +7,6 @@ type ButtonProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
   isLoading?: boolean;
-  type?: "button" | "submit";
   onClick?: () => void;
   children: React.ReactNode;
 };
@@ -30,13 +29,11 @@ export const Button = ({
   variant = "primary",
   size = "md",
   isLoading = false,
-  type = "button",
   onClick,
   children,
 }: ButtonProps) => {
   return (
     <button
-      type={type}
       className={`rounded-button ${VARIANT_CLASS[variant]} ${SIZE_CLASS[size]}`}
       disabled={isLoading}
       onClick={onClick}
