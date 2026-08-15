@@ -16,6 +16,7 @@ import { DueDateBadge } from "@/client/components/ui/DueDateBadge";
 import { SearchInput } from "@/client/components/SearchInput";
 import { CreateTicketButton } from "@/client/components/CreateTicketButton";
 import { DeleteButton } from "@/client/components/DeleteButton";
+import { TicketDetailView } from "@/client/components/TicketDetailView";
 
 type PreviewSectionProps = {
   title: string;
@@ -206,6 +207,18 @@ const PreviewPage = () => {
               클릭 횟수: {deleteClickCount}
             </span>
           </div>
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm text-text-primary">
+            TicketDetailView (읽기 전용 필드 — null이면 &quot;-&quot; 표시)
+          </p>
+          <TicketDetailView
+            status="IN_PROGRESS"
+            startedAt="2026-08-01T09:00:00.000Z"
+            completedAt={null}
+            createdAt="2026-07-30T12:00:00.000Z"
+          />
         </div>
       </PreviewSection>
 

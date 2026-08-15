@@ -223,13 +223,13 @@ graph BT
 
 **역할**: 읽기 전용 필드(상태, 시작일, 종료일, 생성일) 표시.
 
-- [ ] Red — `__tests__/components/TicketDetailView.test.tsx` (TEST_CASES.md 미기재,
+- [x] Red — `__tests__/components/TicketDetailView.test.tsx` (TEST_CASES.md 미기재,
       COMPONENT_SPEC §2.7 표시 필드 기준)
   - `status`, `startedAt`, `completedAt`, `createdAt` 값이 화면에 표시됨
   - `startedAt`/`completedAt`이 `null`이면 "-" 표시
   - 편집 UI(입력/버튼)가 전혀 없음 (읽기 전용 확인)
-- [ ] Green — 값 포맷팅(날짜 → 표시 형식) 포함한 최소 구현
-- [ ] Refactor — 날짜 포맷 함수가 여러 곳에서 필요해지면 `src/client/` 내 공용 유틸로 추출
+- [x] Green — 값 포맷팅(날짜 → 표시 형식) 포함한 최소 구현
+- [x] Refactor — 날짜 포맷 함수가 여러 곳에서 필요해지면 `src/client/` 내 공용 유틸로 추출
       (아직은 1곳에서만 쓰이므로 인라인 유지 — 조기 추상화 금지)
 
 ---
