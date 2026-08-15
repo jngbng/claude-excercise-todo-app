@@ -14,8 +14,6 @@ import { ConfirmDialog } from "@/client/components/ui/ConfirmDialog";
 import { PriorityBadge } from "@/client/components/ui/PriorityBadge";
 import { DueDateBadge } from "@/client/components/ui/DueDateBadge";
 import { SearchInput } from "@/client/components/SearchInput";
-import { CreateTicketButton } from "@/client/components/CreateTicketButton";
-import { DeleteButton } from "@/client/components/DeleteButton";
 import { TicketDetailView } from "@/client/components/TicketDetailView";
 import { TicketForm } from "@/client/components/TicketForm";
 import { FilterBar } from "@/client/components/FilterBar";
@@ -60,8 +58,6 @@ const PreviewPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [clickCount, setClickCount] = useState(0);
-  const [createClickCount, setCreateClickCount] = useState(0);
-  const [deleteClickCount, setDeleteClickCount] = useState(0);
   const [ticketFormResult, setTicketFormResult] = useState<string>("");
   const [activeFilter, setActiveFilter] = useState<"all" | "thisWeek" | "overdue">("all");
   const isBodyScrollLocked = useBodyScrollLocked();
@@ -189,28 +185,6 @@ const PreviewPage = () => {
             SearchInput (MVP: 비활성 placeholder)
           </p>
           <SearchInput />
-        </div>
-
-        <div>
-          <p className="mb-2 text-sm text-text-primary">
-            CreateTicketButton (클릭 시 카운트 증가)
-          </p>
-          <div className="flex items-center gap-3">
-            <CreateTicketButton onClick={() => setCreateClickCount((count) => count + 1)} />
-            <span data-testid="create-click-count" className="text-sm text-text-secondary">
-              클릭 횟수: {createClickCount}
-            </span>
-          </div>
-        </div>
-
-        <div>
-          <p className="mb-2 text-sm text-text-primary">DeleteButton (클릭 시 카운트 증가)</p>
-          <div className="flex items-center gap-3">
-            <DeleteButton onClick={() => setDeleteClickCount((count) => count + 1)} />
-            <span data-testid="delete-click-count" className="text-sm text-text-secondary">
-              클릭 횟수: {deleteClickCount}
-            </span>
-          </div>
         </div>
 
         <div>

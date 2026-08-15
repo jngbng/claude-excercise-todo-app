@@ -139,7 +139,7 @@
 | TC ID | 시나리오 | 조건 | 기대 결과 |
 |-------|----------|------|-----------|
 | TC-COMP-003-1 | 4개 칼럼 렌더링 | initialData 있음 | BACKLOG, TODO, IN PROGRESS, DONE 칼럼명 모두 표시 |
-| TC-COMP-003-2 | "새 업무" 버튼 클릭 | BoardHeader의 CreateTicketButton 클릭 | 생성 모드 TicketForm 모달 렌더링 |
+| TC-COMP-003-2 | "새 업무" 버튼 클릭 | BoardHeader의 "새 업무" 버튼 클릭 | 생성 모드 TicketForm 모달 렌더링 |
 | TC-COMP-003-3 | FilterBar 표시 | — | "이번주 업무", "일정 초과" 버튼 표시 |
 
 ---

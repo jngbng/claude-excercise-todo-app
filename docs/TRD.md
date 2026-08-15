@@ -197,7 +197,7 @@ app/page.tsx (BoardPage — RSC, 초기 데이터 패치)
 └── src/client/components/
     └── BoardContainer          # 상태 관리 총괄, DndContext 루트
         ├── BoardHeader
-        │   └── CreateTicketButton ─── TicketForm  # 생성 모달
+        │   └── "새 업무" 버튼(Button 인라인) ─── TicketForm  # 생성 모달
         ├── FilterBar            # 이번주 업무 / 일정 초과 필터 버튼
         ├── Board                # DndContext + DragOverlay
         │   └── Column × 4       # Backlog(사이드바) / TODO / In Progress / Done
@@ -206,7 +206,7 @@ app/page.tsx (BoardPage — RSC, 초기 데이터 패치)
         └── TicketModal          # 상세 보기 / 수정 오버레이
             ├── TicketDetailView # 읽기 전용 필드 (시작일, 종료일, 상태, 생성일)
             ├── TicketForm       # 수정 모드
-            └── DeleteButton ─── ui/ConfirmDialog
+            └── "삭제" 버튼(Button 인라인) ─── ui/ConfirmDialog
 
 # ui/ — 범용 UI 유틸리티 컴포넌트 (도메인 로직 없음, 여러 화면에서 재사용)
 src/client/components/ui/

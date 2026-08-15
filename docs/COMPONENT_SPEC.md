@@ -14,7 +14,7 @@ App (page.tsx - 서버 컴포넌트)
     │
     ├── BoardHeader
     │   ├── SearchInput (2차 구현 예정, MVP에서는 placeholder)
-    │   └── CreateTicketButton ─── TicketForm (생성 모달)
+    │   └── "새 업무" 버튼 (Button 인라인 사용) ─── TicketForm (생성 모달)
     │
     ├── FilterBar (이번주 업무 | 일정 초과 필터)
     │
@@ -34,7 +34,7 @@ App (page.tsx - 서버 컴포넌트)
     └── TicketModal (상세/수정 모달)
         ├── TicketDetailView (읽기 전용: 시작일, 종료일, 상태, 생성일)
         ├── TicketForm (수정 모드)
-        └── DeleteButton ─── ConfirmDialog
+        └── "삭제" 버튼 (Button 인라인 사용) ─── ConfirmDialog
 ```
 
 ### 레이아웃 구성 (PRD 기준)
@@ -98,7 +98,8 @@ App (page.tsx - 서버 컴포넌트)
 
 **구성 요소**:
 - **SearchInput**: 2차 구현 예정. MVP에서는 비활성 placeholder로 렌더링
-- **CreateTicketButton**: "새 업무" 버튼. 클릭 시 TicketForm 생성 모달 열림
+- **"새 업무" 버튼**: `Button`(primary variant)을 인라인으로 사용. 클릭 시 TicketForm 생성 모달
+  열림. 별도 컴포넌트로 분리하지 않는다 (단순 래핑에 불과해 과설계)
 
 ---
 
@@ -247,7 +248,7 @@ function isThisWeek(ticket: TicketWithMeta): boolean {
 **동작**:
 1. 모달 열림 시 바깥 영역 클릭 또는 ESC로 닫기
 2. 인라인 편집: 필드 클릭 시 편집 모드 전환
-3. 삭제 버튼 클릭 시 ConfirmDialog 표시
+3. 삭제 버튼(`Button` danger variant, 인라인 사용) 클릭 시 ConfirmDialog 표시
 4. 수정 완료 시 onUpdate 호출 (PATCH /api/tickets/:id)
 5. body 스크롤 잠금
 

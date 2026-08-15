@@ -45,18 +45,16 @@ graph BT
   PriorityBadge --> TicketDetailView
 
   Button --> SearchInput_group[SearchInput]
-  Button --> CreateTicketButton
-  Button --> DeleteButton
 
   Modal --> TicketModal
   TicketDetailView --> TicketModal
   TicketForm --> TicketModal
-  DeleteButton --> TicketModal
+  Button --> TicketModal
   ConfirmDialog --> TicketModal
 
   TicketCard --> Column
   SearchInput_group --> BoardHeader
-  CreateTicketButton --> BoardHeader
+  Button --> BoardHeader
 
   ticketApi --> useTickets
 
@@ -158,8 +156,6 @@ graph BT
 |---|---|---|
 | ConfirmDialog | `src/client/components/ui/ConfirmDialog.tsx` | TC-COMP-006 |
 | SearchInput | `src/client/components/SearchInput.tsx` | (TEST_CASES.md 미기재) |
-| CreateTicketButton | `src/client/components/CreateTicketButton.tsx` | (TEST_CASES.md 미기재) |
-| DeleteButton | `src/client/components/DeleteButton.tsx` | (TEST_CASES.md 미기재) |
 | TicketDetailView | `src/client/components/TicketDetailView.tsx` | (TEST_CASES.md 미기재) |
 | TicketCard | `src/client/components/TicketCard.tsx` | TC-COMP-001 |
 | TicketForm | `src/client/components/TicketForm.tsx` | TC-COMP-004 |
@@ -192,30 +188,9 @@ graph BT
       범위를 넘어서지 않는다)
 - [x] Refactor — 불필요
 
----
-
-#### CreateTicketButton
-
-**역할**: "새 업무" 버튼. 클릭 시 생성 모달을 여는 트리거.
-
-- [x] Red — `__tests__/components/CreateTicketButton.test.tsx` (TEST_CASES.md 미기재)
-  - "새 업무" 텍스트 렌더링
-  - 클릭 시 `onClick` 1회 호출
-- [x] Green — `Button`(primary) 래핑
-- [x] Refactor — 불필요
-
----
-
-#### DeleteButton
-
-**역할**: TicketModal 내 삭제 버튼. 클릭 시 `ConfirmDialog`를 여는 트리거 (다이얼로그 상태는
-`TicketModal`이 보유).
-
-- [x] Red — `__tests__/components/DeleteButton.test.tsx` (TEST_CASES.md 미기재)
-  - "삭제" 텍스트 렌더링, danger variant 스타일
-  - 클릭 시 `onClick` 1회 호출
-- [x] Green — `Button`(danger) 래핑
-- [x] Refactor — 불필요
+> **"새 업무" 버튼 / "삭제" 버튼**: `Button`을 얇게 감싸기만 하는 것에 불과해 독립 컴포넌트로
+> 두기엔 과도하다고 판단해 제거했다. 각각 사용처(BoardHeader, TicketModal)에서 `Button`
+> (primary/danger variant)을 인라인으로 직접 사용한다 — 아래 BoardHeader, TicketModal 절 참고.
 
 ---
 
@@ -301,7 +276,7 @@ graph BT
 #### TicketModal
 
 **역할**: 상세 표시 + 인라인 편집 + 삭제. `Modal` + `TicketDetailView` + `TicketForm` +
-`DeleteButton` + `ConfirmDialog` 조합.
+삭제 버튼(`Button` danger variant, 인라인) + `ConfirmDialog` 조합.
 
 - [ ] Red — `__tests__/components/TicketModal.test.tsx` (TC-COMP-005)
   - TC-COMP-005-1: 기존 `ticket` 데이터로 폼/상세 필드 초기화 (title, priority 등)
@@ -313,7 +288,8 @@ graph BT
   - `status`/`startedAt`/`completedAt`/`createdAt`은 `TicketDetailView`를 통해 읽기 전용으로
     표시 (편집 불가 확인)
   - ESC/바깥 클릭 시 `onClose` 호출 (Modal 위임 동작이 실제로 연결됐는지)
-- [ ] Green — 각 하위 컴포넌트를 조합하고, 삭제 확인 다이얼로그 열림 여부를 로컬 state로 관리
+- [ ] Green — 각 하위 컴포넌트를 조합하고("삭제" 버튼은 `Button`(danger)을 직접 인라인 렌더링),
+      삭제 확인 다이얼로그 열림 여부를 로컬 state로 관리
 - [ ] Refactor — 인라인 편집 상태(필드별 편집 모드)와 폼 제출 로직 분리 정리
 
 ---
@@ -340,8 +316,8 @@ graph BT
 - [ ] Red — `__tests__/components/BoardHeader.test.tsx` (TC-COMP-003 중 -2 관련 부분만: 버튼
       존재 및 클릭 위임. 모달이 실제로 열리는지는 BoardContainer 레벨에서 TC-COMP-003-2로 검증)
   - `SearchInput`(비활성) 렌더링
-  - `CreateTicketButton` 렌더링, 클릭 시 `onCreateClick` 1회 호출
-- [ ] Green — `SearchInput` + `CreateTicketButton` 배치
+  - "새 업무" 버튼 렌더링, 클릭 시 `onCreateClick` 1회 호출
+- [ ] Green — `SearchInput` + "새 업무" 버튼(`Button` primary variant, 인라인) 배치
 - [ ] Refactor — 불필요
 
 ---
@@ -501,7 +477,7 @@ TDD 대상 "컴포넌트"가 아니라 테스트 인프라이므로 Red/Green �
 | Phase | 성격 | 컴포넌트/대상 |
 |---|---|---|
 | 0 | 공통 UI 프리미티브 | Button, PriorityBadge, DueDateBadge, Modal |
-| 1 | 1차 리프 (Phase 0 의존) | ConfirmDialog, SearchInput, CreateTicketButton, DeleteButton, TicketDetailView, TicketCard, TicketForm, FilterBar |
+| 1 | 1차 리프 (Phase 0 의존) | ConfirmDialog, SearchInput, TicketDetailView, TicketCard, TicketForm, FilterBar |
 | 2 | 2차 조합 | TicketModal, Column, BoardHeader |
 | 3 | 데이터 레이어 | MSW 설정, ticketApi, useTickets |
 | 4 | 보드 오케스트레이션 | Board, BoardContainer (+ 통합 테스트 3종) |

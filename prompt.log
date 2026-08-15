@@ -570,3 +570,8 @@ FRONTEND_TASKS.md 의 phase 1을 순차적으로 구현해줘.
 
 2026-08-15 21:39
 TicketForm을 container를 form 태그를 이용해서 구현하니깐 button에 type을 전달해야 하는 문제가 생기는건데, div로 구현하면 이런 문제가 안 생겨. 수정하고 button에 type을 넣었던 커밋은 리버트해줘.
+
+---
+
+2026-08-15 21:45
+CreateTicketButton과 DeleteButton은 독립된 컴포넌트로 존재하기에는 너무 과도해. 필요한 곳에서 inline으로 구현하면 돼. 문서 수정하고 관련 구현 제거해줘
