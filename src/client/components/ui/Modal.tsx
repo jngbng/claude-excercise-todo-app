@@ -25,8 +25,16 @@ export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
   useEffect(() => {
     if (!isOpen) return;
 
+    // 스크롤바가 사라지며 생기는 폭만큼 padding-right로 보정해 배경 레이아웃이 밀리지 않게 한다.
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
     document.body.classList.add("body-scroll-locked");
-    return () => document.body.classList.remove("body-scroll-locked");
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+    return () => {
+      document.body.classList.remove("body-scroll-locked");
+      document.body.style.paddingRight = "";
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
