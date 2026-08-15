@@ -565,3 +565,8 @@ FRONTEND_TASKS.md 의 phase 1을 순차적으로 구현해줘.
 - RED 단계 작성 후 GREEN으로 넘어갈 때 운영 코드에 interface만 가지는 더미 컴포넌트를 추가하여 테스트가 의도대로 실패하는 지 검사해줘.
 - 매 컴포넌트 완료 후에 작업을 커밋해줘.
 - 매 컴포넌트 완료 후에 preview 페이지의 phase1에 렌더링 예제를 추가해줘.
+
+---
+
+2026-08-15 21:39
+TicketForm을 container를 form 태그를 이용해서 구현하니깐 button에 type을 전달해야 하는 문제가 생기는건데, div로 구현하면 이런 문제가 안 생겨. 수정하고 button에 type을 넣었던 커밋은 리버트해줘.
