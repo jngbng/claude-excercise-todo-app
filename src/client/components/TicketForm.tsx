@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import type { Ticket, TicketPriority } from "@/shared/types";
 import {
   createTicketSchema,
@@ -42,9 +42,7 @@ export const TicketForm = ({ mode, initialData, onSubmit, onCancel, isLoading }:
   const [dueDate, setDueDate] = useState(initialData?.dueDate ?? "");
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleSubmit = () => {
     const input = {
       title,
       description: description || null,
@@ -73,7 +71,7 @@ export const TicketForm = ({ mode, initialData, onSubmit, onCancel, isLoading }:
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <div>
         <label htmlFor="ticket-title" className="mb-1 block text-sm text-text-secondary">
           제목
@@ -145,13 +143,13 @@ export const TicketForm = ({ mode, initialData, onSubmit, onCancel, isLoading }:
       </div>
 
       <div className="flex items-center gap-3">
-        <Button type="submit" variant="primary" isLoading={isLoading}>
+        <Button variant="primary" isLoading={isLoading} onClick={handleSubmit}>
           저장
         </Button>
-        <Button type="button" variant="secondary" onClick={onCancel}>
+        <Button variant="secondary" onClick={onCancel}>
           취소
         </Button>
       </div>
-    </form>
+    </div>
   );
 };
