@@ -90,6 +90,12 @@ src/shared/에서 타입과 검증 스키마를 공유한다.
 - 새 기능은 spec-kit 기반 SDD 워크플로(constitution → specify → clarify → plan → tasks → analyze/checklist → implement)를 따른다
 - 상세 진행 순서, 준수 규칙, 문서 체계는 CLAUDE-SDD.md 참조
 
-### 변경 이력 기록
-- 코드 수정 후 `/changelog "요약"` 명령으로 CHANGELOG.md에 상세 이력을 기록할 수 있다 (Hook이 아닌 Skill 방식 — 사용자가 원할 때만 실행)
-- 상세 규칙은 `.claude/skills/changelog/SKILL.md` 참조
+
+## 디자인 시스템
+스타일링 작업 시 반드시 아래 파일들을 참조할 것:
+- 컬러 토큰 (참조): `src/shared/design/colors.json`
+- 디자인 가이드: `docs/DESIGN_SYSTEM.md`
+- CSS 변수 (런타임): `app/globals.css` `:root`
+
+새 컴포넌트 생성 시 colors.json의 semantic 컬러와 DESIGN_SYSTEM.md의 간격/그림자/라운딩 규칙을 따른다.
+컬러 변경 시 colors.json과 globals.css의 CSS 변수를 함께 업데이트한다.
