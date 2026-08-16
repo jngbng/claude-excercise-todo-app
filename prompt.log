@@ -589,3 +589,8 @@ FRONTEND_TASKS.md 의 phase 2을 순차적으로 구현해줘.
 
 2026-08-15 22:51
 FRONTEND 개발할 때 api 요청 테스트는 jest.mock 으로 처리하려고 해. MSW 목 서버 개발 관련은 계획에서 제거해줘.
+
+---
+
+2026-08-16 16:31
+FRONTEND_TASKS.md의 phase 3 에 ticketApi 구현해줘. fetch는 jest.fn()으로 mock 처리해줘.

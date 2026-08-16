@@ -339,7 +339,7 @@ graph BT
 **역할**: 모든 fetch 호출을 캡슐화. 컴포넌트/훅에서 직접 `fetch` 금지 (CLAUDE.md, COMPONENT_SPEC
 §4).
 
-- [ ] Red — `__tests__/api-client/ticketApi.test.ts` (TEST_CASES.md 미기재 — TC-API-*를
+- [x] Red — `__tests__/api-client/ticketApi.test.ts` (TEST_CASES.md 미기재 — TC-API-*를
       클라이언트 관점에서 재사용: 각 함수가 올바른 URL/메서드/바디로 요청하고 응답을 파싱하는지)
   - `createTicket(data)` → `POST /api/tickets`, 201 응답 파싱
   - `getBoard()` → `GET /api/tickets`, `BoardData` 형태 파싱
@@ -348,9 +348,10 @@ graph BT
   - `reorderTicket(ticketId, status, position)` → `PATCH /api/tickets/reorder`
   - `completeTicket(id)` → `PATCH /api/tickets/:id/complete`
   - 각 함수의 실패 응답(400/404) 시 에러를 throw/반환하는 공통 에러 처리 검증
-- [ ] Green — 전역 `fetch`를 `jest.mock`/`jest.spyOn`으로 모킹해 위 함수들을 `fetch` 기반으로
-      구현 (에러 응답 형식 `{ error: { code, message } }` 파싱 포함)
-- [ ] Refactor — 공통 fetch 래퍼(에러 처리, JSON 파싱) 추출해 중복 제거
+- [x] Green — 전역 `fetch`를 `jest.fn()`으로 모킹해 위 함수들을 `fetch` 기반으로 구현
+      (에러 응답 형식 `{ error: { code, message } }` 파싱 포함, `ApiError` 클래스로 throw)
+- [x] Refactor — 공통 fetch 래퍼(`request<T>`: 204 처리, JSON 파싱, 에러 throw)로 6개 함수의
+      중복 제거 완료
 
 ---
 
