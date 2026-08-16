@@ -19,10 +19,11 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
   ghost: "bg-transparent text-text-primary hover:bg-surface-app transition-colors",
 };
 
+// 버튼 텍스트도 docs/DESIGN_SYSTEM.md §3 "내용" 규칙(12px)을 따른다 — 크기 구분은 padding으로만 표현
 const SIZE_CLASS: Record<ButtonSize, string> = {
-  sm: "text-sm px-3 py-1.5",
-  md: "text-base px-4 py-2",
-  lg: "text-lg px-5 py-2.5",
+  sm: "text-xs px-3 py-1.5",
+  md: "text-xs px-4 py-2",
+  lg: "text-xs px-5 py-2.5",
 };
 
 export const Button = ({

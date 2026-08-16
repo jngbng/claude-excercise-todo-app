@@ -173,15 +173,19 @@ export const BoardContainer = ({ initialData }: BoardContainerProps) => {
   return (
     <div className="flex flex-col gap-4">
       <BoardHeader onCreateClick={() => setIsCreating(true)} />
-      <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} counts={counts} />
 
       {error && (
-        <p role="alert" data-testid="board-error" className="text-sm text-danger">
+        <p role="alert" data-testid="board-error" className="text-xs text-danger">
           {error}
         </p>
       )}
 
-      <Board board={filteredBoard} onTicketClick={setSelectedTicket} onDragEnd={handleDragEnd} />
+      <Board
+        board={filteredBoard}
+        onTicketClick={setSelectedTicket}
+        onDragEnd={handleDragEnd}
+        filterSlot={<FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} counts={counts} />}
+      />
 
       <Modal isOpen={isCreating} onClose={() => setIsCreating(false)}>
         <TicketForm

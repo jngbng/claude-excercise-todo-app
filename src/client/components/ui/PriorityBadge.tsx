@@ -4,7 +4,7 @@ type PriorityBadgeProps = {
   priority: TicketPriority;
 };
 
-const BASE_CLASS = "text-xs px-2 py-0.5 rounded-full font-medium";
+const BASE_CLASS = "text-[11px] px-2 py-0.5 rounded-full font-semibold";
 
 const PRIORITY_CLASS: Record<TicketPriority, string> = {
   LOW: "bg-priority-low/10 text-priority-low",

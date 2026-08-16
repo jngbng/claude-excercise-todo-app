@@ -11,7 +11,7 @@ const formatDate = (value: string | null) => (value ? value.slice(0, 10) : "-");
 
 export const TicketDetailView = ({ status, startedAt, completedAt, createdAt }: TicketDetailViewProps) => {
   return (
-    <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+    <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
       <dt className="text-text-secondary">상태</dt>
       <dd className="text-text-primary">{status}</dd>
 

@@ -10,7 +10,7 @@ type ConfirmDialogProps = {
 export const ConfirmDialog = ({ isOpen, onConfirm, onCancel }: ConfirmDialogProps) => {
   return (
     <Modal isOpen={isOpen} onClose={onCancel}>
-      <p>정말 삭제하시겠습니까?</p>
+      <p className="text-xs text-text-primary">정말 삭제하시겠습니까?</p>
       <Button variant="secondary" onClick={onCancel}>
         취소
       </Button>

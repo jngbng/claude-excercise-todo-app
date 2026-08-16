@@ -37,12 +37,12 @@ export const Column = ({ status, tickets, onTicketClick }: ColumnProps) => {
   const { setNodeRef } = useDroppable({ id: status });
 
   return (
-    <div ref={setNodeRef} className={`flex min-h-full flex-col gap-2 rounded-card ${COLUMN_BG[status]} p-3`}>
+    <div ref={setNodeRef} className={`flex h-full min-h-full flex-col gap-2 ${COLUMN_BG[status]} p-3`}>
       <div className="flex items-center justify-between px-1">
         <h2 className="text-sm font-bold tracking-wide text-text-primary">{COLUMN_LABEL[status]}</h2>
         <span
           data-testid="column-count"
-          className={`min-w-[1.375rem] rounded-full bg-surface-card px-2 py-0.5 text-center text-xs font-semibold shadow-card ${COLUMN_ACCENT_TEXT[status]}`}
+          className={`min-w-[1.375rem] rounded-full bg-surface-card px-2 py-0.5 text-center text-[11px] font-semibold shadow-card ${COLUMN_ACCENT_TEXT[status]}`}
         >
           {tickets.length}
         </span>
@@ -51,7 +51,7 @@ export const Column = ({ status, tickets, onTicketClick }: ColumnProps) => {
       <SortableContext items={tickets.map((ticket) => ticket.id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-2">
           {tickets.length === 0 ? (
-            <p className="px-1 text-sm text-text-secondary">이 칼럼에 티켓이 없습니다</p>
+            <p className="px-1 text-xs text-text-secondary">이 칼럼에 티켓이 없습니다</p>
           ) : (
             tickets.map((ticket) => (
               <TicketCard key={ticket.id} ticket={ticket} onClick={() => onTicketClick(ticket)} />

@@ -31,6 +31,7 @@
   /* Border */
   --color-border-default: #dfe1e6;
   --color-border-strong: #c1c7d0;
+  --color-border-column-divider: #d1d5db;
 
   /* Text */
   --color-text-primary: #172b4d;

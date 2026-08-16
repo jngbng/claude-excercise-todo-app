@@ -9,6 +9,9 @@ import {
   type UpdateTicketInput,
 } from "@/shared/validations/ticket";
 import { Button } from "@/client/components/ui/Button";
+import { INPUT_CLASS } from "@/client/components/ui/inputStyles";
+
+const LABEL_CLASS = "mb-1 block text-xs font-semibold text-text-secondary";
 
 type TicketFormMode = "create" | "edit";
 
@@ -28,7 +31,7 @@ const FieldError = ({ message }: { message?: string }) => {
   if (!message) return null;
 
   return (
-    <p role="alert" className="mt-1 text-sm text-danger">
+    <p role="alert" className="mt-1 text-xs text-danger">
       {message}
     </p>
   );
@@ -73,7 +76,7 @@ export const TicketForm = ({ mode, initialData, onSubmit, onCancel, isLoading }:
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <label htmlFor="ticket-title" className="mb-1 block text-sm text-text-secondary">
+        <label htmlFor="ticket-title" className={LABEL_CLASS}>
           제목
         </label>
         <input
@@ -81,33 +84,33 @@ export const TicketForm = ({ mode, initialData, onSubmit, onCancel, isLoading }:
           type="text"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
-          className="w-full rounded-button border border-border-default px-3 py-1.5 text-sm"
+          className={`w-full ${INPUT_CLASS}`}
         />
         <FieldError message={errors.title} />
       </div>
 
       <div>
-        <label htmlFor="ticket-description" className="mb-1 block text-sm text-text-secondary">
+        <label htmlFor="ticket-description" className={LABEL_CLASS}>
           설명
         </label>
         <textarea
           id="ticket-description"
           value={description ?? ""}
           onChange={(event) => setDescription(event.target.value)}
-          className="w-full rounded-button border border-border-default px-3 py-1.5 text-sm"
+          className={`w-full ${INPUT_CLASS}`}
         />
         <FieldError message={errors.description} />
       </div>
 
       <div>
-        <label htmlFor="ticket-priority" className="mb-1 block text-sm text-text-secondary">
+        <label htmlFor="ticket-priority" className={LABEL_CLASS}>
           우선순위
         </label>
         <select
           id="ticket-priority"
           value={priority}
           onChange={(event) => setPriority(event.target.value as TicketPriority)}
-          className="w-full rounded-button border border-border-default px-3 py-1.5 text-sm"
+          className={`w-full ${INPUT_CLASS}`}
         >
           <option value="LOW">LOW</option>
           <option value="MEDIUM">MEDIUM</option>
@@ -116,7 +119,7 @@ export const TicketForm = ({ mode, initialData, onSubmit, onCancel, isLoading }:
       </div>
 
       <div>
-        <label htmlFor="ticket-planned-start-date" className="mb-1 block text-sm text-text-secondary">
+        <label htmlFor="ticket-planned-start-date" className={LABEL_CLASS}>
           시작예정일
         </label>
         <input
@@ -124,12 +127,12 @@ export const TicketForm = ({ mode, initialData, onSubmit, onCancel, isLoading }:
           type="date"
           value={plannedStartDate ?? ""}
           onChange={(event) => setPlannedStartDate(event.target.value)}
-          className="w-full rounded-button border border-border-default px-3 py-1.5 text-sm"
+          className={`w-full ${INPUT_CLASS}`}
         />
       </div>
 
       <div>
-        <label htmlFor="ticket-due-date" className="mb-1 block text-sm text-text-secondary">
+        <label htmlFor="ticket-due-date" className={LABEL_CLASS}>
           종료예정일
         </label>
         <input
@@ -137,7 +140,7 @@ export const TicketForm = ({ mode, initialData, onSubmit, onCancel, isLoading }:
           type="date"
           value={dueDate ?? ""}
           onChange={(event) => setDueDate(event.target.value)}
-          className="w-full rounded-button border border-border-default px-3 py-1.5 text-sm"
+          className={`w-full ${INPUT_CLASS}`}
         />
         <FieldError message={errors.dueDate} />
       </div>

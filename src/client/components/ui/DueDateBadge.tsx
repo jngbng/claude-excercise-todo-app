@@ -3,7 +3,7 @@ type DueDateBadgeProps = {
   isOverdue: boolean;
 };
 
-const BASE_CLASS = "text-xs font-medium";
+const BASE_CLASS = "text-[11px] font-semibold";
 
 export const DueDateBadge = ({ dueDate, isOverdue }: DueDateBadgeProps) => {
   const colorClass = isOverdue ? "text-danger" : "text-text-secondary";

@@ -46,17 +46,17 @@ export const TicketCard = ({ ticket, onClick }: TicketCardProps) => {
         .filter(Boolean)
         .join(" ")}
     >
-      <p className="truncate text-sm font-medium text-text-primary">{ticket.title}</p>
+      <p className="truncate text-sm font-bold text-text-primary">{ticket.title}</p>
       <div className="mt-2 flex items-center gap-2">
         <PriorityBadge priority={ticket.priority} />
         {ticket.dueDate && <DueDateBadge dueDate={ticket.dueDate} isOverdue={ticket.isOverdue} />}
         {ticket.isOverdue && (
-          <span data-testid="overdue-warning" className="text-danger" aria-hidden="true">
+          <span data-testid="overdue-warning" className="text-xs text-danger" aria-hidden="true">
             ⚠
           </span>
         )}
         {ticket.status === "DONE" && (
-          <span data-testid="ticket-complete-mark" className="text-priority-low">
+          <span data-testid="ticket-complete-mark" className="text-xs text-priority-low">
             완료 ✓
           </span>
         )}
