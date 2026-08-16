@@ -359,7 +359,7 @@ graph BT
 
 **역할**: 티켓 CRUD + 낙관적 업데이트 상태 관리 (COMPONENT_SPEC §4).
 
-- [ ] Red — `__tests__/hooks/useTickets.test.ts` (TEST_CASES.md 미기재 — `@testing-library/react`의
+- [x] Red — `__tests__/hooks/useTickets.test.ts` (TEST_CASES.md 미기재 — `@testing-library/react`의
       `renderHook` 사용, `jest.mock('@/client/api/ticketApi')`로 API 모킹)
   - `create` 성공 시 `board.backlog` 맨 앞에 낙관적으로 추가되고, 성공 응답으로 확정됨
   - `update` 성공 시 해당 티켓 필드만 갱신
@@ -368,9 +368,11 @@ graph BT
   - `complete` 성공 시 `done` 칼럼으로 이동, `completedAt` 반영
   - **롤백**: API가 500을 반환하면 낙관적 업데이트 이전 상태로 복원되고 `error`가 설정됨
     (TC-INT-001-4, TC-INT-002 롤백 시나리오의 훅 레벨 검증)
-- [ ] Green — 백업 → 낙관적 반영 → API 호출 → 성공 시 확정/실패 시 롤백 패턴 구현
+- [x] Green — 백업 → 낙관적 반영 → API 호출 → 성공 시 확정/실패 시 롤백 패턴 구현
       (COMPONENT_SPEC §4 낙관적 업데이트 패턴 그대로)
-- [ ] Refactor — 5개 액션에 공통된 "백업/낙관적 반영/롤백" 로직을 내부 헬퍼로 추출
+- [x] Refactor — 5개 액션에 공통된 "백업/낙관적 반영/롤백" 로직을 `runAction` 내부 헬퍼로 추출,
+      보드 조작(칼럼 탐색/삽입/삭제/치환)도 `findTicketInBoard`/`removeTicketFromBoard`/
+      `moveTicketIntoBoard`/`mapTicketInBoard`로 공통화 완료
 
 ---
 

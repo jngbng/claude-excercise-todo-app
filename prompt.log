@@ -594,3 +594,8 @@ FRONTEND 개발할 때 api 요청 테스트는 jest.mock 으로 처리하려고 
 
 2026-08-16 16:31
 FRONTEND_TASKS.md의 phase 3 에 ticketApi 구현해줘. fetch는 jest.fn()으로 mock 처리해줘.
+
+---
+
+2026-08-16 16:36
+FRONTEND_TASKS.md의 phase 3 에 useTickets 구현해줘.
