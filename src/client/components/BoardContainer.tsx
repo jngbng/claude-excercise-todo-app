@@ -134,8 +134,11 @@ export const BoardContainer = ({ initialData }: BoardContainerProps) => {
   }, [board]);
 
   // 대상 칼럼 판별/API 분기는 여기(BoardContainer)의 책임이다 — Board는 이벤트를 그대로 전달만 한다
-  // (docs/COMPONENT_SPEC.md §2.1). DONE으로 들어가거나 DONE에서 나오는 이동은 모두
-  // useTickets.complete()의 토글 동작으로 처리된다(TC-INT-002-2).
+  // (docs/COMPONENT_SPEC.md §2.1). 분기는 반드시 드롭 "대상(target)" 칼럼 기준이어야 한다 — 출발
+  // 칼럼(예: DONE에서 드래그를 시작했는지)을 기준으로 삼으면 DONE 카드를 BACKLOG/TODO로 드롭해도
+  // useTickets.complete()가 무조건 IN_PROGRESS로 토글해버려 드롭 위치를 무시하는 버그가 생긴다.
+  // target === DONE일 때만 complete()를 호출하고, 그 외(BACKLOG/TODO/IN_PROGRESS)는 출발 칼럼과
+  // 무관하게 항상 reorder()를 호출한다 (docs/COMPONENT_SPEC.md §5.1).
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
@@ -147,7 +150,7 @@ export const BoardContainer = ({ initialData }: BoardContainerProps) => {
     const target = resolveDropTarget(board, activeId, over.id);
     if (!target) return;
 
-    if (activeTicket.status === TICKET_STATUS.DONE || target.status === TICKET_STATUS.DONE) {
+    if (target.status === TICKET_STATUS.DONE) {
       void complete(activeId);
       return;
     }

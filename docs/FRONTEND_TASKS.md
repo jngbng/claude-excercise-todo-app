@@ -448,14 +448,25 @@ graph BT
 
 - [x] Red — `__tests__/integration/completeTicket.test.tsx` (TC-INT-002, `jest.mock('@/client/api/ticketApi')` 사용)
   - TC-INT-002-1: DONE으로 드래그 → `PATCH /:id/complete` 호출, DONE 칼럼에 표시
-  - TC-INT-002-2: DONE → IN_PROGRESS로 역이동 → `PATCH /:id/complete` 호출(토글)
+  - TC-INT-002-2: DONE → IN_PROGRESS로 드래그 → `PATCH /api/tickets/reorder` 호출
+  - DONE → BACKLOG로 드래그 → `PATCH /api/tickets/reorder` 호출 (회귀 테스트, 아래 버그 수정 참고)
   - TC-INT-002-3: DONE 이동 후 완료 표시(✓) 렌더링 — PRD.md §7 와이어프레임 기준으로
     `TicketCard`에 `status === 'DONE'`일 때 `완료 ✓`(`data-testid="ticket-complete-mark"`) 표시를
     추가 (기존 TC-COMP-001 테스트는 모두 `status: "TODO"` 기준이라 회귀 없음)
-- [x] Green — `onDragEnd`에서 대상이 DONE이면 `useTickets.complete` 호출하도록 배선. `activeTicket.status
-      === 'DONE' || target.status === 'DONE'`이면 무조건 `complete()`를 호출해(대상 칼럼 인자 없이
-      토글) TC-INT-002-2의 역이동도 동일 분기로 처리
+- [x] Green — `onDragEnd`에서 대상이 DONE이면 `useTickets.complete` 호출하도록 배선.
+      **분기는 반드시 드롭 대상(target) 칼럼 기준**(`target.status === 'DONE'`)이어야 한다 —
+      최초 구현 시 `activeTicket.status === 'DONE' || target.status === 'DONE'`(출발 칼럼 기준)으로
+      작성했는데, 이 경우 DONE 카드를 BACKLOG/TODO로 드롭해도 `useTickets.complete()`가 드롭
+      위치와 무관하게 항상 IN_PROGRESS로 토글해버리는 버그가 있었다(2026-08-16 실사용 중 발견).
+      target 기준으로 수정: target === DONE → `complete()`, 그 외 → `reorder()` (COMPONENT_SPEC.md
+      §5.1과 일치)
 - [x] Refactor — 불필요
+- [x] **알려진 백엔드 이슈 (미수정, 프론트엔드 스코프 밖)**: `src/server/services/ticketService.ts`의
+      `reorder()`는 `startedAt`만 조정하고 `completedAt`은 초기화하지 않는다. DONE에서
+      BACKLOG/TODO/IN_PROGRESS로 `reorder()`를 통해 나가는 티켓은 `completedAt`이 그대로 남는다
+      (COMPONENT_SPEC.md §5.1 "completedAt 규칙 적용(Done에서 나올 때 초기화)" 위반). 화면에
+      보이는 완료 표시(✓)는 `status === 'DONE'` 기준이라 시각적으로 드러나진 않지만 데이터
+      정합성 문제이므로 별도 백엔드 작업으로 처리 필요
 
 - [x] Red — `__tests__/integration/deleteTicket.test.tsx` (TC-INT-003, `jest.mock('@/client/api/ticketApi')` 사용).
       드래그가 없는 흐름이라 `@dnd-kit` 모킹 없이 실제 컴포넌트 트리 그대로 사용

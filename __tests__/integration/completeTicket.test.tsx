@@ -100,7 +100,11 @@ describe("TC-INT-002: DONE 완료 처리 및 역이동", () => {
     expect(screen.getByText("진행중 티켓")).toBeInTheDocument();
   });
 
-  it("TC-INT-002-2: DONE 카드를 IN_PROGRESS로 역이동하면 /:id/complete가 다시 호출된다 (토글)", async () => {
+  // 분기는 드롭 "대상(target)" 칼럼 기준이어야 한다 — 출발 칼럼(DONE)을 기준으로 삼으면
+  // useTickets.complete()가 드롭 위치와 무관하게 항상 IN_PROGRESS로 토글해버려, DONE 카드를
+  // BACKLOG/TODO로 드롭해도 IN_PROGRESS로 가버리는 버그가 있었다 (docs/COMPONENT_SPEC.md §5.1
+  // 위반). target === DONE일 때만 complete()를 호출해야 한다.
+  it("TC-INT-002-2: DONE 카드를 IN_PROGRESS로 드래그하면 reorder API가 호출되고 IN_PROGRESS로 이동한다", async () => {
     const ticket = createTicket({
       id: 2,
       title: "완료된 티켓",
@@ -108,14 +112,32 @@ describe("TC-INT-002: DONE 완료 처리 및 역이동", () => {
       completedAt: "2026-08-05T00:00:00.000Z",
     });
     const reopened = { ...ticket, status: "IN_PROGRESS" as const, completedAt: null };
-    mockedApi.completeTicket.mockResolvedValue(reopened);
+    mockedApi.reorderTicket.mockResolvedValue(reopened);
 
     render(<BoardContainer initialData={createBoard({ done: [ticket] })} />);
 
-    await triggerDragEnd(ticket.id, "IN_PROGRESS", mockedApi.completeTicket);
+    await triggerDragEnd(ticket.id, "IN_PROGRESS", mockedApi.reorderTicket);
 
-    expect(mockedApi.completeTicket).toHaveBeenCalledWith(ticket.id);
-    expect(mockedApi.reorderTicket).not.toHaveBeenCalled();
+    expect(mockedApi.reorderTicket).toHaveBeenCalledWith(ticket.id, "IN_PROGRESS", 0);
+    expect(mockedApi.completeTicket).not.toHaveBeenCalled();
+  });
+
+  it("DONE 카드를 BACKLOG로 드래그하면 reorder API가 호출되고 BACKLOG로 이동한다 (회귀 테스트)", async () => {
+    const ticket = createTicket({
+      id: 4,
+      title: "완료된 티켓",
+      status: "DONE",
+      completedAt: "2026-08-05T00:00:00.000Z",
+    });
+    const reopened = { ...ticket, status: "BACKLOG" as const, completedAt: null };
+    mockedApi.reorderTicket.mockResolvedValue(reopened);
+
+    render(<BoardContainer initialData={createBoard({ done: [ticket] })} />);
+
+    await triggerDragEnd(ticket.id, "BACKLOG", mockedApi.reorderTicket);
+
+    expect(mockedApi.reorderTicket).toHaveBeenCalledWith(ticket.id, "BACKLOG", 0);
+    expect(mockedApi.completeTicket).not.toHaveBeenCalled();
   });
 
   it("TC-INT-002-3: DONE 칼럼으로 이동한 카드에 완료 표시(✓)가 렌더링된다", async () => {

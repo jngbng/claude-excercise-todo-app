@@ -208,8 +208,14 @@
 | TC ID | 시나리오 | 동작 | 기대 결과 |
 |-------|----------|------|-----------|
 | TC-INT-002-1 | 카드를 DONE 칼럼으로 드래그 | 카드 → DONE 드롭 → API 성공 | DONE 칼럼에 카드 표시, PATCH /:id/complete 호출됨 |
-| TC-INT-002-2 | DONE 카드 역이동 | DONE 카드 → IN_PROGRESS 드롭 → API 성공 | IN_PROGRESS 칼럼으로 이동, PATCH /:id/complete 호출됨 (토글) |
+| TC-INT-002-2 | DONE 카드 역이동 | DONE 카드 → IN_PROGRESS 드롭 → API 성공 | IN_PROGRESS 칼럼으로 이동, PATCH /api/tickets/reorder 호출됨 |
 | TC-INT-002-3 | DONE 카드 완료 표시 | DONE 칼럼 이동 후 | 카드에 완료 표시(✓) 렌더링 |
+
+> **분기 기준**: DnD 이동의 API 분기는 드롭 "대상(target)" 칼럼 기준이다 — target이 DONE일 때만
+> `/complete`(토글)를 호출하고, 그 외(BACKLOG/TODO/IN_PROGRESS)는 출발 칼럼이 DONE이든 아니든
+> 항상 `/reorder`를 호출한다(COMPONENT_SPEC.md §5.1). 출발 칼럼 기준으로 분기하면 DONE 카드를
+> BACKLOG/TODO로 드롭해도 무조건 IN_PROGRESS로 토글되어 버리는 버그가 생긴다(2026-08-16 실사용
+> 중 발견·수정).
 
 ---
 

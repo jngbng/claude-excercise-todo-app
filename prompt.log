@@ -609,3 +609,18 @@ FRONTEND_TASKS.md의 phase 4 - Board 구현해줘. 구현 후 preview(미리보�
 
 2026-08-16 16:58
 FRONTEND_TASKS.md의 phase 4 - BoardContainer 구현해줘. 구현 후 preview(미리보기) 페이지의 Phase 2에 추가해줘.
+
+---
+
+2026-08-16 17:17
+BoardContainer 에서 DND 동작에 오류가 있는데 원인을 파악해줘:
+1. 새 업무 버튼으로 티켓을 하나 만든다.
+2. 티켓을 DONE 컬럼으로 옮긴다.
+
+---
+
+2026-08-16 17:18
+BoardContainer 에서 DND 동작에 오류가 있는데 원인을 파악해줘:
+1. 새 업무 버튼으로 티켓을 하나 만든다.
+2. 티켓을 DONE 컬럼으로 옮긴다. (drag & drop) -> 성공적으로 DONE컬럼으로 이동함.
+3. DONE 컬럼으로 옮긴 티켓을 다시 BACKLOG로 옮긴다. (drag & drop) -> IN PROGRESS 컬럼으로 이동한다. BACKLOD 컬럼으로 이동해야 한다.
