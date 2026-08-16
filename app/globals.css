@@ -18,6 +18,16 @@
   --color-surface-column: #f1f2f4;
   --color-surface-card: #ffffff;
 
+  /* Column (칼럼별 파스텔 배경 — docs/DESIGN_SYSTEM.md §4, src/shared/design/colors.json) */
+  --color-column-backlog: #f0edfa;
+  --color-column-todo: #fff8e1;
+  --color-column-in-progress: #e8f4fd;
+  --color-column-done: #e8f5e9;
+  --color-column-accent-backlog: #8b7ec8;
+  --color-column-accent-todo: #f59e0b;
+  --color-column-accent-in-progress: #3b82f6;
+  --color-column-accent-done: #22c55e;
+
   /* Border */
   --color-border-default: #dfe1e6;
   --color-border-strong: #c1c7d0;
