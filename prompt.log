@@ -646,3 +646,8 @@ complete api 은 토글이 아니라 종료로 바꾸는 일방향 통행만이�
 
 2026-08-16 19:14
 FRONTEND_TASKS.md의 phase 5 - page.tsx 구현해줘.
+
+---
+
+2026-08-16 21:06
+app/preview/page.tsx 삭제해줘. 실제 page.tsx에서 전체 앱을 확인할 수 있어.
