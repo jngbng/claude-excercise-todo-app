@@ -53,9 +53,7 @@ export const Column = ({ status, tickets, onTicketClick }: ColumnProps) => {
           {tickets.length === 0 ? (
             <p className="px-1 text-xs text-text-secondary">이 칼럼에 티켓이 없습니다</p>
           ) : (
-            tickets.map((ticket) => (
-              <TicketCard key={ticket.id} ticket={ticket} onClick={() => onTicketClick(ticket)} />
-            ))
+            tickets.map((ticket) => <TicketCard key={ticket.id} ticket={ticket} onClick={onTicketClick} />)
           )}
         </div>
       </SortableContext>

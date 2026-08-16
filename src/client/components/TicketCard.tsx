@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { TicketWithMeta } from "@/shared/types";
@@ -8,14 +9,14 @@ import { DueDateBadge } from "@/client/components/ui/DueDateBadge";
 
 type TicketCardProps = {
   ticket: TicketWithMeta;
-  onClick: () => void;
+  onClick: (ticket: TicketWithMeta) => void;
 };
 
 const BASE_CLASS = "rounded-card bg-surface-card p-3 shadow-card hover:shadow-card-hover";
 const DRAGGING_CLASS = "opacity-50 shadow-card-dragging";
 const OVERDUE_CLASS = "border border-danger";
 
-export const TicketCard = ({ ticket, onClick }: TicketCardProps) => {
+export const TicketCard = memo(({ ticket, onClick }: TicketCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: ticket.id,
   });
@@ -25,9 +26,13 @@ export const TicketCard = ({ ticket, onClick }: TicketCardProps) => {
     transition,
   };
 
+  const handleClick = () => {
+    onClick(ticket);
+  };
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Enter") {
-      onClick();
+      onClick(ticket);
     }
   };
 
@@ -40,7 +45,7 @@ export const TicketCard = ({ ticket, onClick }: TicketCardProps) => {
       role="button"
       tabIndex={0}
       aria-label={`티켓: ${ticket.title}`}
-      onClick={onClick}
+      onClick={handleClick}
       onKeyDown={handleKeyDown}
       className={[BASE_CLASS, isDragging && DRAGGING_CLASS, ticket.isOverdue && OVERDUE_CLASS]
         .filter(Boolean)
@@ -63,4 +68,6 @@ export const TicketCard = ({ ticket, onClick }: TicketCardProps) => {
       </div>
     </div>
   );
-};
+});
+
+TicketCard.displayName = "TicketCard";
