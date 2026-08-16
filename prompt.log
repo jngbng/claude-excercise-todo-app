@@ -641,3 +641,8 @@ API_SPECS.md 도 업데이트 해줘.
 
 2026-08-16 17:59
 complete api 은 토글이 아니라 종료로 바꾸는 일방향 통행만이야. 그 의도에 맞춰서 API_SPECS.md도 수정하고 현재 구현과 테스트도 수정해줘
+
+---
+
+2026-08-16 19:14
+FRONTEND_TASKS.md의 phase 5 - page.tsx 구현해줘.

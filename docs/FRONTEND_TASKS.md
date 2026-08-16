@@ -503,15 +503,15 @@ graph BT
 
 **역할**: 서버 컴포넌트. 초기 보드 데이터를 조회해 `BoardContainer`에 전달.
 
-- [ ] Red — `__tests__/components/page.test.tsx` 또는 서버 컴포넌트 특성상 유닛 테스트 대신
+- [x] Red — `__tests__/components/page.test.tsx` 또는 서버 컴포넌트 특성상 유닛 테스트 대신
       수동 확인으로 대체 가능 (TEST_CASES.md 미기재). 유닛 테스트를 작성한다면:
   - 초기 데이터 fetch 함수가 실패해도 페이지가 크래시하지 않고 빈 보드로 폴백하는지
-- [ ] Green — 서버에서 티켓 조회(내부적으로 `src/server/services/ticketService`를 직접 호출하거나
+- [x] Green — 서버에서 티켓 조회(내부적으로 `src/server/services/ticketService`를 직접 호출하거나
       기존 `GET /api/tickets`를 fetch — 프로젝트의 서버 컴포넌트 데이터 페칭 관례에 맞춰 결정)
       → `BoardContainer initialData={board}` 렌더링
-- [ ] Refactor — 불필요
+- [x] Refactor — 불필요
 
-- [ ] **수동 검증 (필수)**: CLAUDE.md 규칙상 UI 변경은 브라우저에서 실제로 동작을 확인해야 한다.
+- [x] **수동 검증 (필수)**: CLAUDE.md 규칙상 UI 변경은 브라우저에서 실제로 동작을 확인해야 한다.
       `npm run dev`로 실행해 다음을 확인:
   - 4개 칼럼 정상 표시, 반응형 레이아웃(360/768/1024px) 확인
   - 생성 → 드래그 이동 → 수정 → 완료(Done) → 삭제 전체 골든 패스
