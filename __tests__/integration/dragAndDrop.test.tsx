@@ -115,6 +115,36 @@ describe("TC-INT-001: 드래그앤드롭 — 이동 및 롤백", () => {
     expect(mockedApi.reorderTicket).toHaveBeenCalledWith(ticketB.id, "TODO", 0);
   });
 
+  it("카드를 제자리(자기 자신 위)에 드롭하면 원래 인덱스로 reorder API가 호출된다", async () => {
+    const ticketA = createTicket({ id: 1, title: "티켓A", status: "TODO", position: 0 });
+    const ticketB = createTicket({ id: 2, title: "티켓B", status: "TODO", position: 1024 });
+    const ticketC = createTicket({ id: 3, title: "티켓C", status: "TODO", position: 2048 });
+    mockedApi.reorderTicket.mockResolvedValue(ticketB);
+
+    render(
+      <BoardContainer initialData={createBoard({ todo: [ticketA, ticketB, ticketC] })} />,
+    );
+
+    await triggerDragEnd(ticketB.id, ticketB.id, mockedApi.reorderTicket);
+
+    expect(mockedApi.reorderTicket).toHaveBeenCalledWith(ticketB.id, "TODO", 1);
+  });
+
+  it("카드를 자신보다 뒤에 있는 카드 위로 드롭하면(아래로 이동) 그 카드 다음 자리로 reorder API가 호출된다", async () => {
+    const ticketA = createTicket({ id: 1, title: "티켓A", status: "TODO", position: 0 });
+    const ticketB = createTicket({ id: 2, title: "티켓B", status: "TODO", position: 1024 });
+    const ticketC = createTicket({ id: 3, title: "티켓C", status: "TODO", position: 2048 });
+    mockedApi.reorderTicket.mockResolvedValue(ticketB);
+
+    render(
+      <BoardContainer initialData={createBoard({ todo: [ticketA, ticketB, ticketC] })} />,
+    );
+
+    await triggerDragEnd(ticketB.id, ticketC.id, mockedApi.reorderTicket);
+
+    expect(mockedApi.reorderTicket).toHaveBeenCalledWith(ticketB.id, "TODO", 2);
+  });
+
   it("TC-INT-001-4: API가 실패하면 카드가 원래 칼럼으로 복귀하고 에러 메시지가 표시된다", async () => {
     const ticket = createTicket({ id: 1, title: "백로그 티켓", status: "BACKLOG" });
     mockedApi.reorderTicket.mockRejectedValue(new Error("서버 오류가 발생했습니다"));

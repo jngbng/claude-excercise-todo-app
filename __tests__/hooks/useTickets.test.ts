@@ -126,6 +126,32 @@ describe('reorder', () => {
     expect(mockedApi.reorderTicket).toHaveBeenCalledWith(1, 'TODO', 512);
   });
 
+  it('낙관적 갱신은 실제 position 값이 아니라 전달받은 인덱스 자리에 카드를 즉시 삽입한다', async () => {
+    const a = makeTicket({ id: 1, status: 'TODO', position: 0 });
+    const b = makeTicket({ id: 2, status: 'TODO', position: 1024 });
+    const c = makeTicket({ id: 3, status: 'TODO', position: 2048 });
+    const d = makeTicket({ id: 4, status: 'TODO', position: 3072 });
+
+    const deferred = createDeferred<TicketWithMeta>();
+    mockedApi.reorderTicket.mockReturnValue(deferred.promise);
+
+    const { result } = renderHook(() =>
+      useTickets({ ...emptyBoard(), todo: [a, b, c, d] }),
+    );
+
+    // a(id 1)를 맨 뒤(인덱스 3)로 옮긴다.
+    act(() => {
+      void result.current.reorder(1, 'TODO', 3);
+    });
+
+    expect(result.current.board.todo.map((ticket) => ticket.id)).toEqual([2, 3, 4, 1]);
+
+    await act(async () => {
+      deferred.resolve({ ...a, position: 4096 });
+      await deferred.promise;
+    });
+  });
+
   it('API가 500을 반환하면 이동 이전 상태로 롤백되고 error가 설정된다 (TC-INT-001-4)', async () => {
     const ticket = makeTicket({ id: 1, status: 'BACKLOG', position: 0 });
     mockedApi.reorderTicket.mockRejectedValue(new Error('서버 오류가 발생했습니다'));

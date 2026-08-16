@@ -112,9 +112,9 @@ const resolveDropTarget = (
   const overTicket = findTicketInBoard(board, Number(overId));
   if (!overTicket) return null;
 
-  const siblings = board[STATUS_TO_COLUMN[overTicket.status]].filter((ticket) => ticket.id !== activeId);
-  const index = siblings.findIndex((ticket) => ticket.id === overTicket.id);
-  return { status: overTicket.status, index: index === -1 ? siblings.length : index };
+  const column = board[STATUS_TO_COLUMN[overTicket.status]];
+  const index = column.findIndex((ticket) => ticket.id === overTicket.id);
+  return { status: overTicket.status, index };
 };
 
 export const BoardContainer = ({ initialData }: BoardContainerProps) => {

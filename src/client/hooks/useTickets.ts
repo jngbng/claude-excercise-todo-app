@@ -53,6 +53,24 @@ const moveTicketIntoBoard = (board: BoardData, ticket: TicketWithMeta): BoardDat
   return { ...withoutTicket, [column]: sorted };
 };
 
+// reorder에 전달되는 position은 서버 API 계약상 대상 칼럼 내 0-based 삽입 인덱스이며(REORDER API
+// 요청 바디), DB에 저장된 실제 position 값(간격 1024짜리 gap 방식)과는 단위가 다르다. 이를
+// moveTicketIntoBoard의 position 기준 정렬에 넣으면 인덱스 숫자가 실제 position 값보다 훨씬 작아
+// 카드가 항상 칼럼 맨 위 근처로 낙관적 정렬되었다가, 서버 응답의 실제 position으로 교체되며 다시
+// 순간이동하는 문제가 생긴다. 낙관적 갱신에서는 인덱스를 배열 삽입 위치로 그대로 사용한다.
+const insertTicketAtIndex = (
+  board: BoardData,
+  ticket: TicketWithMeta,
+  index: number,
+): BoardData => {
+  const withoutTicket = removeTicketFromBoard(board, ticket.id);
+  const column = STATUS_TO_COLUMN[ticket.status];
+  const list = withoutTicket[column];
+  const clampedIndex = Math.max(0, Math.min(index, list.length));
+  const nextList = [...list.slice(0, clampedIndex), ticket, ...list.slice(clampedIndex)];
+  return { ...withoutTicket, [column]: nextList };
+};
+
 const mapTicketInBoard = (
   board: BoardData,
   id: number,
@@ -153,10 +171,10 @@ export const useTickets = (initialData: BoardData): UseTicketsReturn => {
       const current = findTicketInBoard(boardRef.current, ticketId);
       if (!current) return;
 
-      const optimisticTicket: TicketWithMeta = { ...current, status, position };
+      const optimisticTicket: TicketWithMeta = { ...current, status };
 
       await runAction(
-        moveTicketIntoBoard(removeTicketFromBoard(boardRef.current, ticketId), optimisticTicket),
+        insertTicketAtIndex(boardRef.current, optimisticTicket, position),
         () => ticketApi.reorderTicket(ticketId, status, position),
         (board, result) => moveTicketIntoBoard(removeTicketFromBoard(board, ticketId), result),
       );
