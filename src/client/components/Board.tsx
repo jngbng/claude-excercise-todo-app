@@ -76,9 +76,17 @@ export const Board = ({ board, onTicketClick, onDragEnd }: BoardProps) => {
       onDragCancel={handleDragCancel}
     >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {COLUMNS.map(({ key, status }) => (
-          <Column key={status} status={status} tickets={board[key]} onTicketClick={onTicketClick} />
-        ))}
+        {COLUMNS.map(({ key, status }) =>
+          // 768px 미만에서는 Backlog를 숨긴다 — md 이상에서는 display:contents로 그리드에서
+          // 원래 자리(2컬럼/4컬럼)를 그대로 차지하도록 복원한다.
+          status === "BACKLOG" ? (
+            <div key={status} className="hidden md:contents">
+              <Column status={status} tickets={board[key]} onTicketClick={onTicketClick} />
+            </div>
+          ) : (
+            <Column key={status} status={status} tickets={board[key]} onTicketClick={onTicketClick} />
+          ),
+        )}
       </div>
       <DragOverlay>
         {activeTicket ? (
