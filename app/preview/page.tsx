@@ -22,6 +22,7 @@ import { TicketModal } from "@/client/components/TicketModal";
 import { Column } from "@/client/components/Column";
 import { BoardHeader } from "@/client/components/BoardHeader";
 import { Board } from "@/client/components/Board";
+import { BoardContainer } from "@/client/components/BoardContainer";
 import type { BoardData, TicketWithMeta } from "@/shared/types";
 
 type PreviewSectionProps = {
@@ -99,6 +100,24 @@ const PreviewPage = () => {
   const handleBoardDragEnd = (event: DragEndEvent) => {
     setBoardDragEndLog(`onDragEnd: active=${event.active.id}, over=${event.over?.id ?? "null"}`);
   };
+  // BoardContainer는 위 Board 데모와 달리 useTickets를 내부에서 직접 소유하므로, 이 프리뷰
+  // 인스턴스와의 상호작용(생성/수정/삭제/드래그)은 실제 /api/tickets에 fetch 요청을 보낸다 —
+  // 다른 프리뷰 섹션들과 달리 이 카드는 목 데이터가 아니라 실제 개발 DB에 반영된다.
+  const [boardContainerInitialData] = useState<BoardData>({
+    backlog: [{ ...ticketModalTicket, id: 301, title: "BoardContainer 백로그 티켓", status: "BACKLOG" }],
+    todo: [
+      {
+        ...ticketModalTicket,
+        id: 302,
+        title: "BoardContainer 투두 티켓",
+        status: "TODO",
+        dueDate: "2020-01-01",
+        isOverdue: true,
+      },
+    ],
+    inProgress: [],
+    done: [],
+  });
   const isBodyScrollLocked = useBodyScrollLocked();
   const previewDndSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -359,6 +378,26 @@ const PreviewPage = () => {
               {boardDragEndLog}
             </p>
           )}
+        </div>
+
+        <div className="mt-10">
+          <p className="mb-2 text-sm text-text-primary">
+            BoardContainer (헤더 + 필터 + 보드 + 생성/수정 모달까지 실제로 연결된 최상위 컴포넌트)
+          </p>
+          <ul className="mb-3 list-disc space-y-1 pl-5 text-sm text-text-secondary">
+            <li>
+              위 Board 데모와 달리 <code>useTickets</code>를 직접 소유하므로, 여기서의 생성/수정/
+              삭제/드래그는 실제 <code>/api/tickets</code>에 fetch 요청을 보냅니다 (목 데이터가
+              아닌 실제 개발 DB에 반영됩니다)
+            </li>
+            <li>
+              시드로 넣은 두 카드(id 301/302)는 실제 DB에 없는 가짜 id라 수정·삭제·드래그 시
+              404로 실패 → 낙관적 업데이트가 롤백되고 에러 배너가 표시되는 것을 확인할 수
+              있습니다. 반대로 &quot;새 업무&quot;로 새로 만든 카드는 실제 DB에 저장되어 정상
+              동작합니다
+            </li>
+          </ul>
+          <BoardContainer initialData={boardContainerInitialData} />
         </div>
       </PreviewSection>
 

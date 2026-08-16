@@ -55,6 +55,11 @@ export const TicketCard = ({ ticket, onClick }: TicketCardProps) => {
             ⚠
           </span>
         )}
+        {ticket.status === "DONE" && (
+          <span data-testid="ticket-complete-mark" className="text-priority-low">
+            완료 ✓
+          </span>
+        )}
       </div>
     </div>
   );

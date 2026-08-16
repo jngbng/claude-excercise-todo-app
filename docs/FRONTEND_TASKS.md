@@ -414,38 +414,56 @@ graph BT
 
 **역할**: 최상위 상태 관리 + DnD 이벤트 → `useTickets` 액션 분기 + 모달 제어.
 
-- [ ] Red — `__tests__/components/BoardContainer.test.tsx` (TC-COMP-003)
+- [x] Red — `__tests__/components/BoardContainer.test.tsx` (TC-COMP-003). `@/client/api/ticketApi`만
+      모킹하고 실제 `useTickets`/`Board`/`Column`/`TicketCard`는 그대로 사용 (DnD 이벤트 배선은
+      아래 통합 테스트에서 별도 검증)
   - TC-COMP-003-1: BACKLOG/TODO/IN PROGRESS/DONE 칼럼명 모두 표시
   - TC-COMP-003-2: "새 업무" 클릭 → 생성 모드 `TicketForm` 모달 렌더링
   - TC-COMP-003-3: FilterBar("이번주 업무"/"일정 초과") 표시
   - 카드 클릭 → `TicketModal` 오픈 (수정 모드)
   - 필터 적용 시 TODO/IN_PROGRESS만 필터링되고 BACKLOG는 항상 전체 표시 (COMPONENT_SPEC §2.3)
-- [ ] Green — `useTickets` 연결, `activeFilter` 상태로 클라이언트 사이드 필터링, 생성/수정 모달
-      상태(`isCreating`/`selectedTicket`) 관리
-- [ ] Refactor — 필터 로직(`isThisWeek` 등)을 순수 함수로 분리해 별도 유닛 테스트 가능하게 정리
+  - `isThisWeek`/`isOverdueTicket` 순수 함수 자체에 대한 단위 테스트(월요일 시작 기준 이번 주
+    범위, BACKLOG/DONE 제외, dueDate 없음)도 함께 작성
+- [x] Green — `useTickets` 연결, `activeFilter` 상태로 클라이언트 사이드 필터링, 생성/수정 모달
+      상태(`isCreating`/`selectedTicket`) 관리. `useTickets.error`를 `role="alert"` 배너로 노출해
+      TC-INT-001-4의 "에러 메시지 표시"를 충족
+- [x] Refactor — 필터 로직(`isThisWeek` 등)을 순수 함수로 분리해 별도 유닛 테스트 가능하게 정리
+      완료 (`BoardContainer.tsx` 상단에 `isThisWeek`/`isOverdueTicket`/`getMonday`/`getSunday`/
+      `toDateString`으로 분리)
 
-- [ ] Red — `__tests__/integration/dragAndDrop.test.tsx` (TC-INT-001, `jest.mock('@/client/api/ticketApi')` 사용)
+- [x] Red — `__tests__/integration/dragAndDrop.test.tsx` (TC-INT-001, `jest.mock('@/client/api/ticketApi')` 사용).
+      Board.test.tsx와 동일하게 `@dnd-kit/core`의 `DndContext`/`DragOverlay`만 부분 모킹해
+      `onDragEnd` 콜백을 직접 호출하는 방식으로 검증 (jsdom이 네이티브 `PointerEvent`를 지원하지
+      않아 실제 포인터 드래그 물리를 재현할 수 없음)
   - TC-INT-001-1: BACKLOG → TODO 드래그 → 카드가 TODO에 표시, `PATCH /api/tickets/reorder` 호출
   - TC-INT-001-2: 칼럼 내 순서 변경 → reorder 호출
-  - TC-INT-001-3: 드래그 중 원위치 반투명 placeholder + `DragOverlay` 렌더링
+  - TC-INT-001-3: 드래그 중 원위치 반투명 placeholder + `DragOverlay` 렌더링 — 실제 포인터 물리가
+    필요해 이 방식으로 재현 불가하므로 `__tests__/components/Board.test.tsx`의 컴포넌트 단위
+    테스트로 이미 검증 완료 (Phase 4 Board 절 참고)
   - TC-INT-001-4: API 500 응답 → 카드가 원래 칼럼으로 복귀 + 에러 메시지 표시
-- [ ] Green — `onDragEnd`에서 대상이 DONE이 아니면 `useTickets.reorder` 호출 (Board/BoardContainer
-      완성본 기준 조정)
-- [ ] Refactor — 불필요(이미 Board/useTickets 단계에서 구현됨 — 통합 테스트로 배선만 확인)
+- [x] Green — `onDragEnd`에서 대상이 DONE이 아니면 `useTickets.reorder` 호출. `resolveDropTarget`
+      헬퍼로 `over.id`(칼럼 상태값 또는 다른 티켓 id)로부터 대상 칼럼/삽입 인덱스를 계산해
+      `ticketService`의 0-based 삽입 인덱스 계약에 맞춤
+- [x] Refactor — 불필요(이미 Board/useTickets 단계에서 구현됨 — 통합 테스트로 배선만 확인)
 
-- [ ] Red — `__tests__/integration/completeTicket.test.tsx` (TC-INT-002, `jest.mock('@/client/api/ticketApi')` 사용)
+- [x] Red — `__tests__/integration/completeTicket.test.tsx` (TC-INT-002, `jest.mock('@/client/api/ticketApi')` 사용)
   - TC-INT-002-1: DONE으로 드래그 → `PATCH /:id/complete` 호출, DONE 칼럼에 표시
   - TC-INT-002-2: DONE → IN_PROGRESS로 역이동 → `PATCH /:id/complete` 호출(토글)
-  - TC-INT-002-3: DONE 이동 후 완료 표시(✓) 렌더링
-- [ ] Green — `onDragEnd`에서 대상이 DONE이면 `useTickets.complete` 호출하도록 배선
-- [ ] Refactor — 불필요
+  - TC-INT-002-3: DONE 이동 후 완료 표시(✓) 렌더링 — PRD.md §7 와이어프레임 기준으로
+    `TicketCard`에 `status === 'DONE'`일 때 `완료 ✓`(`data-testid="ticket-complete-mark"`) 표시를
+    추가 (기존 TC-COMP-001 테스트는 모두 `status: "TODO"` 기준이라 회귀 없음)
+- [x] Green — `onDragEnd`에서 대상이 DONE이면 `useTickets.complete` 호출하도록 배선. `activeTicket.status
+      === 'DONE' || target.status === 'DONE'`이면 무조건 `complete()`를 호출해(대상 칼럼 인자 없이
+      토글) TC-INT-002-2의 역이동도 동일 분기로 처리
+- [x] Refactor — 불필요
 
-- [ ] Red — `__tests__/integration/deleteTicket.test.tsx` (TC-INT-003, `jest.mock('@/client/api/ticketApi')` 사용)
+- [x] Red — `__tests__/integration/deleteTicket.test.tsx` (TC-INT-003, `jest.mock('@/client/api/ticketApi')` 사용).
+      드래그가 없는 흐름이라 `@dnd-kit` 모킹 없이 실제 컴포넌트 트리 그대로 사용
   - TC-INT-003-1: 카드 클릭 → [삭제] → [확인] → `DELETE /:id` 호출, 카드 제거, 모달 닫힘
   - TC-INT-003-2: [삭제] → [취소] → `DELETE` 미호출, 카드/모달 유지
-- [ ] Green — `TicketModal.onDelete` → `useTickets.remove` → 성공 시 `selectedTicket=null`로
+- [x] Green — `TicketModal.onDelete` → `useTickets.remove` → 성공 시 `selectedTicket=null`로
       모달 닫기 배선
-- [ ] Refactor — 불필요
+- [x] Refactor — 불필요
 
 **완료 조건**: Phase 4가 끝나면 TEST_CASES.md의 TC-COMP-*, TC-INT-* 전체가 통과한다.
 
