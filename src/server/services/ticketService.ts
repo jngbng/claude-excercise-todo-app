@@ -214,12 +214,19 @@ export const reorder = async (input: ReorderTicketInput): Promise<TicketWithMeta
       startedAt = null;
     }
 
+    // reorder의 targetStatus는 DONE을 허용하지 않으므로(reorderTicketSchema), previousStatus가
+    // DONE이면 이 이동은 항상 "Done에서 나가는" 이동이다 — completedAt을 초기화한다
+    // (COMPONENT_SPEC.md §5.1 "completedAt 규칙 적용(Done에서 나올 때 초기화)").
+    const completedAt: Date | null | undefined =
+      previousStatus === TICKET_STATUS.DONE ? null : undefined;
+
     const [row] = await tx
       .update(tickets)
       .set({
         status: targetStatus,
         position: finalPosition,
         ...(startedAt !== undefined ? { startedAt } : {}),
+        ...(completedAt !== undefined ? { completedAt } : {}),
       })
       .where(eq(tickets.id, ticketId))
       .returning();

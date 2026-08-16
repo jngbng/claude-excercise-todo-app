@@ -90,6 +90,8 @@
 | TC-API-007-5 | 잘못된 status 값 | `{ ticketId, status: "INVALID" }` | 400, VALIDATION_ERROR |
 | TC-API-007-6 | 존재하지 않는 ticketId | `{ ticketId: 9999, status: "TODO", position: 0 }` | 404, NOT_FOUND |
 | TC-API-007-7 | position 간격 < 1 시 재정렬 | 기존 두 카드의 position 차이 < 1인 상태에서 삽입 | 200, 칼럼 전체 1024 간격으로 재정렬 후 반환 |
+| TC-API-007-8 | DONE → BACKLOG 이동 | id가 DONE 상태(completedAt 설정됨)에서 `{ ticketId, status: "BACKLOG", position: 0 }` | 200, status=BACKLOG, completedAt=null |
+| TC-API-007-9 | DONE → IN_PROGRESS 이동 | id가 DONE 상태(completedAt 설정됨)에서 `{ ticketId, status: "IN_PROGRESS", position: 0 }` | 200, status=IN_PROGRESS, completedAt=null |
 
 ---
 

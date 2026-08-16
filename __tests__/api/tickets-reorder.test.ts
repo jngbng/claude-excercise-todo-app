@@ -6,6 +6,7 @@
 import { eq } from 'drizzle-orm';
 import { NextRequest } from 'next/server';
 import { PATCH } from '@/app/api/tickets/reorder/route';
+import { PATCH as completePatch } from '@/app/api/tickets/[id]/complete/route';
 import { POST } from '@/app/api/tickets/route';
 import { closeDb, db } from '@/server/db';
 import { tickets } from '@/server/db/schema';
@@ -38,6 +39,11 @@ const reorderTicket = (body: unknown) =>
       body: JSON.stringify(body),
     }),
   );
+
+const completeTicket = (id: number | string) =>
+  completePatch(new NextRequest(`http://localhost/api/tickets/${id}/complete`, { method: 'PATCH' }), {
+    params: Promise.resolve({ id: String(id) }),
+  });
 
 describe('PATCH /api/tickets/reorder', () => {
   it('TC-API-007-1: BACKLOG에서 TODO로 이동하면 200과 함께 status=TODO, startedAt이 기록된다', async () => {
@@ -133,5 +139,29 @@ describe('PATCH /api/tickets/reorder', () => {
 
     expect(uniquePositions.size).toBe(positions.length);
     expect(body.status).toBe('BACKLOG');
+  });
+
+  it('TC-API-007-8: DONE에서 BACKLOG로 이동하면 200과 함께 completedAt이 초기화된다', async () => {
+    const ticket = await createTicket();
+    await completeTicket(ticket.id);
+
+    const response = await reorderTicket({ ticketId: ticket.id, status: 'BACKLOG', position: 0 });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.status).toBe('BACKLOG');
+    expect(body.completedAt).toBeNull();
+  });
+
+  it('TC-API-007-9: DONE에서 IN_PROGRESS로 이동하면 200과 함께 completedAt이 초기화된다', async () => {
+    const ticket = await createTicket();
+    await completeTicket(ticket.id);
+
+    const response = await reorderTicket({ ticketId: ticket.id, status: 'IN_PROGRESS', position: 0 });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.status).toBe('IN_PROGRESS');
+    expect(body.completedAt).toBeNull();
   });
 });

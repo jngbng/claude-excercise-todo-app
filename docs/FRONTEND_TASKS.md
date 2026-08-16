@@ -461,12 +461,14 @@ graph BT
       target 기준으로 수정: target === DONE → `complete()`, 그 외 → `reorder()` (COMPONENT_SPEC.md
       §5.1과 일치)
 - [x] Refactor — 불필요
-- [x] **알려진 백엔드 이슈 (미수정, 프론트엔드 스코프 밖)**: `src/server/services/ticketService.ts`의
-      `reorder()`는 `startedAt`만 조정하고 `completedAt`은 초기화하지 않는다. DONE에서
-      BACKLOG/TODO/IN_PROGRESS로 `reorder()`를 통해 나가는 티켓은 `completedAt`이 그대로 남는다
-      (COMPONENT_SPEC.md §5.1 "completedAt 규칙 적용(Done에서 나올 때 초기화)" 위반). 화면에
-      보이는 완료 표시(✓)는 `status === 'DONE'` 기준이라 시각적으로 드러나진 않지만 데이터
-      정합성 문제이므로 별도 백엔드 작업으로 처리 필요
+- [x] **백엔드 수정 완료 (2026-08-16)**: `src/server/services/ticketService.ts`의 `reorder()`가
+      `startedAt`만 조정하고 `completedAt`은 초기화하지 않던 문제를 수정했다 (COMPONENT_SPEC.md
+      §5.1 "completedAt 규칙 적용(Done에서 나올 때 초기화)" 위반이었음). `reorderTicketSchema`는
+      target status로 DONE을 허용하지 않으므로, `previousStatus === 'DONE'`이면 이 이동은 항상
+      "Done에서 나가는" 이동이라는 뜻이다 — 이 경우 `completedAt: null`을 함께 저장하도록
+      `startedAt`과 동일한 패턴으로 추가. `__tests__/api/tickets-reorder.test.ts`에 TC-API-007-8/9
+      (DONE→BACKLOG, DONE→IN_PROGRESS 모두 completedAt 초기화 확인) 추가, `docs/TEST_CASES.md`
+      TC-API-007 표에도 반영
 
 - [x] Red — `__tests__/integration/deleteTicket.test.tsx` (TC-INT-003, `jest.mock('@/client/api/ticketApi')` 사용).
       드래그가 없는 흐름이라 `@dnd-kit` 모킹 없이 실제 컴포넌트 트리 그대로 사용
