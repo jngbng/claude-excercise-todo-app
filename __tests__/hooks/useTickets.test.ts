@@ -177,4 +177,27 @@ describe('complete', () => {
     expect(result.current.board).toEqual(initialBoard);
     expect(result.current.error).toBe('서버 오류가 발생했습니다');
   });
+
+  it('이미 done인 티켓에 다시 호출해도 낙관적 업데이트가 done 칼럼을 유지한다', async () => {
+    const deferred = createDeferred<TicketWithMeta>();
+    mockedApi.completeTicket.mockReturnValue(deferred.promise);
+    const ticket = makeTicket({ id: 1, status: 'DONE', completedAt: '2026-06-28T11:30:00.000Z' });
+
+    const { result } = renderHook(() => useTickets({ ...emptyBoard(), done: [ticket] }));
+
+    act(() => {
+      void result.current.complete(1);
+    });
+
+    expect(result.current.board.done).toHaveLength(1);
+
+    const recompleted: TicketWithMeta = { ...ticket, completedAt: '2026-06-28T12:00:00.000Z' };
+    await act(async () => {
+      deferred.resolve(recompleted);
+      await deferred.promise;
+    });
+
+    expect(result.current.board.done).toEqual([recompleted]);
+    expect(mockedApi.completeTicket).toHaveBeenCalledWith(1);
+  });
 });

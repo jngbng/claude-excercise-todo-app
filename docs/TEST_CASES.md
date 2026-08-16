@@ -64,7 +64,7 @@
 | TC ID | 시나리오 | 입력값 | 기대 결과 |
 |-------|----------|--------|-----------|
 | TC-API-005-1 | 비-DONE 티켓 → DONE 처리 | id=1 (status=BACKLOG) | 200, status=DONE, completedAt=현재시각 |
-| TC-API-005-2 | DONE 티켓 → 복귀 (토글) | id=1 (status=DONE) | 200, status=IN_PROGRESS, completedAt=null |
+| TC-API-005-2 | 이미 DONE인 티켓에 재호출 (멱등) | id=1 (status=DONE) | 200, status=DONE 유지, completedAt=현재시각으로 갱신 |
 | TC-API-005-3 | 존재하지 않는 ID | id=9999 | 404, NOT_FOUND |
 
 ---
@@ -214,10 +214,8 @@
 | TC-INT-002-3 | DONE 카드 완료 표시 | DONE 칼럼 이동 후 | 카드에 완료 표시(✓) 렌더링 |
 
 > **분기 기준**: DnD 이동의 API 분기는 드롭 "대상(target)" 칼럼 기준이다 — target이 DONE일 때만
-> `/complete`(토글)를 호출하고, 그 외(BACKLOG/TODO/IN_PROGRESS)는 출발 칼럼이 DONE이든 아니든
-> 항상 `/reorder`를 호출한다(COMPONENT_SPEC.md §5.1). 출발 칼럼 기준으로 분기하면 DONE 카드를
-> BACKLOG/TODO로 드롭해도 무조건 IN_PROGRESS로 토글되어 버리는 버그가 생긴다(2026-08-16 실사용
-> 중 발견·수정).
+> `/complete`를 호출하고, 그 외(BACKLOG/TODO/IN_PROGRESS)는 출발 칼럼이 DONE이든 아니든 항상
+> `/reorder`를 호출한다(COMPONENT_SPEC.md §5.1).
 
 ---
 
@@ -238,9 +236,9 @@
 | TC-API-002 | FR-002 | US-003 | GET /api/tickets 보드 조회 및 정렬 |
 | TC-API-003 | FR-003 | US-007 | GET /api/tickets/:id 단건 조회 |
 | TC-API-004 | FR-004 | US-007 | PATCH /api/tickets/:id 부분 수정 |
-| TC-API-005 | FR-005 | US-006 | PATCH /api/tickets/:id/complete 완료 토글 |
+| TC-API-005 | FR-005 | US-006 | PATCH /api/tickets/:id/complete 완료 처리 |
 | TC-API-006 | FR-006 | US-008 | DELETE /api/tickets/:id 하드 삭제 |
-| TC-API-007 | FR-007 | US-005, US-006 | PATCH /api/tickets/reorder 상태·순서 변경 |
+| TC-API-007 | FR-007 | US-005, US-006 | PATCH /api/tickets/reorder 상태·순서 변경 (DONE에서 나가는 이동 포함) |
 | TC-API-008 | FR-008 | US-004 | isOverdue 파생 필드 계산 |
 | TC-COMP-001 | FR-008 | US-004 | TicketCard 렌더링, 오버듀·우선순위 표시 |
 | TC-COMP-002 | FR-002 | US-003 | Column 칼럼·카드 수 렌더링 |
@@ -250,5 +248,5 @@
 | TC-COMP-006 | FR-006 | US-008 | ConfirmDialog 삭제 확인 흐름 |
 | TC-COMP-007 | — | — | FilterBar 필터 토글 및 강조 상태 |
 | TC-INT-001 | FR-007 | US-005 | DnD 이동, 낙관적 업데이트, 실패 롤백 |
-| TC-INT-002 | FR-005, FR-007 | US-006 | DONE 완료 처리, 역이동 토글, 완료 표시 |
+| TC-INT-002 | FR-005, FR-007 | US-006 | DONE 완료 처리, DONE에서의 역이동(reorder), 완료 표시 |
 | TC-INT-003 | FR-006 | US-008 | 티켓 삭제 전체 흐름 (모달→확인→보드 반영) |

@@ -45,7 +45,7 @@ describe('PATCH /api/tickets/:id/complete', () => {
     expect(body.completedAt).toEqual(expect.any(String));
   });
 
-  it('TC-API-005-2: DONE 티켓을 다시 호출하면 200과 함께 status=IN_PROGRESS, completedAt=null로 복귀한다', async () => {
+  it('TC-API-005-2: 이미 DONE인 티켓을 다시 호출해도 200과 함께 DONE 상태를 유지한다', async () => {
     const ticket = await createTicket();
     await completeTicket(ticket.id);
 
@@ -53,8 +53,8 @@ describe('PATCH /api/tickets/:id/complete', () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.status).toBe('IN_PROGRESS');
-    expect(body.completedAt).toBeNull();
+    expect(body.status).toBe('DONE');
+    expect(body.completedAt).toEqual(expect.any(String));
   });
 
   it('TC-API-005-3: 존재하지 않는 ID를 완료 처리하려 하면 404와 NOT_FOUND를 반환한다', async () => {

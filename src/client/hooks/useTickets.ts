@@ -169,12 +169,10 @@ export const useTickets = (initialData: BoardData): UseTicketsReturn => {
       const current = findTicketInBoard(boardRef.current, id);
       if (!current) return;
 
-      const nextStatus: TicketStatus =
-        current.status === TICKET_STATUS.DONE ? TICKET_STATUS.IN_PROGRESS : TICKET_STATUS.DONE;
       const optimisticTicket: TicketWithMeta = {
         ...current,
-        status: nextStatus,
-        completedAt: nextStatus === TICKET_STATUS.DONE ? new Date().toISOString() : null,
+        status: TICKET_STATUS.DONE,
+        completedAt: new Date().toISOString(),
       };
 
       await runAction(

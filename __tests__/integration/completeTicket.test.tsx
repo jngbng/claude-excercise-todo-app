@@ -100,10 +100,6 @@ describe("TC-INT-002: DONE 완료 처리 및 역이동", () => {
     expect(screen.getByText("진행중 티켓")).toBeInTheDocument();
   });
 
-  // 분기는 드롭 "대상(target)" 칼럼 기준이어야 한다 — 출발 칼럼(DONE)을 기준으로 삼으면
-  // useTickets.complete()가 드롭 위치와 무관하게 항상 IN_PROGRESS로 토글해버려, DONE 카드를
-  // BACKLOG/TODO로 드롭해도 IN_PROGRESS로 가버리는 버그가 있었다 (docs/COMPONENT_SPEC.md §5.1
-  // 위반). target === DONE일 때만 complete()를 호출해야 한다.
   it("TC-INT-002-2: DONE 카드를 IN_PROGRESS로 드래그하면 reorder API가 호출되고 IN_PROGRESS로 이동한다", async () => {
     const ticket = createTicket({
       id: 2,

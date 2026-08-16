@@ -469,6 +469,17 @@ graph BT
       `startedAt`과 동일한 패턴으로 추가. `__tests__/api/tickets-reorder.test.ts`에 TC-API-007-8/9
       (DONE→BACKLOG, DONE→IN_PROGRESS 모두 completedAt 초기화 확인) 추가, `docs/TEST_CASES.md`
       TC-API-007 표에도 반영
+- [x] **`complete` 일방향화 완료 (2026-08-16)**: target 기준 분기로 고치고 나니 DnD 경로에서
+      `useTickets.complete()`/`ticketService.complete()`의 "이미 DONE이면 IN_PROGRESS로 토글"
+      분기가 도달 불가능한 죽은 코드가 되었다(target === DONE일 때만 호출되므로 항상 진입 상태가
+      비-DONE). REQUIREMENTS.md FR-005·COMPONENT_SPEC.md §4도 애초에 `complete`를 "Done으로
+      이동, completedAt 자동 설정"이라는 일방향 동작으로만 정의하고 있어(토글 언급 없음), 토글
+      분기는 스펙에도 없던 것이었다. 두 곳 모두 무조건 `status: DONE, completedAt: NOW()`로
+      갱신하도록 단순화(이미 DONE이어도 멱등하게 `completedAt`만 갱신). `docs/API_SPECS.md`
+      `/complete` 절과 `docs/TEST_CASES.md` TC-API-005-2를 "일방향/멱등" 기준으로 갱신,
+      `__tests__/api/tickets-id-complete.test.ts`(TC-API-005-2)와
+      `__tests__/hooks/useTickets.test.ts`(낙관적 업데이트가 done 유지하는지 확인)에 회귀 테스트
+      추가
 
 - [x] Red — `__tests__/integration/deleteTicket.test.tsx` (TC-INT-003, `jest.mock('@/client/api/ticketApi')` 사용).
       드래그가 없는 흐름이라 `@dnd-kit` 모킹 없이 실제 컴포넌트 트리 그대로 사용

@@ -127,17 +127,13 @@ export const remove = async (id: number): Promise<boolean> => {
 };
 
 export const complete = async (id: number): Promise<TicketWithMeta | null> => {
-  const [existing] = await db.select().from(tickets).where(eq(tickets.id, id));
-  if (!existing) return null;
+  const [row] = await db
+    .update(tickets)
+    .set({ status: TICKET_STATUS.DONE, completedAt: new Date() })
+    .where(eq(tickets.id, id))
+    .returning();
 
-  const values =
-    existing.status === TICKET_STATUS.DONE
-      ? { status: TICKET_STATUS.IN_PROGRESS, completedAt: null }
-      : { status: TICKET_STATUS.DONE, completedAt: new Date() };
-
-  const [row] = await db.update(tickets).set(values).where(eq(tickets.id, id)).returning();
-
-  return toTicket(row);
+  return row ? toTicket(row) : null;
 };
 
 // position(=클라이언트가 계산한 대상 칼럼 내 0-based 삽입 인덱스, docs/TRD.md 드래그앤드롭 흐름
