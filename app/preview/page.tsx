@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { Button } from "@/client/components/ui/Button";
 import { Modal } from "@/client/components/ui/Modal";
 import { ConfirmDialog } from "@/client/components/ui/ConfirmDialog";
@@ -21,7 +21,8 @@ import { FilterBar } from "@/client/components/FilterBar";
 import { TicketModal } from "@/client/components/TicketModal";
 import { Column } from "@/client/components/Column";
 import { BoardHeader } from "@/client/components/BoardHeader";
-import type { TicketWithMeta } from "@/shared/types";
+import { Board } from "@/client/components/Board";
+import type { BoardData, TicketWithMeta } from "@/shared/types";
 
 type PreviewSectionProps = {
   title: string;
@@ -84,6 +85,20 @@ const PreviewPage = () => {
   const [ticketModalLog, setTicketModalLog] = useState<string>("");
   const [columnClickLog, setColumnClickLog] = useState<string>("");
   const [boardHeaderLog, setBoardHeaderLog] = useState<string>("");
+  const [boardData] = useState<BoardData>({
+    backlog: [
+      { ...ticketModalTicket, id: 201, title: "백로그 티켓 1", status: "BACKLOG" },
+      { ...ticketModalTicket, id: 202, title: "백로그 티켓 2", status: "BACKLOG" },
+    ],
+    todo: [{ ...ticketModalTicket, id: 203, title: "투두 티켓", status: "TODO" }],
+    inProgress: [{ ...ticketModalTicket, id: 204, title: "진행중 티켓", status: "IN_PROGRESS" }],
+    done: [],
+  });
+  const [boardTicketClickLog, setBoardTicketClickLog] = useState<string>("");
+  const [boardDragEndLog, setBoardDragEndLog] = useState<string>("");
+  const handleBoardDragEnd = (event: DragEndEvent) => {
+    setBoardDragEndLog(`onDragEnd: active=${event.active.id}, over=${event.over?.id ?? "null"}`);
+  };
   const isBodyScrollLocked = useBodyScrollLocked();
   const previewDndSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -321,8 +336,31 @@ const PreviewPage = () => {
         </div>
       </PreviewSection>
 
-      {/* Phase 2: BoardHeader, FilterBar 등 */}
-      <PreviewSection title="Phase 2" />
+      {/* Phase 2: Board 등 */}
+      <PreviewSection title="Phase 2">
+        <div>
+          <p className="mb-2 text-sm text-text-primary">
+            Board (카드를 실제로 드래그해보세요 — 대상 칼럼 판별/API 분기는 아직 미구현인
+            BoardContainer의 책임이라 카드 위치는 바뀌지 않고, 아래에 onDragEnd 이벤트 로그만
+            표시됩니다)
+          </p>
+          <Board
+            board={boardData}
+            onTicketClick={(ticket) => setBoardTicketClickLog(`onTicketClick(${ticket.id})`)}
+            onDragEnd={handleBoardDragEnd}
+          />
+          {boardTicketClickLog && (
+            <p data-testid="board-ticket-click-log" className="mt-3 text-sm text-text-secondary">
+              {boardTicketClickLog}
+            </p>
+          )}
+          {boardDragEndLog && (
+            <p data-testid="board-drag-end-log" className="mt-1 text-sm text-text-secondary">
+              {boardDragEndLog}
+            </p>
+          )}
+        </div>
+      </PreviewSection>
 
       {/* Phase 3: TicketModal, TicketForm 등 */}
       <PreviewSection title="Phase 3" />

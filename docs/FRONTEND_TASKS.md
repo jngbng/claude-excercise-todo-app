@@ -387,16 +387,26 @@ graph BT
 
 **역할**: `DndContext` + `DragOverlay`로 4개 `Column`(Backlog 사이드바 + 3칼럼) 배치.
 
-- [ ] Red — `__tests__/components/Board.test.tsx` (TEST_CASES.md 미기재 — TC-INT-001-3의 렌더링
-      측면만 컴포넌트 단위로 선검증하고, 실제 이동 결과는 BoardContainer 통합 테스트에서 검증)
+- [x] Red — `__tests__/components/Board.test.tsx` (TEST_CASES.md 미기재 — TC-INT-001-3의 렌더링
+      측면만 컴포넌트 단위로 선검증하고, 실제 이동 결과는 BoardContainer 통합 테스트에서 검증).
+      jsdom이 네이티브 `PointerEvent`를 지원하지 않아 실제 포인터 드래그 물리를 `fireEvent`로
+      재현할 수 없으므로, `@dnd-kit/core`의 `DndContext`/`DragOverlay`만 부분 모킹해
+      `onDragStart`/`onDragEnd` 콜백을 직접 호출하는 방식으로 검증 (FRONTEND_TASKS.md 0장의
+      "DragStart/DragEnd 콜백 테스트" 지침 적용)
   - `board` prop의 4개 칼럼(backlog/todo/inProgress/done)이 각각 `Column`으로 렌더링됨
   - 드래그 시작(`onDragStart` 트리거) 시 `DragOverlay`에 활성 카드가 표시됨
   - 카드 클릭 시 `onTicketClick` 위임 확인
-- [ ] Green — `DndContext`/`DragOverlay` 배치, `Column` 4개 렌더링, 반응형 레이아웃(desktop
-      1024px~ 4칼럼, tablet 768px~ 2칼럼, mobile 360px~ 단일 칼럼)은 Tailwind 브레이크포인트로
-      구현
-- [ ] Refactor — `onDragEnd`에서 대상 칼럼 판별 로직은 `Board`가 아니라 `BoardContainer`가
-      소유하도록 책임 분리 재확인 (COMPONENT_SPEC §2.1 — API 분기는 BoardContainer 책임)
+- [x] Green — `DndContext`/`DragOverlay` 배치, `Column` 4개 렌더링, 반응형 레이아웃(desktop
+      1024px~ 4칼럼(`lg:grid-cols-4`), tablet 768px~ 2칼럼(`md:grid-cols-2`), mobile 360px~
+      단일 칼럼(기본 `grid-cols-1`))은 Tailwind 브레이크포인트로 구현. `PointerSensor`는 Column과
+      동일하게 `activationConstraint: { distance: 8 }`로 구성해 클릭/드래그를 구분. `DragOverlay`
+      복제 카드는 `TicketCard`를 재사용하지 않고 별도 프리젠테이션 컴포넌트(`TicketCardPreview`)로
+      구현 — `TicketCard`가 내부에서 `useSortable`을 호출하므로 그대로 재사용하면 원본과 같은
+      티켓 id로 dnd-kit `draggableNodes` 등록이 충돌하기 때문
+- [x] Refactor — `onDragEnd`에서 대상 칼럼 판별 로직은 `Board`가 아니라 `BoardContainer`가
+      소유하도록 책임 분리 재확인 (COMPONENT_SPEC §2.1 — API 분기는 BoardContainer 책임). `Board`의
+      `handleDragEnd`는 `activeId` 초기화 후 `onDragEnd` prop으로 이벤트를 그대로 전달만 하고
+      대상 칼럼/상태 판별 로직을 갖지 않음을 확인
 
 ---
 
