@@ -629,3 +629,10 @@ BoardContainer 에서 DND 동작에 오류가 있는데 원인을 파악해줘:
 
 2026-08-16 17:36
 이어서 backend도 수정해줘.
+
+---
+
+2026-08-16 17:43
+API_SPECS.md 도 업데이트 해줘.
+- complete api 설명에서 DONE을 다른 상태로 복귀 시킨다는 문구가 틀렸어.
+- reorder api 에서 DONE을 다른 상태로 변환할 때도 이 API를 사용한다는 언급을 추가해줘.

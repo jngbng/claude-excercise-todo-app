@@ -299,7 +299,7 @@ type TicketWithMeta = Ticket & {
 
 ### PATCH `/api/tickets/:id/complete`
 
-티켓을 `DONE` 상태로 완료 처리하거나 `DONE`에서 다른 상태로 복귀시킨다.
+티켓을 `DONE` 상태로 완료 처리한다.
 
 **관련 FR**: FR-005
 
@@ -313,10 +313,9 @@ Body 없음.
 
 #### 처리 규칙
 
-| 현재 상태 | 호출 결과 |
-|-----------|-----------|
-| `DONE` 이외 | `status = DONE`, `completed_at = NOW()` |
-| `DONE` | `status = IN_PROGRESS`, `completed_at = null` |
+현재 상태와 무관하게 항상 `status = DONE`, `completed_at = NOW()`로 갱신한다. 이미 `DONE`인
+티켓에 다시 호출해도 `DONE` 상태를 유지하며 `completed_at`만 현재 시각으로 갱신된다(멱등,
+토글 아님).
 
 > Done 칼럼에는 `completed_at` 기준 24시간 이내 티켓만 표시된다 (조회 시 필터링).
 
@@ -345,7 +344,9 @@ Body 없음.
 
 ### PATCH `/api/tickets/reorder`
 
-티켓을 다른 칼럼으로 이동하거나 같은 칼럼 내 순서를 변경한다. `DONE` 이동은 이 엔드포인트에서 허용하지 않는다.
+티켓을 다른 칼럼으로 이동하거나 같은 칼럼 내 순서를 변경한다. `status`(이동 대상)로 `DONE`을
+지정하는 것은 허용하지 않는다 — `DONE`으로 들어가는 이동은 `PATCH /api/tickets/:id/complete`를
+사용한다. 그 외 이동은 모두 이 엔드포인트를 사용한다.
 
 **관련 FR**: FR-007
 
@@ -383,6 +384,7 @@ Body 없음.
 |-----------|------|
 | 어느 칼럼 → `TODO` | `started_at = NOW()` |
 | `TODO` → `BACKLOG` | `started_at = null` |
+| `DONE` → `BACKLOG`/`TODO`/`IN_PROGRESS` | `completed_at = null` |
 | 그 외 이동 | 변경 없음 |
 
 - `status`, `position`, `updated_at` 동시 업데이트
