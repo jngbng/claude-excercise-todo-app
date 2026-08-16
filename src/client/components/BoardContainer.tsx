@@ -144,6 +144,10 @@ export const BoardContainer = ({ initialData }: BoardContainerProps) => {
     const target = resolveDropTarget(board, activeId, over.id);
     if (!target) return;
 
+    const originalColumn = board[STATUS_TO_COLUMN[activeTicket.status]];
+    const originalIndex = originalColumn.findIndex((ticket) => ticket.id === activeId);
+    if (target.status === activeTicket.status && target.index === originalIndex) return;
+
     if (target.status === TICKET_STATUS.DONE) {
       void complete(activeId);
       return;

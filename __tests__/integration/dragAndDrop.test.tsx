@@ -115,19 +115,32 @@ describe("TC-INT-001: 드래그앤드롭 — 이동 및 롤백", () => {
     expect(mockedApi.reorderTicket).toHaveBeenCalledWith(ticketB.id, "TODO", 0);
   });
 
-  it("카드를 제자리(자기 자신 위)에 드롭하면 원래 인덱스로 reorder API가 호출된다", async () => {
+  it("카드를 제자리(자기 자신 위)에 드롭하면 실질적 변화가 없으므로 reorder API가 호출되지 않는다", async () => {
     const ticketA = createTicket({ id: 1, title: "티켓A", status: "TODO", position: 0 });
     const ticketB = createTicket({ id: 2, title: "티켓B", status: "TODO", position: 1024 });
     const ticketC = createTicket({ id: 3, title: "티켓C", status: "TODO", position: 2048 });
-    mockedApi.reorderTicket.mockResolvedValue(ticketB);
 
     render(
       <BoardContainer initialData={createBoard({ todo: [ticketA, ticketB, ticketC] })} />,
     );
 
-    await triggerDragEnd(ticketB.id, ticketB.id, mockedApi.reorderTicket);
+    await act(async () => {
+      mockDndHandlers.onDragEnd?.(dragEndEvent(ticketB.id, ticketB.id));
+    });
 
-    expect(mockedApi.reorderTicket).toHaveBeenCalledWith(ticketB.id, "TODO", 1);
+    expect(mockedApi.reorderTicket).not.toHaveBeenCalled();
+  });
+
+  it("빈 칼럼 배경이 아니라 같은 위치의 칼럼 컨테이너 위로 드롭해도 reorder API가 호출되지 않는다", async () => {
+    const ticket = createTicket({ id: 1, title: "티켓A", status: "BACKLOG", position: 0 });
+
+    render(<BoardContainer initialData={createBoard({ backlog: [ticket] })} />);
+
+    await act(async () => {
+      mockDndHandlers.onDragEnd?.(dragEndEvent(ticket.id, "BACKLOG"));
+    });
+
+    expect(mockedApi.reorderTicket).not.toHaveBeenCalled();
   });
 
   it("카드를 자신보다 뒤에 있는 카드 위로 드롭하면(아래로 이동) 그 카드 다음 자리로 reorder API가 호출된다", async () => {
